@@ -450,6 +450,25 @@
     ericActions.onload=()=>{actionsReady=ericActions.naturalWidth===1774 && ericActions.naturalHeight===887;};
     ericActions.onerror=()=>{actionsReady=false;};
     if(ERIC_ACTIONS_URL)ericActions.src=ERIC_ACTIONS_URL;
+    // Corrida: oito fases menores do MESMO passo. A última coluna é a
+    // âncora horizontal medida pelo rosto, evitando que a cabeça salte.
+    const ERIC_RUN_URL='eric-run.png?v=7';
+    const runFrames=[
+      [68,1,326,443,247],[498,1,303,443,660.5],
+      [934,1,311,443,1104],[1386,1,303,443,1548.5],
+      [59,448,330,433,224],[491,444,304,437,649.5],
+      [955,444,287,437,1102.5],[1386,444,329,434,1553]
+    ];
+    const ericRun=new Image();let runReady=false;
+    ericRun.onload=()=>{runReady=ericRun.naturalWidth===1774 && ericRun.naturalHeight===887;};
+    ericRun.onerror=()=>{runReady=false;};ericRun.src=ERIC_RUN_URL;
+    // Rugido separado: expressão e garras inspiradas na referência original.
+    // Se faltar este PNG, a pose antiga da folha continua disponível.
+    const ERIC_ROAR_URL='eric-roar.png?v=7';
+    const roarFrame=[110,11,1031,1273];
+    const ericRoar=new Image();let roarReady=false;
+    ericRoar.onload=()=>{roarReady=ericRoar.naturalWidth===1199 && ericRoar.naturalHeight===1312;};
+    ericRoar.onerror=()=>{roarReady=false;};ericRoar.src=ERIC_ROAR_URL;
     const ericImage = new Image();
     let imageReady=false;
     ericImage.onload=()=>{ imageReady=true; };
@@ -845,8 +864,19 @@
       }
       ctx.save();if(state.hurt>0 && Math.floor(state.time*10)%2===0)ctx.globalAlpha=.36;
       ctx.translate(x,y);ctx.rotate(tilt);
-      if(actionsReady) {
-        const index=engine.spriteFrame(state),f=actionFrames[index];
+      const index=engine.spriteFrame(state);
+      if(index<4 && runReady) {
+        // Duas fases visuais para cada fase da física: cerca de 16 quadros/s
+        // na velocidade normal. O turbo acompanha a distância percorrida.
+        const f=runFrames[Math.floor(p.stride*2)%runFrames.length];
+        const scale=size/440;
+        ctx.drawImage(ericRun,f[0],f[1],f[2],f[3],(f[0]-f[4])*scale,-f[3]*scale,f[2]*scale,f[3]*scale);
+      } else if(index===6 && roarReady) {
+        // Agachado, ele fica um pouco mais baixo; as solas seguem no chão.
+        const f=roarFrame,height=size*.85,scale=height/f[3];
+        ctx.drawImage(ericRoar,f[0],f[1],f[2],f[3],-f[2]*scale*.5,-height,f[2]*scale,height);
+      } else if(actionsReady) {
+        const f=actionFrames[index];
         const scale=size/432;
         const rootX=(index%4)*443+260;
         ctx.drawImage(ericActions,f[0],f[1],f[2],f[3],(f[0]-rootX)*scale,-f[3]*scale,f[2]*scale,f[3]*scale);

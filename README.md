@@ -8,11 +8,11 @@ A publicação usa o GitHub Pages, a partir da raiz da branch `main`. Alteraçõ
 
 ## Abrir e brincar
 
-Abra `index.html` com um navegador moderno. Mantenha `eric.png` e `eric-actions.png` na mesma pasta. Funciona localmente e sem internet, sem instalação e sem bibliotecas externas.
+Abra `index.html` com um navegador moderno. Mantenha `eric.png`, `eric-actions.png`, `eric-run.png` e `eric-roar.png` na mesma pasta. Funciona localmente e sem internet, sem instalação e sem bibliotecas externas.
 
 No celular, vire o aparelho para **landscape (horizontal)**. O jogo ocupa a área disponível do navegador, com RUGIR à esquerda e PULAR à direita e margens para recortes da tela. Na vertical, aparece um convite para virar o aparelho; uma corrida em andamento pausa, preservando progresso e poderes. Ao voltar para a horizontal, toque em Continuar. A orientação do aparelho é feita pelo usuário; a página se adapta a ela.
 
-Todo o HTML, CSS e JavaScript do jogo está em **um único arquivo: `index.html`**. As imagens externas são a folha de animação `eric-actions.png` e o personagem de reserva `eric.png`.
+Todo o HTML, CSS e JavaScript do jogo está em **um único arquivo: `index.html`**. As imagens externas são a corrida `eric-run.png`, o rugido `eric-roar.png`, a folha das demais ações `eric-actions.png` e o personagem de reserva `eric.png`.
 
 - **Começar:** botão “Vamos correr!”, toque no cenário ou Espaço.
 - **Pular:** toque no cenário, botão PULAR, Espaço ou seta para cima.
@@ -36,7 +36,9 @@ O jogo pausa ao sair da aba. A pausa preserva o tempo dos poderes.
 
 ## Animação com os pés no chão
 
-`eric-actions.png` contém oito imagens em uma grade 4 × 2: quatro passos, salto, chute, rugido e descanso. A velocidade de troca dos passos acompanha a corrida. Os retângulos de cada quadro foram medidos pelo canal alfa; a sola fica apoiada no chão. O personagem só sobe quando a física está em um salto.
+`eric-run.png` contém oito etapas menores de um ciclo de corrida em uma grade 4 × 2. A velocidade de troca acompanha a distância percorrida, com cerca de 16 quadros por segundo na velocidade normal. A posição horizontal do rosto foi medida em cada quadro e usada como âncora para evitar deslocamentos bruscos da cabeça. Os retângulos foram medidos pelo canal alfa; a sola fica apoiada no chão. O personagem só sobe quando a física está em um salto.
+
+`eric-roar.png` mostra uma pose frontal agachada, com olhos semicerrados, nariz franzido, boca bem aberta e mãos em garras, inspirada na pose RUGIDO da referência original. `eric-actions.png` mantém salto, chute e descanso, além das poses anteriores de reserva. Se um dos novos PNGs faltar, o jogo usa a folha anterior.
 
 A pose de chute aparece ao encontrar a bola. A pose de rugido acompanha o especial acionado pelo botão ou pela tecla R. O rugido também funciona no ar, mantendo a pose de salto. Na tela de início e durante a pausa, o Eric fica em pé.
 
@@ -63,7 +65,7 @@ const ERIC_IMAGE_URL = 'eric.png?v=6';
 
 Há comentários em português nessa seção. Para mostrar exclusivamente uma nova imagem estática, deixe `ERIC_ACTIONS_URL = ''`. Se trocar a folha de animação, ajuste os retângulos em `actionFrames`, a escala de referência e a verificação das dimensões no evento `onload`. O salto inclina levemente o personagem. Se as imagens estiverem ausentes, um desenho provisório permite continuar brincando.
 
-As imagens foram geradas com a ferramenta integrada a partir do personagem e das fotos de referência. A versão atual usa a pose frontal aprovada pelo pai como referência fixa do rosto nas oito ações, com o rosto mais voltado à câmera. O PNG de reserva também mantém essa pose aprovada. O sufixo `?v=6` evita reutilizar as imagens antigas armazenadas pelo navegador; o nome dos arquivos continua o mesmo. Os prompts do refinamento estão em `output/imagegen/eric-approved-face-prompts.md`.
+As imagens foram geradas com a ferramenta integrada a partir do personagem e das fotos de referência. A versão atual usa a pose frontal aprovada pelo pai como referência fixa do rosto, com o rosto mais voltado à câmera. O PNG de reserva também mantém essa pose aprovada. Os sufixos `?v=6` e `?v=7` evitam reutilizar as imagens antigas armazenadas pelo navegador; o nome dos arquivos continua o mesmo. Os prompts estão em `output/imagegen/eric-approved-face-prompts.md` e `output/imagegen/eric-fluid-run-and-roar-prompts.md`.
 
 ## Verificação
 

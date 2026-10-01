@@ -30,10 +30,14 @@ async function observe(page) {
     };
     const drawImage=CanvasRenderingContext2D.prototype.drawImage;
     CanvasRenderingContext2D.prototype.drawImage=function(image,...args) {
-      if(image.src?.split('?')[0].endsWith('/eric-actions.png') && args.length===8) {
+      const asset=image.src?.split('?')[0].split('/').pop();
+      if(['eric-actions.png','eric-run.png','eric-roar.png'].includes(asset) && args.length===8) {
         const transform=this.getTransform();
         const bottom=transform.transformPoint({x:0,y:args[5]+args[7]});
-        __spriteDraws.push({sx:args[0],sy:args[1],sole:bottom.y/transform.d,lift:globalThis.__observedState?.player.lift || 0});
+        const faces={'68,1':297,'498,1':710.5,'934,1':1154,'1386,1':1598.5,'59,448':274,'491,444':699.5,'955,444':1152.5,'1386,444':1603};
+        const center=faces[`${args[0]},${args[1]}`];
+        const head=center===undefined?null:transform.transformPoint({x:args[4]+(center-args[0])*args[6]/args[2],y:0}).x/transform.a;
+        __spriteDraws.push({asset,sx:args[0],sy:args[1],head,sole:bottom.y/transform.d,lift:globalThis.__observedState?.player.lift || 0});
         if(__spriteDraws.length>1500)__spriteDraws.shift();
       }
       return drawImage.call(this,image,...args);
@@ -78,9 +82,11 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await page.evaluate(()=>{__spriteDraws=[];});
     await page.getByRole('button', { name: 'Vamos correr!' }).click();
     await page.waitForTimeout(600);
-    const walking=await page.evaluate(()=>__spriteDraws.filter(d=>d.sy<10));
-    assert.equal(new Set(walking.map(d=>d.sx)).size,4,'a corrida percorre os quatro passos');
-    assert.ok(walking.every(d=>Math.abs(d.sole-436)<.5),'os pés dos quatro passos tocam o chão');
+    const walking=await page.evaluate(()=>__spriteDraws.filter(d=>d.asset==='eric-run.png'));
+    assert.equal(new Set(walking.map(d=>`${d.sx},${d.sy}`)).size,8,'a corrida percorre as oito fases novas');
+    assert.ok(walking.every(d=>Math.abs(d.sole-436)<.5),'as solas das oito fases tocam o chão');
+    const heads=walking.map(d=>d.head);
+    assert.ok(Math.max(...heads)-Math.min(...heads)<.5,'a cabeça mantém a mesma âncora durante todo o ciclo');
     await page.locator('canvas').focus();
     await page.keyboard.press('Space');
     await page.waitForTimeout(100);
@@ -132,7 +138,8 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     });
     await page.locator('canvas').focus();
     await page.keyboard.press('r');
-    await page.waitForFunction(()=>__spriteDraws.some(d=>d.sx===905 && d.sy===447));
+    await page.waitForFunction(()=>__spriteDraws.some(d=>d.asset==='eric-roar.png'));
+    assert.ok(await page.evaluate(()=>__spriteDraws.filter(d=>d.asset==='eric-roar.png').every(d=>Math.abs(d.sole-436)<.5)),'rugido agachado mantém as solas no chão');
     await page.waitForFunction(()=>__observedState.scared===3);
     assert.ok(await page.evaluate(()=>__observedState.mobs.filter(m=>!RunnerEngine.isEnemy(m)).every(m=>!m.fleeing)),'rugido poupa os animais amigos');
     const playedSamples=await page.evaluate(()=>__sampleStarts);
@@ -226,7 +233,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
     assert.ok(await mobile.evaluate(() => Number.isFinite(__observedState.player.x)));
     assert.deepEqual(mobileErrors, [],JSON.stringify(await mobile.evaluate(()=>__canvasErrors)));
-    console.log('PASS:',url,'; passos no chão; novo rugido vocal; sete gravações; travessos fogem; amigos protegidos; toque; landscape 844×390 e 667×320; aviso na vertical; pausa preserva poderes; nenhum erro de JavaScript.');
+    console.log('PASS:',url,'; oito fases de corrida; cabeça estável; solas no chão; nova pose de rugido; sete gravações; travessos fogem; amigos protegidos; toque; landscape 844×390 e 667×320; pausa preserva poderes; nenhum erro de JavaScript.');
     console.log('Capturas:', output);
   } finally { await browser.close(); }
 })().catch(e => { console.error(e); process.exitCode = 1; });
