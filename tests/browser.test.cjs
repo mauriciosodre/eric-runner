@@ -37,7 +37,7 @@ async function observe(page) {
         const faces={'68,1':297,'498,1':710.5,'934,1':1154,'1386,1':1598.5,'59,448':274,'491,444':699.5,'955,444':1152.5,'1386,444':1603};
         const center=faces[`${args[0]},${args[1]}`];
         const head=center===undefined?null:transform.transformPoint({x:args[4]+(center-args[0])*args[6]/args[2],y:0}).x/transform.a;
-        __spriteDraws.push({asset,sx:args[0],sy:args[1],head,sole:bottom.y/transform.d,lift:globalThis.__observedState?.player.lift || 0});
+        __spriteDraws.push({asset,sx:args[0],sy:args[1],head,localSole:args[5]+args[7],sole:bottom.y/transform.d,lift:globalThis.__observedState?.player.lift || 0});
         if(__spriteDraws.length>1500)__spriteDraws.shift();
       }
       return drawImage.call(this,image,...args);
@@ -139,7 +139,9 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await page.locator('canvas').focus();
     await page.keyboard.press('r');
     await page.waitForFunction(()=>__spriteDraws.some(d=>d.asset==='eric-roar.png'));
-    assert.ok(await page.evaluate(()=>__spriteDraws.filter(d=>d.asset==='eric-roar.png').every(d=>Math.abs(d.sole-436)<.5)),'rugido agachado mantém as solas no chão');
+    // O rugido move toda a câmera em até 1,8 px na vertical. A sola precisa
+    // estar na origem local do personagem, acompanhando o chão que treme.
+    assert.ok(await page.evaluate(()=>__spriteDraws.filter(d=>d.asset==='eric-roar.png').every(d=>Math.abs(d.localSole)<.001 && Math.abs(d.sole-436)<2.3)),'rugido agachado mantém as solas no chão durante o tremor');
     await page.waitForFunction(()=>__observedState.scared===3);
     assert.ok(await page.evaluate(()=>__observedState.mobs.filter(m=>!RunnerEngine.isEnemy(m)).every(m=>!m.fleeing)),'rugido poupa os animais amigos');
     const playedSamples=await page.evaluate(()=>__sampleStarts);
