@@ -1,0 +1,7 @@
+# Capturas, pacotes e arquivos de criação ficam apenas no computador.
+output/
+node_modules/
+__pycache__/
+*.pyc
+.env
+.env.*
