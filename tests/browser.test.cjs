@@ -29,16 +29,49 @@ async function observe(page) {
       return startAudio.apply(this,args);
     };
     const drawImage=CanvasRenderingContext2D.prototype.drawImage;
+    const atlasBuffers=new WeakMap(),edges=new Map();
     CanvasRenderingContext2D.prototype.drawImage=function(image,...args) {
-      const asset=image.src?.split('?')[0].split('/').pop();
-      if(['eric-actions.png','eric-run.png','eric-roar.png'].includes(asset) && args.length===8) {
+      let info=atlasBuffers.get(image);
+      const asset=image.src?.split('?')[0].split('/').pop() || info?.asset;
+      if(['eric-actions.png','eric-run.png','eric-roar.png','eric-roar-actions.png'].includes(asset) && args.length===8) {
         const transform=this.getTransform();
-        const bottom=transform.transformPoint({x:0,y:args[5]+args[7]});
-        const faces={'68,1':297,'498,1':710.5,'934,1':1154,'1386,1':1598.5,'59,448':274,'491,444':699.5,'955,444':1152.5,'1386,444':1603};
-        const center=faces[`${args[0]},${args[1]}`];
-        const head=center===undefined?null:transform.transformPoint({x:args[4]+(center-args[0])*args[6]/args[2],y:0}).x/transform.a;
-        __spriteDraws.push({asset,sx:args[0],sy:args[1],head,localSole:args[5]+args[7],sole:bottom.y/transform.d,lift:globalThis.__observedState?.player.lift || 0});
-        if(__spriteDraws.length>1500)__spriteDraws.shift();
+        if(!info) {
+          const faces={'68,1':[297,97],'498,1':[710.5,98],'934,1':[1154,101],'1386,1':[1598.5,98],'59,448':[274,97],'491,444':[699.5,98],'491,448':[699.5,98],'955,444':[1152.5,98],'955,449':[1152.5,98],'1386,444':[1603,97],'1386,448':[1603,97],'110,11':[628.5,266],'112,9':[309.5,106],'581,10':[785.5,106],'1056,13':[1271.5,110],'83,514':[313,115],'588,520':[791.5,110],'1091,516':[1276.5,108]};
+          const face=faces[`${args[0]},${args[1]}`];
+          let blackTop=0;
+          if(asset==='eric-run.png') {
+            const key=`${args[0]},${args[1]}`;
+            if(!edges.has(key)) {
+              const probe=document.createElement('canvas');probe.width=args[2];probe.height=3;
+              const pc=probe.getContext('2d');pc.imageSmoothingEnabled=false;
+              drawImage.call(pc,image,args[0],args[1],args[2],3,0,0,args[2],3);
+              const pixels=pc.getImageData(0,0,args[2],3).data;
+              for(let i=0;i<pixels.length;i+=4)if(pixels[i+3]>100 && Math.max(pixels[i],pixels[i+1],pixels[i+2])<100)blackTop++;
+              edges.set(key,blackTop);
+            }
+            blackTop=edges.get(key);
+          }
+          info={asset,sx:args[0],sy:args[1],head:face?.[0],faceWidth:face?.[1],sole:args[1]+args[3],blackTop};
+        }
+        const scaleX=args[6]/args[2],scaleY=args[7]/args[3];
+        const localSole=args[5]+(info.sole-args[1])*scaleY;
+        const bottom=transform.transformPoint({x:0,y:localSole});
+        const head=info.head===undefined?null:transform.transformPoint({x:args[4]+(info.head-args[0])*scaleX,y:0}).x;
+        if(this.canvas.id==='game') {
+          for(const layer of info.layers || [info]) {
+            const sole= args[5]+(layer.sole-args[1])*scaleY;
+            const point=transform.transformPoint({x:0,y:sole});
+            const hx=layer.head===undefined?null:transform.transformPoint({x:args[4]+(layer.head-args[0])*scaleX,y:0}).x;
+            __spriteDraws.push({...layer,head:hx===null?null:hx/transform.a,faceWidth:layer.faceWidth*scaleX,localSole:sole,sole:point.y/transform.d,lift:globalThis.__observedState?.player.lift || 0});
+          }
+          if(__spriteDraws.length>1500)__spriteDraws.shift();
+        } else {
+          const mapped={...info,head,faceWidth:info.faceWidth*scaleX*transform.a,sole:bottom.y};
+          delete mapped.layers;
+          const previous=atlasBuffers.get(this.canvas);
+          if(this.globalCompositeOperation==='lighter' && previous)mapped.layers=[...(previous.layers || [previous]),{...mapped}];
+          atlasBuffers.set(this.canvas,mapped);
+        }
       }
       return drawImage.call(this,image,...args);
     };
@@ -60,7 +93,7 @@ async function observe(page) {
 }
 const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'index.html')).href;
 (async () => {
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: true, args:['--allow-file-access-from-files'] });
   try {
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
     const errors = [];
@@ -85,6 +118,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     const walking=await page.evaluate(()=>__spriteDraws.filter(d=>d.asset==='eric-run.png'));
     assert.equal(new Set(walking.map(d=>`${d.sx},${d.sy}`)).size,8,'a corrida percorre as oito fases novas');
     assert.ok(walking.every(d=>Math.abs(d.sole-436)<.5),'as solas das oito fases tocam o chão');
+    assert.ok(walking.every(d=>d.blackTop===0),'nenhum quadro contém sola preta do vizinho acima do capacete: '+JSON.stringify(walking.map(d=>({sx:d.sx,sy:d.sy,blackTop:d.blackTop}))));
     const heads=walking.map(d=>d.head);
     assert.ok(Math.max(...heads)-Math.min(...heads)<.5,'a cabeça mantém a mesma âncora durante todo o ciclo');
     await page.locator('canvas').focus();
@@ -138,10 +172,17 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     });
     await page.locator('canvas').focus();
     await page.keyboard.press('r');
-    await page.waitForFunction(()=>__spriteDraws.some(d=>d.asset==='eric-roar.png'));
+    await page.waitForFunction(()=>__spriteDraws.some(d=>d.asset==='eric-roar-actions.png'));
     // O rugido move toda a câmera em até 1,8 px na vertical. A sola precisa
     // estar na origem local do personagem, acompanhando o chão que treme.
-    assert.ok(await page.evaluate(()=>__spriteDraws.filter(d=>d.asset==='eric-roar.png').every(d=>Math.abs(d.localSole)<.001 && Math.abs(d.sole-436)<2.3)),'rugido agachado mantém as solas no chão durante o tremor');
+    assert.ok(await page.evaluate(()=>__spriteDraws.filter(d=>d.asset==='eric-roar-actions.png').every(d=>Math.abs(d.localSole)<.001 && Math.abs(d.sole-436)<2.3)),'rugido agachado mantém as solas no chão durante o tremor');
+    await page.waitForTimeout(450);
+    await page.screenshot({path:path.join(output,'desktop-roar-sequence.png'),fullPage:true});
+    await page.waitForTimeout(400);
+    const roarDraws=await page.evaluate(()=>__spriteDraws.filter(d=>d.asset==='eric-roar-actions.png'));
+    assert.equal(new Set(roarDraws.map(d=>`${d.sx},${d.sy}`)).size,6,'preparação, força e retorno percorrem seis poses');
+    const runningFace=walking.reduce((sum,d)=>sum+d.faceWidth,0)/walking.length;
+    assert.ok(roarDraws.every(d=>Math.abs(d.faceWidth-runningFace)/runningFace<.05),'rosto mantém a mesma escala da corrida, sem afastar o Eric');
     await page.waitForFunction(()=>__observedState.scared===3);
     assert.ok(await page.evaluate(()=>__observedState.mobs.filter(m=>!RunnerEngine.isEnemy(m)).every(m=>!m.fleeing)),'rugido poupa os animais amigos');
     const playedSamples=await page.evaluate(()=>__sampleStarts);
@@ -211,6 +252,11 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await mobile.locator('#roar').tap({force:true});
     assert.ok(await mobile.evaluate(()=>__observedState.roarCooldown)<=beforeCooldown,'toque durante recarga não dispara outra vez');
     assert.equal(await mobile.evaluate(()=>__observedState.player.lift),0,'rugir não aciona pulo sem querer');
+    await mobile.evaluate(()=>{__observedState.roarCooldown=0;});
+    await mobile.getByRole('button',{name:'Rugir e afugentar os travessos'}).tap();
+    await mobile.waitForTimeout(450);
+    await mobile.screenshot({path:path.join(output,'mobile-ground-roar-sequence.png')});
+    assert.ok(await mobile.evaluate(()=>__spriteDraws.some(d=>d.asset==='eric-roar-actions.png' && d.lift===0)),'sequência de rugido também aparece no celular');
     await mobile.setViewportSize({width:320,height:700});
     await mobile.waitForTimeout(100);
     assert.equal(await mobile.locator('#rotate-screen').isVisible(),true);
@@ -235,7 +281,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
     assert.ok(await mobile.evaluate(() => Number.isFinite(__observedState.player.x)));
     assert.deepEqual(mobileErrors, [],JSON.stringify(await mobile.evaluate(()=>__canvasErrors)));
-    console.log('PASS:',url,'; oito fases de corrida; cabeça estável; solas no chão; nova pose de rugido; sete gravações; travessos fogem; amigos protegidos; toque; landscape 844×390 e 667×320; pausa preserva poderes; nenhum erro de JavaScript.');
+    console.log('PASS:',url,'; oito fases sem linha preta; cabeça estável; solas no chão; rugido com seis poses, transições e rosto na mesma escala; áudio anterior; travessos fogem; amigos protegidos; landscape 844×390 e 667×320; pausa preserva poderes; nenhum erro de JavaScript.');
     console.log('Capturas:', output);
   } finally { await browser.close(); }
 })().catch(e => { console.error(e); process.exitCode = 1; });

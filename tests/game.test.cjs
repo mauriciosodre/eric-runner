@@ -145,6 +145,29 @@ test('um chute e um rugido ativam poses de ação antes de voltar à corrida', (
   Engine.roar(state); assert.equal(Engine.spriteFrame(state),6);
 });
 
+test('rugido percorre seis fases, pausa a animação e retorna à corrida', () => {
+  const state=game();
+  assert.equal(typeof Engine.roarPhase,'function');
+  Engine.roar(state);
+  assert.equal(Engine.roarPhase(state),0);
+  const phases=new Set();
+  for(let i=0;i<42;i++) {
+    phases.add(Math.floor(Engine.roarPhase(state)));
+    if(i===12) {
+      const phase=Engine.roarPhase(state);
+      state.paused=true;Engine.step(state,.1);
+      assert.equal(Engine.roarPhase(state),phase);
+      state.paused=false;
+    }
+    Engine.step(state,.025);
+  }
+  assert.deepEqual([...phases],[0,1,2,3,4,5]);
+  Engine.step(state,.05);
+  assert.equal(state.roar,0);
+  assert.ok(Engine.spriteFrame(state)<4);
+  assert.ok(state.shield>3);
+});
+
 test('há obstáculos e mobs logo no começo com tempo para vê-los chegar', () => {
   const state=game(true);state.width=440;state.player.x=97;
   let seenObstacle=false,seenMob=false;

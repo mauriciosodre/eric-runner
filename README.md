@@ -8,11 +8,11 @@ A publicação usa o GitHub Pages, a partir da raiz da branch `main`. Alteraçõ
 
 ## Abrir e brincar
 
-Abra `index.html` com um navegador moderno. Mantenha `eric.png`, `eric-actions.png`, `eric-run.png` e `eric-roar.png` na mesma pasta. Funciona localmente e sem internet, sem instalação e sem bibliotecas externas.
+Abra `index.html` com um navegador moderno. Mantenha `eric.png`, `eric-actions.png`, `eric-run.png`, `eric-roar.png` e `eric-roar-actions.png` na mesma pasta. Funciona localmente e sem internet, sem instalação e sem bibliotecas externas.
 
 No celular, vire o aparelho para **landscape (horizontal)**. O jogo ocupa a área disponível do navegador, com RUGIR à esquerda e PULAR à direita e margens para recortes da tela. Na vertical, aparece um convite para virar o aparelho; uma corrida em andamento pausa, preservando progresso e poderes. Ao voltar para a horizontal, toque em Continuar. A orientação do aparelho é feita pelo usuário; a página se adapta a ela.
 
-Todo o HTML, CSS e JavaScript do jogo está em **um único arquivo: `index.html`**. As imagens externas são a corrida `eric-run.png`, o rugido `eric-roar.png`, a folha das demais ações `eric-actions.png` e o personagem de reserva `eric.png`.
+Todo o HTML, CSS e JavaScript do jogo está em **um único arquivo: `index.html`**. As imagens externas são a corrida `eric-run.png`, o rugido animado `eric-roar-actions.png`, o rugido de reserva `eric-roar.png`, a folha das demais ações `eric-actions.png` e o personagem de reserva `eric.png`.
 
 - **Começar:** botão “Vamos correr!”, toque no cenário ou Espaço.
 - **Pular:** toque no cenário, botão PULAR, Espaço ou seta para cima.
@@ -38,7 +38,9 @@ O jogo pausa ao sair da aba. A pausa preserva o tempo dos poderes.
 
 `eric-run.png` contém oito etapas menores de um ciclo de corrida em uma grade 4 × 2. A velocidade de troca acompanha a distância percorrida, com cerca de 16 quadros por segundo na velocidade normal. A posição horizontal do rosto foi medida em cada quadro e usada como âncora para evitar deslocamentos bruscos da cabeça. Os retângulos foram medidos pelo canal alfa; a sola fica apoiada no chão. O personagem só sobe quando a física está em um salto.
 
-`eric-roar.png` mostra uma pose frontal agachada, com olhos semicerrados, nariz franzido, boca bem aberta e mãos em garras, inspirada na pose RUGIDO da referência original. `eric-actions.png` mantém salto, chute e descanso, além das poses anteriores de reserva. Se um dos novos PNGs faltar, o jogo usa a folha anterior.
+Os recortes da segunda linha da corrida começam abaixo das solas do quadro acima, que invadiam o início dessa linha. Cada quadro é copiado uma vez para um Canvas separado com borda transparente; assim, a redução na tela não mistura pixels de imagens vizinhas e não cria a linha preta acima do capacete.
+
+`eric-roar-actions.png` tem seis poses frontais de preparação, força, rugido e retorno, inspiradas na referência original. A sequência dura 1,05 segundo, com mistura suave entre poses num Canvas transparente. A escala é calculada pela largura do rosto, igual à da corrida, e a âncora horizontal também é a mesma; o Eric apenas se agacha. As solas ficam no chão. A pausa congela a sequência. `eric-roar.png` é a pose de reserva; `eric-actions.png` mantém salto, chute e descanso, além das poses anteriores de reserva.
 
 A pose de chute aparece ao encontrar a bola. A pose de rugido acompanha o especial acionado pelo botão ou pela tecla R. O rugido também funciona no ar, mantendo a pose de salto. Na tela de início e durante a pausa, o Eric fica em pé.
 
@@ -65,7 +67,7 @@ const ERIC_IMAGE_URL = 'eric.png?v=6';
 
 Há comentários em português nessa seção. Para mostrar exclusivamente uma nova imagem estática, deixe `ERIC_ACTIONS_URL = ''`. Se trocar a folha de animação, ajuste os retângulos em `actionFrames`, a escala de referência e a verificação das dimensões no evento `onload`. O salto inclina levemente o personagem. Se as imagens estiverem ausentes, um desenho provisório permite continuar brincando.
 
-As imagens foram geradas com a ferramenta integrada a partir do personagem e das fotos de referência. A versão atual usa a pose frontal aprovada pelo pai como referência fixa do rosto, com o rosto mais voltado à câmera. O PNG de reserva também mantém essa pose aprovada. Os sufixos `?v=6` e `?v=7` evitam reutilizar as imagens antigas armazenadas pelo navegador; o nome dos arquivos continua o mesmo. Os prompts estão em `output/imagegen/eric-approved-face-prompts.md` e `output/imagegen/eric-fluid-run-and-roar-prompts.md`.
+As imagens foram geradas com a ferramenta integrada a partir do personagem e das fotos de referência. A versão atual usa a pose frontal aprovada pelo pai como referência fixa do rosto, com o rosto mais voltado à câmera. O PNG de reserva também mantém essa pose aprovada. Os sufixos `?v=6`, `?v=7` e `?v=9` evitam reutilizar as imagens antigas armazenadas pelo navegador; o nome dos arquivos continua o mesmo. Os prompts estão em `output/imagegen/eric-approved-face-prompts.md`, `output/imagegen/eric-fluid-run-and-roar-prompts.md` e `output/imagegen/eric-roar-sequence-prompt.md`.
 
 ## Verificação
 
@@ -73,10 +75,10 @@ As imagens foram geradas com a ferramenta integrada a partir do personagem e das
 node --test tests/game.test.cjs
 ```
 
-Os 24 testes exercitam a física extraída do próprio HTML: salto e aterrissagem, chute único, duração e expiração dos poderes, proteção, colisões sem derrota, margem de coleta, pausa, animação, amigos sem penalidade, fuga dos três inimigos, onda limitada à tela, recarga do especial, tarefas, espaçamento durante o turbo e dez minutos de corrida simulada com memória limitada.
+Os 25 testes exercitam a física extraída do próprio HTML: salto e aterrissagem, chute único, duração e expiração dos poderes, proteção, colisões sem derrota, margem de coleta, pausa, animação, amigos sem penalidade, fuga dos três inimigos, onda limitada à tela, recarga do especial, tarefas, espaçamento durante o turbo e dez minutos de corrida simulada com memória limitada.
 
-`tests/browser.test.cjs` verifica o HTML local no Chromium com Playwright disponível no ambiente de desenvolvimento. Confere os quatro passos com solas no chão, poses de ação, tarefas, teclado R, toque nos dois botões, pausa, gols, poderes, sete gravações decodificadas e reprodução do novo rugido vocal, fuga dos travessos sem assustar amigos, landscape em 844 × 390 e 667 × 320, convite na vertical, pausa por rotação preservando poderes e geometria preservada quando o painel é ocultado. As capturas ficam em `output/verification`. Playwright não é uma dependência do jogo.
+`tests/browser.test.cjs` verifica o HTML local no Chromium com Playwright disponível no ambiente de desenvolvimento. Confere as oito fases da corrida com solas no chão e sem linha preta, as seis poses do rugido com escala do rosto consistente, tarefas, teclado R, toque nos dois botões, pausa, gols, poderes, sete gravações decodificadas e reprodução do áudio anterior do rugido, fuga dos travessos sem assustar amigos, landscape em 844 × 390 e 667 × 320, convite na vertical, pausa por rotação preservando poderes e geometria preservada quando o painel é ocultado. As capturas ficam em `output/verification`. Playwright não é uma dependência do jogo.
 
 Para executar a verificação do navegador, instale Playwright no ambiente de desenvolvimento e rode `node tests/browser.test.cjs`. `PLAYWRIGHT_MODULE` pode apontar para uma instalação já existente. Defina `GAME_URL` com o endereço publicado para conferir a versão online em vez do HTML local.
 
-Os arquivos de criação e pacotes em `output/` ficam no ambiente local e não são enviados ao repositório. O site utiliza apenas o HTML e as duas imagens do personagem; os sons estão embutidos.
+Os arquivos de criação e pacotes em `output/` ficam no ambiente local e não são enviados ao repositório. O site utiliza o HTML e as cinco imagens do personagem; os sons estão embutidos.
