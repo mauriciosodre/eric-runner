@@ -136,7 +136,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await page.waitForFunction(()=>__observedState.scared===3);
     assert.ok(await page.evaluate(()=>__observedState.mobs.filter(m=>!RunnerEngine.isEnemy(m)).every(m=>!m.fleeing)),'rugido poupa os animais amigos');
     const playedSamples=await page.evaluate(()=>__sampleStarts);
-    assert.ok(playedSamples.some(s=>s.duration>3 && Math.abs(s.rate-1.9)<.001),'o rugido usa a gravação com voz mais aguda: '+JSON.stringify(playedSamples));
+    assert.ok(playedSamples.some(s=>Math.abs(s.duration-1.25)<.002 && Math.abs(s.rate-1.08)<.001),'o especial toca a nova gravação vocal de criança: '+JSON.stringify(playedSamples));
     assert.equal(await page.locator('#roar').getAttribute('aria-disabled'),'true');
     await page.screenshot({ path: path.join(output, 'desktop-playing.png'), fullPage: true });
     await page.getByRole('button', { name: 'Desativar sons' }).click();
@@ -169,7 +169,16 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await mobile.goto(url);
     await mobile.waitForTimeout(350);
     assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'sem rolagem horizontal');
-    await mobile.screenshot({ path: path.join(output, 'mobile-start.png'), fullPage: true });
+    assert.equal(await mobile.locator('#rotate-screen').isVisible(),true,'celular na vertical orienta a virar');
+    await mobile.keyboard.press('Space');
+    assert.equal(await mobile.evaluate(()=>__observedState.running),false,'não iniciar corrida atrás do aviso');
+    await mobile.screenshot({path:path.join(output,'mobile-portrait.png')});
+    await mobile.setViewportSize({width:844,height:390});
+    await mobile.waitForTimeout(150);
+    assert.equal(await mobile.locator('#rotate-screen').isVisible(),false);
+    const stageBounds=await mobile.locator('#stage').boundingBox();
+    assert.ok(stageBounds.x===0 && stageBounds.y===0 && Math.abs(stageBounds.width-844)<1 && Math.abs(stageBounds.height-390)<1,'jogo preenche o celular em landscape');
+    await mobile.screenshot({ path: path.join(output, 'mobile-start.png') });
     await mobile.getByRole('button', { name: 'Vamos correr!' }).tap();
     await mobile.locator('canvas').tap({ position: { x: 140, y: 260 } });
     await mobile.waitForTimeout(100);
@@ -178,7 +187,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await mobile.getByRole('button', { name: 'PULAR', exact: true }).tap();
     await mobile.waitForTimeout(80);
     assert.ok(await mobile.evaluate(() => __observedState.player.lift > 20));
-    await mobile.screenshot({ path: path.join(output, 'mobile-playing.png'), fullPage: true });
+    await mobile.screenshot({ path: path.join(output, 'mobile-playing.png') });
     await mobile.evaluate(()=>{
       const s=__observedState;s.items=[];s.obstacles=[];s.mobs=[];
       s.spawnIn=s.obstacleIn=s.mobIn=Infinity;s.roarCooldown=0;
@@ -187,7 +196,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await mobile.getByRole('button',{name:'Rugir e afugentar os travessos'}).tap();
     await mobile.waitForFunction(()=>__observedState.scared>0);
     assert.ok(await mobile.evaluate(()=>__observedState.roarCooldown>5));
-    await mobile.screenshot({path:path.join(output,'mobile-roar.png'),fullPage:true});
+    await mobile.screenshot({path:path.join(output,'mobile-roar.png')});
     await mobile.waitForTimeout(900);
     const beforeCooldown=await mobile.evaluate(()=>__observedState.roarCooldown);
     await mobile.locator('#roar').tap({force:true});
@@ -195,15 +204,29 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     assert.equal(await mobile.evaluate(()=>__observedState.player.lift),0,'rugir não aciona pulo sem querer');
     await mobile.setViewportSize({width:320,height:700});
     await mobile.waitForTimeout(100);
-    const roarBounds=await mobile.locator('#roar').boundingBox(),jumpBounds=await mobile.locator('#jump').boundingBox();
-    assert.ok(roarBounds.x+roarBounds.width<jumpBounds.x,'botões separados no celular estreito');
+    assert.equal(await mobile.locator('#rotate-screen').isVisible(),true);
+    assert.equal(await mobile.evaluate(()=>__observedState.paused),true,'virar para vertical pausa a corrida');
+    const frozen=await mobile.evaluate(()=>({time:__observedState.time,cooldown:__observedState.roarCooldown}));
+    await mobile.waitForTimeout(150);
+    assert.deepEqual(await mobile.evaluate(()=>({time:__observedState.time,cooldown:__observedState.roarCooldown})),frozen,'rotação preserva corrida e poderes');
     assert.ok(await mobile.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
     await mobile.setViewportSize({ width: 844, height: 390 });
     await mobile.waitForTimeout(200);
+    assert.equal(await mobile.locator('#rotate-screen').isVisible(),false);
+    await mobile.getByRole('button',{name:'Continuar',exact:true}).tap();
+    assert.equal(await mobile.evaluate(()=>__observedState.paused),false);
+    await mobile.setViewportSize({width:667,height:320});
+    await mobile.waitForTimeout(150);
+    const roarBounds=await mobile.locator('#roar').boundingBox(),jumpBounds=await mobile.locator('#jump').boundingBox();
+    assert.ok(roarBounds.x+roarBounds.width<jumpBounds.x,'botões separados no celular pequeno em landscape');
+    assert.ok(roarBounds.height>=44 && jumpBounds.height>=44);
+    const compactStage=await mobile.locator('#stage').boundingBox();
+    assert.ok(compactStage.width===667 && compactStage.height===320);
+    await mobile.screenshot({path:path.join(output,'mobile-landscape-small.png')});
     assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
     assert.ok(await mobile.evaluate(() => Number.isFinite(__observedState.player.x)));
     assert.deepEqual(mobileErrors, [],JSON.stringify(await mobile.evaluate(()=>__canvasErrors)));
-    console.log('PASS: HTML local; passos no chão; salto/chute/rugido; três inimigos fogem; animais continuam amigos; sete gravações reais; recarga; teclado R; toque; pausa; tarefas; celular 320px; rotação; nenhum erro de JavaScript.');
+    console.log('PASS:',url,'; passos no chão; novo rugido vocal; sete gravações; travessos fogem; amigos protegidos; toque; landscape 844×390 e 667×320; aviso na vertical; pausa preserva poderes; nenhum erro de JavaScript.');
     console.log('Capturas:', output);
   } finally { await browser.close(); }
 })().catch(e => { console.error(e); process.exitCode = 1; });

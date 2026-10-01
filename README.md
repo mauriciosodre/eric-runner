@@ -10,6 +10,8 @@ A publicação usa o GitHub Pages, a partir da raiz da branch `main`. Alteraçõ
 
 Abra `index.html` com um navegador moderno. Mantenha `eric.png` e `eric-actions.png` na mesma pasta. Funciona localmente e sem internet, sem instalação e sem bibliotecas externas.
 
+No celular, vire o aparelho para **landscape (horizontal)**. O jogo ocupa a área disponível do navegador, com RUGIR à esquerda e PULAR à direita e margens para recortes da tela. Na vertical, aparece um convite para virar o aparelho; uma corrida em andamento pausa, preservando progresso e poderes. Ao voltar para a horizontal, toque em Continuar. A orientação do aparelho é feita pelo usuário; a página se adapta a ela.
+
 Todo o HTML, CSS e JavaScript do jogo está em **um único arquivo: `index.html`**. As imagens externas são a folha de animação `eric-actions.png` e o personagem de reserva `eric.png`.
 
 - **Começar:** botão “Vamos correr!”, toque no cenário ou Espaço.
@@ -40,12 +42,12 @@ A pose de chute aparece ao encontrar a bola. A pose de rugido acompanha o especi
 
 ## Sons e créditos
 
-O chute tem um impacto macio com uma pequena fanfarra. A aterrissagem e os passos usam gravações discretas de grama. O turbo combina vento filtrado com uma subida musical; o pulo tem uma mola sonora. O rugido usa uma voz mais aguda, curta e suave, com os graves removidos para lembrar um pequeno dinossauro brincando de "rááá!". A gravação é um efeito de monstro ajustado, não uma gravação de criança. Uma onda visual e um tremor pequeno acompanham o especial. O volume dos efeitos é equilibrado e há um compressor na saída para controlar picos. Desativar o som interrompe os efeitos em andamento.
+O chute tem um impacto macio com uma pequena fanfarra. A aterrissagem e os passos usam gravações discretas de grama. O turbo combina vento filtrado com uma subida musical; o pulo tem uma mola sonora. O rugido usa uma gravação de criança fazendo "RAAA!", com a vogal aberta e energia de filhote. Um tratamento leve acrescenta textura de dinossauro e preserva a voz infantil. Uma onda visual e um tremor pequeno acompanham o especial. O volume dos efeitos é equilibrado e há um compressor na saída para controlar picos. Desativar o som interrompe os efeitos em andamento.
 
 Fontes das gravações, ambas com licença [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/):
 
 - **Kenney — [Impact Sounds](https://kenney.nl/assets/impact-sounds):** `impactSoft_medium_000.ogg` (chute), `impactSoft_heavy_001.ogg` (esbarrão), `footstep_grass_002.ogg` (aterrissagem), `footstep_grass_000.ogg` e `footstep_grass_001.ogg` (passos), `impactBell_heavy_000.ogg` (poder dino).
-- **123agumon — [Dinosaur Growl](https://freesound.org/people/123agumon/sounds/147527/), publicado no Freesound em 23/02/2012:** trecho da prévia MP3 de alta qualidade, com velocidade, filtro e envelope ajustados para o jogo.
+- **wolfdoctor — [Child Saying "Raaaarrr" / Roar](https://freesound.org/people/wolfdoctor/sounds/578769/), publicado no Freesound em 01/07/2021:** gravação da filha do autor imitando um rugido. Foi selecionado o trecho de 4,20 a 5,45 segundos da prévia MP3 de alta qualidade, convertido em WAV mono com saturação leve e fades curtos. O jogo aplica volume, filtros e um ajuste pequeno de velocidade (1,08×).
 
 Os efeitos musicais e de vento são sintetizados pelo próprio JavaScript. Os créditos também estão em `LICENSE_AUDIO.md`. O pacote distribuído não depende de arquivos de áudio externos.
 
@@ -71,7 +73,7 @@ node --test tests/game.test.cjs
 
 Os 24 testes exercitam a física extraída do próprio HTML: salto e aterrissagem, chute único, duração e expiração dos poderes, proteção, colisões sem derrota, margem de coleta, pausa, animação, amigos sem penalidade, fuga dos três inimigos, onda limitada à tela, recarga do especial, tarefas, espaçamento durante o turbo e dez minutos de corrida simulada com memória limitada.
 
-`tests/browser.test.cjs` verifica o HTML local no Chromium com Playwright disponível no ambiente de desenvolvimento. Confere os quatro passos com solas no chão, poses de ação, tarefas, teclado R, toque nos dois botões, pausa, gols, poderes, sete gravações decodificadas e reprodução do rugido, fuga dos travessos sem assustar amigos, layout de 320 px, rotação e geometria preservada quando o painel é ocultado. As capturas ficam em `output/verification`. Playwright não é uma dependência do jogo.
+`tests/browser.test.cjs` verifica o HTML local no Chromium com Playwright disponível no ambiente de desenvolvimento. Confere os quatro passos com solas no chão, poses de ação, tarefas, teclado R, toque nos dois botões, pausa, gols, poderes, sete gravações decodificadas e reprodução do novo rugido vocal, fuga dos travessos sem assustar amigos, landscape em 844 × 390 e 667 × 320, convite na vertical, pausa por rotação preservando poderes e geometria preservada quando o painel é ocultado. As capturas ficam em `output/verification`. Playwright não é uma dependência do jogo.
 
 Para executar a verificação do navegador, instale Playwright no ambiente de desenvolvimento e rode `node tests/browser.test.cjs`. `PLAYWRIGHT_MODULE` pode apontar para uma instalação já existente. Defina `GAME_URL` com o endereço publicado para conferir a versão online em vez do HTML local.
 
