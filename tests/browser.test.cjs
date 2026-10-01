@@ -33,7 +33,7 @@ async function observe(page) {
     CanvasRenderingContext2D.prototype.drawImage=function(image,...args) {
       let info=atlasBuffers.get(image);
       const asset=image.src?.split('?')[0].split('/').pop() || info?.asset;
-      if(['eric-actions.png','eric-run.png','eric-roar.png','eric-roar-actions.png'].includes(asset) && args.length===8) {
+      if(['eric.png','eric-actions.png','eric-run.png','eric-roar.png','eric-roar-actions.png'].includes(asset) && args.length===8) {
         const transform=this.getTransform();
         if(!info) {
           const faces={'68,1':[297,97],'498,1':[710.5,98],'934,1':[1154,101],'1386,1':[1598.5,98],'59,448':[274,97],'491,444':[699.5,98],'491,448':[699.5,98],'955,444':[1152.5,98],'955,449':[1152.5,98],'1386,444':[1603,97],'1386,448':[1603,97],'110,11':[628.5,266],'112,9':[309.5,106],'581,10':[785.5,106],'1056,13':[1271.5,110],'83,514':[313,115],'588,520':[791.5,110],'1091,516':[1276.5,108]};
@@ -111,7 +111,8 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await page.waitForTimeout(300);
     assert.equal(await page.evaluate(() => __observedState.running), false);
     await page.screenshot({ path: path.join(output, 'desktop-start.png'), fullPage: true });
-    assert.ok(await page.evaluate(()=>__spriteDraws.length>0),'folha de ações carregada de verdade');
+    assert.ok(await page.evaluate(()=>__spriteDraws.some(d=>d.asset==='eric.png')),'início usa a imagem frontal aprovada, não a pose diferente da folha');
+    assert.ok(await page.evaluate(()=>__spriteDraws.filter(d=>d.asset==='eric.png').every(d=>Math.abs(d.localSole)<.001)),'imagem frontal aprovada fica apoiada no chão');
     await page.evaluate(()=>{__spriteDraws=[];});
     await page.getByRole('button', { name: 'Vamos correr!' }).click();
     await page.waitForTimeout(600);
@@ -128,9 +129,11 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await page.waitForTimeout(850);
     assert.equal(await page.evaluate(() => __observedState.player.lift), 0);
     await page.getByRole('button', { name: 'Pausar aventura' }).click();
+    await page.evaluate(()=>{__spriteDraws=[];});
     const pausedTime = await page.evaluate(() => __observedState.time);
     await page.waitForTimeout(150);
     assert.equal(await page.evaluate(() => __observedState.time), pausedTime);
+    assert.ok(await page.evaluate(()=>__spriteDraws.some(d=>d.asset==='eric.png')),'pausa também mantém o rosto frontal aprovado');
     await page.getByRole('button', { name: 'Continuar', exact: true }).click();
     await page.evaluate(() => {
       const s = __observedState;
@@ -229,6 +232,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     const stageBounds=await mobile.locator('#stage').boundingBox();
     assert.ok(stageBounds.x===0 && stageBounds.y===0 && Math.abs(stageBounds.width-844)<1 && Math.abs(stageBounds.height-390)<1,'jogo preenche o celular em landscape');
     await mobile.screenshot({ path: path.join(output, 'mobile-start.png') });
+    assert.ok(await mobile.evaluate(()=>__spriteDraws.some(d=>d.asset==='eric.png')),'início no celular usa o mesmo rosto aprovado');
     await mobile.getByRole('button', { name: 'Vamos correr!' }).tap();
     await mobile.locator('canvas').tap({ position: { x: 140, y: 260 } });
     await mobile.waitForTimeout(100);

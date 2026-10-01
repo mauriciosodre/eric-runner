@@ -438,7 +438,7 @@
        Prefira PNG com fundo transparente, corpo inteiro e olhando à direita.
        Todo HTML, CSS e JavaScript está neste arquivo; as imagens são externas.
        ================================================================ */
-    const ERIC_IMAGE_URL = 'eric.png?v=6';
+    const ERIC_IMAGE_URL = 'eric.png?v=10';
     // ANIMAÇÃO: oito imagens na folha eric-actions.png (4 colunas × 2 linhas).
     // 0–3 = passos; 4 = salto; 5 = chute; 6 = rugido; 7 = descanso.
     // Para usar só sua imagem estática, deixe ERIC_ACTIONS_URL = ''.
@@ -497,8 +497,15 @@
     roarBlendCanvas.width=512;roarBlendCanvas.height=512;
     const roarBlendContext=roarBlendCanvas.getContext('2d');
     const ericImage = new Image();
-    let imageReady=false;
-    ericImage.onload=()=>{ imageReady=true; };
+    let imageReady=false,standingFrame;
+    ericImage.onload=()=>{
+      // A pose frontal aprovada aparece no início e na pausa. O recorte
+      // remove só as margens transparentes, preservando o rosto original.
+      standingFrame=ericImage.naturalWidth===1024 && ericImage.naturalHeight===1536
+        ?[57,8,867,1498,530]
+        :[0,0,ericImage.naturalWidth,ericImage.naturalHeight,ericImage.naturalWidth*.52];
+      imageReady=true;
+    };
     ericImage.onerror=()=>{ imageReady=false; console.warn('Coloque eric.png na mesma pasta do HTML. O desenho provisório mantém o jogo funcionando.'); };
     ericImage.src=ERIC_IMAGE_URL;
 
@@ -910,7 +917,12 @@
       ctx.save();if(state.hurt>0 && Math.floor(state.time*10)%2===0)ctx.globalAlpha=.36;
       ctx.translate(x,y);ctx.rotate(tilt);
       const index=engine.spriteFrame(state);
-      if(index<4 && runReady) {
+      if(index===7 && imageReady) {
+        // Usar diretamente o PNG aprovado evita reinterpretar o rosto
+        // pela pose de descanso da folha de animação.
+        const f=standingFrame,scale=size/f[3];
+        ctx.drawImage(ericImage,f[0],f[1],f[2],f[3],(f[0]-f[4])*scale,-size,f[2]*scale,size);
+      } else if(index<4 && runReady) {
         // Duas fases visuais para cada fase da física: cerca de 16 quadros/s
         // na velocidade normal. O turbo acompanha a distância percorrida.
         const phase=Math.floor(p.stride*2)%runFrames.length,f=runFrames[phase];

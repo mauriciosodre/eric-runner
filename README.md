@@ -42,7 +42,7 @@ Os recortes da segunda linha da corrida começam abaixo das solas do quadro acim
 
 `eric-roar-actions.png` tem seis poses frontais de preparação, força, rugido e retorno, inspiradas na referência original. A sequência dura 1,05 segundo, com mistura suave entre poses num Canvas transparente. A escala é calculada pela largura do rosto, igual à da corrida, e a âncora horizontal também é a mesma; o Eric apenas se agacha. As solas ficam no chão. A pausa congela a sequência. `eric-roar.png` é a pose de reserva; `eric-actions.png` mantém salto, chute e descanso, além das poses anteriores de reserva.
 
-A pose de chute aparece ao encontrar a bola. A pose de rugido acompanha o especial acionado pelo botão ou pela tecla R. O rugido também funciona no ar, mantendo a pose de salto. Na tela de início e durante a pausa, o Eric fica em pé.
+A pose de chute aparece ao encontrar a bola. A pose de rugido acompanha o especial acionado pelo botão ou pela tecla R. O rugido também funciona no ar, mantendo a pose de salto. Na tela de início e durante a pausa, o Eric fica em pé usando diretamente `eric.png`, a imagem frontal aprovada. A pose de descanso da folha de animação permanece apenas como reserva caso essa imagem não carregue; assim, o rosto inicial não é uma nova interpretação do personagem.
 
 ## Sons e créditos
 
@@ -62,12 +62,12 @@ Para recriar a inclusão dos mesmos arquivos durante o desenvolvimento, rode `py
 Substitua `eric.png` por outra imagem PNG com fundo transparente, corpo inteiro e olhando à direita. Para usar outro nome ou caminho, procure esta linha no HTML:
 
 ```js
-const ERIC_IMAGE_URL = 'eric.png?v=6';
+const ERIC_IMAGE_URL = 'eric.png?v=10';
 ```
 
 Há comentários em português nessa seção. Para mostrar exclusivamente uma nova imagem estática, deixe `ERIC_ACTIONS_URL = ''`. Se trocar a folha de animação, ajuste os retângulos em `actionFrames`, a escala de referência e a verificação das dimensões no evento `onload`. O salto inclina levemente o personagem. Se as imagens estiverem ausentes, um desenho provisório permite continuar brincando.
 
-As imagens foram geradas com a ferramenta integrada a partir do personagem e das fotos de referência. A versão atual usa a pose frontal aprovada pelo pai como referência fixa do rosto, com o rosto mais voltado à câmera. O PNG de reserva também mantém essa pose aprovada. Os sufixos `?v=6`, `?v=7` e `?v=9` evitam reutilizar as imagens antigas armazenadas pelo navegador; o nome dos arquivos continua o mesmo. Os prompts estão em `output/imagegen/eric-approved-face-prompts.md`, `output/imagegen/eric-fluid-run-and-roar-prompts.md` e `output/imagegen/eric-roar-sequence-prompt.md`.
+As imagens foram geradas com a ferramenta integrada a partir do personagem e das fotos de referência. A versão atual usa a pose frontal aprovada pelo pai como referência fixa do rosto, com o rosto mais voltado à câmera. O PNG de reserva também mantém essa pose aprovada. Os sufixos `?v=6`, `?v=7`, `?v=9` e `?v=10` evitam reutilizar as imagens antigas armazenadas pelo navegador; o nome dos arquivos continua o mesmo. Os prompts estão em `output/imagegen/eric-approved-face-prompts.md`, `output/imagegen/eric-fluid-run-and-roar-prompts.md` e `output/imagegen/eric-roar-sequence-prompt.md`.
 
 ## Verificação
 
@@ -77,7 +77,7 @@ node --test tests/game.test.cjs
 
 Os 25 testes exercitam a física extraída do próprio HTML: salto e aterrissagem, chute único, duração e expiração dos poderes, proteção, colisões sem derrota, margem de coleta, pausa, animação, amigos sem penalidade, fuga dos três inimigos, onda limitada à tela, recarga do especial, tarefas, espaçamento durante o turbo e dez minutos de corrida simulada com memória limitada.
 
-`tests/browser.test.cjs` verifica o HTML local no Chromium com Playwright disponível no ambiente de desenvolvimento. Confere as oito fases da corrida com solas no chão e sem linha preta, as seis poses do rugido com escala do rosto consistente, tarefas, teclado R, toque nos dois botões, pausa, gols, poderes, sete gravações decodificadas e reprodução do áudio anterior do rugido, fuga dos travessos sem assustar amigos, landscape em 844 × 390 e 667 × 320, convite na vertical, pausa por rotação preservando poderes e geometria preservada quando o painel é ocultado. As capturas ficam em `output/verification`. Playwright não é uma dependência do jogo.
+`tests/browser.test.cjs` verifica o HTML local no Chromium com Playwright disponível no ambiente de desenvolvimento. Confere a imagem frontal aprovada no início e na pausa, inclusive no celular, as oito fases da corrida com solas no chão e sem linha preta, as seis poses do rugido com escala do rosto consistente, tarefas, teclado R, toque nos dois botões, pausa, gols, poderes, sete gravações decodificadas e reprodução do áudio anterior do rugido, fuga dos travessos sem assustar amigos, landscape em 844 × 390 e 667 × 320, convite na vertical, pausa por rotação preservando poderes e geometria preservada quando o painel é ocultado. As capturas ficam em `output/verification`. Playwright não é uma dependência do jogo.
 
 Para executar a verificação do navegador, instale Playwright no ambiente de desenvolvimento e rode `node tests/browser.test.cjs`. `PLAYWRIGHT_MODULE` pode apontar para uma instalação já existente. Defina `GAME_URL` com o endereço publicado para conferir a versão online em vez do HTML local.
 
