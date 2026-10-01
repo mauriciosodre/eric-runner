@@ -434,18 +434,18 @@
        Prefira PNG com fundo transparente, corpo inteiro e olhando à direita.
        Todo HTML, CSS e JavaScript está neste arquivo; as imagens são externas.
        ================================================================ */
-    const ERIC_IMAGE_URL = 'eric.png';
+    const ERIC_IMAGE_URL = 'eric.png?v=6';
     // ANIMAÇÃO: oito imagens na folha eric-actions.png (4 colunas × 2 linhas).
     // 0–3 = passos; 4 = salto; 5 = chute; 6 = rugido; 7 = descanso.
     // Para usar só sua imagem estática, deixe ERIC_ACTIONS_URL = ''.
-    const ERIC_ACTIONS_URL = 'eric-actions.png';
+    const ERIC_ACTIONS_URL = 'eric-actions.png?v=6';
     const ericActions = new Image();
     let actionsReady=false;
     // Retângulos medidos pelo alfa do PNG. Cortam as margens transparentes,
     // preservam a escala e colocam a sola da chuteira exatamente no chão.
     const actionFrames=[
-      [52,4,360,439],[493,5,308,438],[926,5,369,438],[1416,6,309,437],
-      [23,445,379,379],[457,449,402,426],[905,450,386,429],[1426,448,278,432]
+      [52,3,362,441],[493,3,311,440],[926,5,373,439],[1416,5,310,438],
+      [25,444,378,382],[455,449,405,426],[905,447,389,433],[1426,449,281,431]
     ];
     ericActions.onload=()=>{actionsReady=ericActions.naturalWidth===1774 && ericActions.naturalHeight===887;};
     ericActions.onerror=()=>{actionsReady=false;};

@@ -30,7 +30,7 @@ async function observe(page) {
     };
     const drawImage=CanvasRenderingContext2D.prototype.drawImage;
     CanvasRenderingContext2D.prototype.drawImage=function(image,...args) {
-      if(image.src?.endsWith('/eric-actions.png') && args.length===8) {
+      if(image.src?.split('?')[0].endsWith('/eric-actions.png') && args.length===8) {
         const transform=this.getTransform();
         const bottom=transform.transformPoint({x:0,y:args[5]+args[7]});
         __spriteDraws.push({sx:args[0],sy:args[1],sole:bottom.y/transform.d,lift:globalThis.__observedState?.player.lift || 0});
@@ -100,7 +100,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     });
     await page.waitForFunction(() => __observedState.goals === 1);
     assert.equal(await page.locator('#goals').textContent(), '1');
-    await page.waitForFunction(()=>__spriteDraws.some(d=>d.sx===457 && d.sy===449));
+    await page.waitForFunction(()=>__spriteDraws.some(d=>d.sx===455 && d.sy===449));
     await page.evaluate(() => {
       const s = __observedState;
       s.items.push({ type: 'fries', x: s.player.x + 5, lift: 100, radius: 25 });
@@ -132,7 +132,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     });
     await page.locator('canvas').focus();
     await page.keyboard.press('r');
-    await page.waitForFunction(()=>__spriteDraws.some(d=>d.sx===905 && d.sy===450));
+    await page.waitForFunction(()=>__spriteDraws.some(d=>d.sx===905 && d.sy===447));
     await page.waitForFunction(()=>__observedState.scared===3);
     assert.ok(await page.evaluate(()=>__observedState.mobs.filter(m=>!RunnerEngine.isEnemy(m)).every(m=>!m.fleeing)),'rugido poupa os animais amigos');
     const playedSamples=await page.evaluate(()=>__sampleStarts);

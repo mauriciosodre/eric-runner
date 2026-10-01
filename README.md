@@ -58,12 +58,12 @@ Para recriar a inclusão dos mesmos arquivos durante o desenvolvimento, rode `py
 Substitua `eric.png` por outra imagem PNG com fundo transparente, corpo inteiro e olhando à direita. Para usar outro nome ou caminho, procure esta linha no HTML:
 
 ```js
-const ERIC_IMAGE_URL = 'eric.png';
+const ERIC_IMAGE_URL = 'eric.png?v=6';
 ```
 
 Há comentários em português nessa seção. Para mostrar exclusivamente uma nova imagem estática, deixe `ERIC_ACTIONS_URL = ''`. Se trocar a folha de animação, ajuste os retângulos em `actionFrames`, a escala de referência e a verificação das dimensões no evento `onload`. O salto inclina levemente o personagem. Se as imagens estiverem ausentes, um desenho provisório permite continuar brincando.
 
-As imagens foram geradas com a ferramenta integrada a partir do personagem e das fotos de referência. Os prompts estão em `output/imagegen/eric-sprite-prompt.md` e `output/imagegen/eric-actions-prompts.md`.
+As imagens foram geradas com a ferramenta integrada a partir do personagem e das fotos de referência. A versão atual usa a pose frontal aprovada pelo pai como referência fixa do rosto nas oito ações, com o rosto mais voltado à câmera. O PNG de reserva também mantém essa pose aprovada. O sufixo `?v=6` evita reutilizar as imagens antigas armazenadas pelo navegador; o nome dos arquivos continua o mesmo. Os prompts do refinamento estão em `output/imagegen/eric-approved-face-prompts.md`.
 
 ## Verificação
 
