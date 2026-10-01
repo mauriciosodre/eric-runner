@@ -110,6 +110,42 @@
     .rotate-card h2 { font-size:29px; letter-spacing:-1px; line-height:1.12; margin:24px 0 12px; }
     .rotate-card p { font-size:14px; color:var(--muted); line-height:1.6; margin:0; }
     .rotate-illustration { width:140px; height:100px; margin:auto; color:var(--green); }
+    /* Vida e recorde ficam numa faixa própria, sem esconder a pista. */
+    .run-status { position:absolute; z-index:2; left:22px; top:80px; pointer-events:none; }
+    .health-meter { display:flex; align-items:center; gap:7px; padding:7px 10px; border:1px solid #ffffffb8; border-radius:12px; background:#fffdf0ee; width:182px; }
+    .health-heart { color:#dc8c78; font-size:18px; line-height:1; }
+    .health-track { flex:1; height:8px; border-radius:10px; background:#e5e9d7; overflow:hidden; }
+    .health-track i { display:block; width:100%; height:100%; background:#87b76e; border-radius:10px; transition:width .2s; }
+    .health-meter.low .health-track i { background:#e3a35b; }
+    .health-meter strong { font-size:13px; min-width:17px; text-align:right; }
+    .health-meter small { font-size:10px; color:#819174; }
+    .record-line { display:flex; justify-content:space-between; gap:12px; font-size:8px; color:#557154; background:#f9fff0df; border-radius:8px; margin-top:5px; padding:6px 8px; }
+    .record-line strong { font-size:11px; margin-left:3px; color:#365c3d; }
+    .power-status { top:147px; }
+    .end-card { max-width:360px; width:calc(100% - 32px); }
+    .end-card h2 { font-size:27px; }
+    .end-results { display:flex; justify-content:center; gap:28px; margin:18px 0; }
+    .end-results small { display:block; color:#819174; font-size:9px; letter-spacing:1px; margin-bottom:4px; }
+    .end-results strong { font-size:29px; color:var(--green); }
+    .end-card p { margin:14px 0; }
+    #end-screen { z-index:6; }
+    #stage:fullscreen { width:100vw; height:100dvh; aspect-ratio:auto; border-radius:0; }
+    #stage:-webkit-full-screen { width:100vw; height:100vh; aspect-ratio:auto; border-radius:0; }
+    body.immersive { overflow:hidden; overscroll-behavior:none; }
+    body.immersive .game-shell { position:fixed; inset:0; z-index:10; height:100dvh; padding:0; border-radius:0; }
+    body.immersive .game-stage { width:100%; height:100%; aspect-ratio:auto; border-radius:0; }
+    @media(pointer:coarse) and (orientation:landscape) {
+      .run-status { top:68px; left:max(14px,env(safe-area-inset-left)); }
+      .health-meter { width:174px; padding:6px 9px; }
+      .record-line { font-size:7px; padding:5px 8px; }
+      .record-line strong { font-size:10px; }
+      .power-status { top:70px; }
+      .end-card { padding:16px 24px; }
+      .end-card h2 { font-size:24px; margin:5px 0; }
+      .end-results { margin:12px 0; }
+      .end-card p { margin:8px 0 14px; }
+      .end-card .primary { min-height:49px; }
+    }
     @media(min-width:1450px) { main { padding-top:24px; } .site-header { height:105px; } }
     @media(max-width:760px) {
       .site-header { height:75px; padding:0 20px; } main { padding:9px 16px 0; }
@@ -119,7 +155,7 @@
       .cards { gap:9px; } .card { padding:14px 11px; gap:8px; } .item-icon { width:35px; height:38px; } .card h3 { font-size:11px; } .card p { font-size:10px; }
       .hud { left:13px; right:13px; top:13px; } .score { padding:9px 10px; min-width:75px; gap:7px; } .score.adventure { min-width:83px; }
       .score small { font-size:7px; letter-spacing:1px; } .score strong { font-size:15px; } .icon-button { width:44px; height:44px; } .tools { gap:5px; }
-      .power-status { top:67px; left:13px; } .hero-name { bottom:16%; left:14%; } .game-footer { padding:13px 10px 8px; font-size:10px; }
+      .power-status { top:147px; left:13px; } .hero-name { bottom:16%; left:14%; } .game-footer { padding:13px 10px 8px; font-size:10px; }
       .mission { top:72px; right:13px; padding:8px 10px; }
       .site-footer { padding:10px 21px 21px; } .jump-button { bottom:15px; right:15px; }
     }
@@ -195,6 +231,7 @@
     <symbol id="i-sound" viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M16 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
     <symbol id="i-mute" viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3zM16 9l5 6m0-6-5 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></symbol>
     <symbol id="i-jump" viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6M5 21h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-fullscreen" viewBox="0 0 24 24"><path d="M4 9V4h5m6 0h5v5m0 6v5h-5m-6 0H4v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   </defs></svg>
   <header class="site-header">
     <div class="brand"><span class="brand-icon"><svg width="29" height="29" aria-hidden="true"><use href="#i-dino"/></svg></span><div><div class="brand-name">ERIC<span>RUN</span></div><div class="brand-sub">O DINO-FUTEBOLISTA</div></div></div>
@@ -212,9 +249,14 @@
             <div class="score adventure"><svg width="19" height="19" aria-hidden="true"><use href="#i-star"/></svg><div><small>ESTRELAS</small><strong id="stars">0</strong></div></div>
           </div>
           <div class="tools">
+            <button class="icon-button" id="fullscreen" aria-label="Entrar em tela cheia" aria-pressed="false" title="Tela cheia"><svg aria-hidden="true"><use href="#i-fullscreen"/></svg></button>
             <button class="icon-button" id="sound" aria-label="Ativar sons" aria-pressed="false" title="Ativar sons"><svg aria-hidden="true"><use href="#i-mute"/></svg></button>
             <button class="icon-button" id="pause" aria-label="Pausar aventura" aria-pressed="false" title="Pausar (P)" hidden><svg aria-hidden="true"><use href="#i-pause"/></svg></button>
           </div>
+        </div>
+        <div class="run-status">
+          <div class="health-meter" id="health-meter" role="meter" aria-label="Vida do Eric" aria-valuemin="0" aria-valuemax="20" aria-valuenow="20"><span class="health-heart" aria-hidden="true">♥</span><span class="health-track" aria-hidden="true"><i id="health-bar"></i></span><strong id="health">20</strong><small>/20</small></div>
+          <div class="record-line"><span>PONTOS <strong id="points">0</strong></span><span>★ RECORDE <strong id="highscore">0</strong></span></div>
         </div>
         <div class="power-status" aria-label="Poderes ativos">
           <div class="power" id="boost-status" hidden>⚡ Supervelocidade <span id="boost-time">3s</span><span class="power-bar"><i id="boost-bar"></i></span></div>
@@ -227,6 +269,7 @@
         <button class="jump-button" id="jump" hidden><svg aria-hidden="true"><use href="#i-jump"/></svg> PULAR</button>
         <button class="jump-button roar-button" id="roar" aria-label="Rugir e afugentar os travessos" title="Rugir (R)" hidden><svg aria-hidden="true"><use href="#i-dino"/></svg><span id="roar-label">RUGIR!</span><small id="roar-hint">ESPANTA OS TRAVESSOS</small></button>
         <div class="pause-screen" id="pause-screen" hidden><div class="pause-card"><svg width="34" height="34" style="color:#82a862" aria-hidden="true"><use href="#i-dino"/></svg><h2>Uma pausinha.</h2><p>A aventura espera por você.</p><button class="primary" id="resume"><svg aria-hidden="true"><use href="#i-play"/></svg> Continuar</button></div></div>
+        <div class="pause-screen" id="end-screen" role="dialog" aria-modal="true" aria-labelledby="end-title" hidden><div class="pause-card end-card"><svg width="30" height="30" style="color:#dda449" aria-hidden="true"><use href="#i-star"/></svg><h2 id="end-title">Que aventura, Eric!</h2><p>Você brilhou. Vamos brincar mais?</p><div class="end-results"><div><small>SEUS PONTOS</small><strong id="end-score">0</strong></div><div><small>SEU RECORDE</small><strong id="end-record">0</strong></div></div><button class="primary" id="restart"><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos de novo!</button></div></div>
         <div class="rotate-screen" id="rotate-screen" aria-label="Vire o celular para brincar na horizontal"><div class="rotate-card"><svg class="rotate-illustration" viewBox="0 0 140 100" aria-hidden="true"><rect x="27" y="29" width="88" height="49" rx="10" fill="#e2f0c4" stroke="currentColor" stroke-width="3"/><rect x="36" y="36" width="69" height="34" rx="6" fill="#b5d69a"/><circle cx="110" cy="53" r="2" fill="currentColor"/><path d="M27 17c23-17 56-13 73 2m-3-15 4 16-16-2" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><use href="#i-dino" x="54" y="37" width="32" height="32"/></svg><h2>Vire o celular,<br>pequeno herói!</h2><p>Na horizontal, tem mais espaço<br>para correr, pular e rugir.</p></div></div>
       </div>
       <div class="game-footer"><span class="controls"><svg width="15" height="15" aria-hidden="true"><use href="#i-touch"/></svg> Toque para pular <span style="color:#bdc7b4">/</span> <kbd>Espaço</kbd></span><span class="safe-note">Aqui, a diversão nunca acaba.</span></div>
@@ -239,7 +282,7 @@
     <div class="sr-only" id="announcement" role="status" aria-live="polite"></div>
     <noscript><p>Ative o JavaScript no navegador para brincar.</p></noscript>
   </main>
-  <footer class="site-footer"><span>Feito com <span class="heart">♥</span> para o Eric. Feliz 4 anos, pequeno explorador!</span><span>Sem pressa. Sem perder. Só brincar.</span></footer>
+  <footer class="site-footer"><span>Feito com <span class="heart">♥</span> para o Eric. Feliz 4 anos, pequeno explorador!</span><span>Sem pressa. Sempre dá para brincar de novo.</span></footer>
 
   <script id="game-engine">
   /* MOTOR DO JOGO — tempo em segundos e distâncias em pixels do mundo.
@@ -247,11 +290,26 @@
   globalThis.RunnerEngine = (() => {
     function create() {
       return { running:false, paused:false, time:0, width:1120, distance:0, speed:220,
+        health:20, maxHealth:20, ended:false,
         goals:0, treasures:0, friends:0, stars:0, taskIndex:0, taskProgress:0,
         boost:0, shield:0, hurt:0, slow:0, shake:0, kick:0, roar:0,
         roarCooldown:0, roarWave:0, scared:0,
         player:{ x:235, lift:0, vy:0, stride:0 }, items:[], obstacles:[], mobs:[], events:[],
         spawnIn:.25, obstacleIn:.9, mobIn:2.6, sequence:0, hazardSequence:0, mobSequence:0 };
+    }
+    // Um ponto por metro, mais as brincadeiras. Nunca desconta pontos por dano.
+    function score(s) {
+      return Math.floor(s.distance)+s.goals*100+s.treasures*25+s.stars*100+s.scared*25+s.friends*10;
+    }
+    function restart(s) {
+      const next=create();next.width=s.width;next.player.x=s.player.x;next.running=true;
+      Object.assign(s,next);
+    }
+    function damage(s,slow) {
+      if(s.ended || s.shield>0 || s.hurt>0)return;
+      s.health=Math.max(0,s.health-1);s.hurt=2;s.slow=slow;
+      emit(s,'bump','OPA!',s.player.x,185);
+      if(s.health===0){s.ended=true;emit(s,'finish','QUE AVENTURA!',s.player.x,230);}
     }
     function emit(s, type, text, x=s.player.x, lift=210) {
       s.events.push({ type, text, x, lift });
@@ -259,7 +317,7 @@
       if (s.events.length > 32) s.events.shift();
     }
     function jump(s) {
-      if (!s.running || s.paused || s.player.lift > 0 || s.player.vy !== 0) return false;
+      if (!s.running || s.paused || s.ended || s.player.lift > 0 || s.player.vy !== 0) return false;
       s.player.vy = -570;
       emit(s, 'jump', 'BOING!', s.player.x, 195);
       progress(s,'jump');
@@ -279,7 +337,7 @@
       if(s.taskProgress>=task(s).target){s.stars++;s.taskProgress=0;s.taskIndex++;emit(s,'celebrate','ESTRELA!',s.player.x+60,290);}
     }
     function spriteFrame(s) {
-      if(!s.running || s.paused)return 7;
+      if(!s.running || s.paused || s.ended)return 7;
       if(s.player.lift>0)return 4;
       if(s.roar>0)return 6;
       if(s.kick>0)return 5;
@@ -295,7 +353,7 @@
       progress(s,'friend');emit(s,'friend',text,mob.x,230);
     }
     // Bichinhos amigos nunca fazem parte das colisões perigosas.
-    function isEnemy(mob) { return ['slime','robot','cloud'].includes(mob.type); }
+    function isEnemy(mob) { return ['slime','robot','cloud','balloon','mushroom','car'].includes(mob.type); }
     function scare(s,mob,reason='roar') {
       if(!isEnemy(mob) || mob.resolved)return;
       mob.resolved=true;mob.fleeing=true;mob.celebrate=1.5;s.scared++;
@@ -303,7 +361,7 @@
       progress(s,'scare');
     }
     function roar(s) {
-      if(!s.running || s.paused || s.roarCooldown>0)return false;
+      if(!s.running || s.paused || s.ended || s.roarCooldown>0)return false;
       s.roarCooldown=6;s.roarWave=1.15;s.roar=ROAR_SECONDS;s.shake=.38;s.shield=5;
       emit(s,'roar','ROAAAAR!',s.player.x+30,260);
       return true;
@@ -313,6 +371,7 @@
       return ![...s.obstacles,...s.mobs.filter(isEnemy)].some(h=>!h.hit && !h.resolved && h.x>s.width+45-gap);
     }
     function collect(s, type) {
+      if(s.ended)return;
       if (type === 'ball') { s.goals++; s.kick=.3; emit(s, 'goal', 'GOOOL!'); progress(s,'ball'); }
       if (type === 'fries') { s.boost=3; emit(s, 'boost', 'ZUUUM!'); }
       if (type === 'coin' || type === 'fossil') {
@@ -322,7 +381,7 @@
       }
     }
     function step(s, dt) {
-      if (!s.running || s.paused) return;
+      if (!s.running || s.paused || s.ended) return;
       dt = Math.min(Math.max(dt,0),.1);
       s.time += dt;
       for (const name of ['boost','shield','hurt','slow','shake','kick','roar','roarCooldown','roarWave']) s[name]=Math.max(0,s[name]-dt);
@@ -355,7 +414,8 @@
       }
       s.mobIn-=dt;
       if(s.mobIn<=0) {
-        const type=['slime','rabbit','robot','parrot','cloud'][s.mobSequence%5];
+        const types=['slime','rabbit','robot','parrot','cloud','rabbit','balloon','parrot','mushroom','rabbit','car','parrot'];
+        const type=types[s.mobSequence%types.length];
         if(!isEnemy({type}) || roomForHazard(s)) {
           s.mobSequence++;
           s.mobs.push({type,x:s.width+50,lift:type==='parrot'?126:0,height:48,width:48,phase:0,resolved:false,friendly:!isEnemy({type}),celebrate:0});
@@ -405,7 +465,7 @@
           else if(p.lift>=mob.height) {mob.resolved=true;emit(s,'clear','BOA!',mob.x,140);}
           else if(p.lift<mob.height-4) {
             mob.resolved=true;
-            if(s.hurt===0){s.hurt=.9;s.slow=.7;emit(s,'bump','OPA!',p.x,185);}
+            damage(s,.7);
           }
         }
       }
@@ -417,15 +477,15 @@
         if (!obstacle.hit && nearX && p.lift < obstacle.height-4) {
           obstacle.hit=true;
           if (s.shield > 0) emit(s,'shield','PLIM!',p.x,180);
-          else if (s.hurt===0) { s.hurt=1.3; s.slow=1.1; emit(s,'bump','OPA!',p.x,185); }
-          // Não perde pontos, não reinicia e nunca entra em Game Over.
+          else damage(s,1.1);
+          // Cada esbarrão tira um coração, preserva pontos e dá 2s de proteção.
         }
       }
       s.items=s.items.filter(i=>!i.collected && i.x > -90 && i.x < s.width+400 && i.lift > -160);
       s.obstacles=s.obstacles.filter(o=>o.x > -90);
       s.mobs=s.mobs.filter(m=>m.x>-110 && (!m.fleeing || m.x<s.width+110));
     }
-    return { create, jump, collect, step, spriteFrame, roarPhase, task, roar, isEnemy };
+    return { create, restart, score, jump, collect, step, spriteFrame, roarPhase, task, roar, isEnemy };
   })();
   </script>
   <script>
@@ -513,9 +573,23 @@
     const canvas=$('game'),ctx=canvas.getContext('2d'),stage=$('stage');
     if (!ctx) { $('start').disabled=true; $('start').textContent='Canvas indisponível'; return; }
     const engine=globalThis.RunnerEngine, state=engine.create();
+    // Recorde local: funciona sem conta. Se o navegador bloquear o armazenamento,
+    // o jogo continua normalmente e mantém o recorde enquanto esta aba estiver aberta.
+    const RECORD_KEY='eric-runner-highscore-v1';
+    let bestScore=0,savedBest=0,lastRecordWrite=-Infinity;
+    try {
+      const saved=Number(localStorage.getItem(RECORD_KEY));
+      if(Number.isSafeInteger(saved) && saved>=0)bestScore=savedBest=saved;
+    } catch(_) {}
+    function saveRecord() {
+      if(bestScore<=savedBest)return;
+      try {localStorage.setItem(RECORD_KEY,String(bestScore));savedBest=bestScore;} catch(_) {}
+    }
+    $('highscore').textContent=bestScore;
     const portraitPhone=window.matchMedia('(pointer:coarse) and (orientation:portrait)');
+    const touchDevice=window.matchMedia('(pointer:coarse)');
     const H=540, ground=436;
-    let W=1120,dpr=1,last=0,ambient=0,particles=[],bubbles=[],animals=[],animalIn=4,dustIn=0,missionSignature='';
+    let W=1120,dpr=1,last=0,ambient=0,particles=[],bubbles=[],animals=[],animalIn=4,dustIn=0,missionSignature='',bubbleSafeY=190;
     const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const palette=['#f9c85a','#f58b70','#74b68a','#72bfd0','#c0a2df'];
     let audio=null, soundEnabled=false, master=null, audioLoading=null;
@@ -626,6 +700,9 @@
       if(canvas.width!==pixelWidth)canvas.width=pixelWidth;
       if(canvas.height!==pixelHeight)canvas.height=pixelHeight;
       state.width=W; state.player.x=Math.max(114,W*.22);
+      // Usa a posição real do HUD, inclusive em telas curtas e em fullscreen.
+      const statusBottom=document.querySelector('.record-line').getBoundingClientRect().bottom;
+      bubbleSafeY=Math.max(190,(statusBottom-rect.top)*H/rect.height+48);
       draw(); // Redesenha imediatamente também na pausa e ao girar o celular.
     }
     new ResizeObserver(resize).observe(stage); resize();
@@ -637,8 +714,49 @@
     portraitPhone.addEventListener('change',syncOrientation);
     syncOrientation();
 
+    // Tela cheia precisa partir de um toque/clique real. Não pode bloquear
+    // os gestos do sistema. Em navegadores sem a API, amplia só o cenário.
+    let wasFullscreen=false;
+    const fullscreenElement=()=>document.fullscreenElement || document.webkitFullscreenElement;
+    function syncFullscreen() {
+      const active=!!fullscreenElement(),expanded=document.body.classList.contains('immersive');
+      const label=active?'Sair da tela cheia':expanded?'Voltar à página':'Entrar em tela cheia';
+      $('fullscreen').setAttribute('aria-label',label);
+      $('fullscreen').setAttribute('title',label);
+      $('fullscreen').setAttribute('aria-pressed',String(active || expanded));
+      if(wasFullscreen && !active && state.running && !state.ended)pause(true);
+      wasFullscreen=active;requestAnimationFrame(resize);
+    }
+    function expandFallback() {
+      document.body.classList.add('immersive');syncFullscreen();
+      $('announcement').textContent='Cenário ampliado. Este navegador não oferece tela cheia para o jogo.';
+    }
+    function enterFullscreen() {
+      if(fullscreenElement())return;
+      const request=stage.requestFullscreen || stage.webkitRequestFullscreen;
+      if(!request){expandFallback();return;}
+      try {
+        Promise.resolve(request.call(stage,{navigationUI:'hide'})).then(()=>{
+          document.body.classList.remove('immersive');syncFullscreen();
+          // A orientação só é travada se o navegador permitir em tela cheia.
+          try {Promise.resolve(screen.orientation?.lock?.('landscape')).catch(()=>{});} catch(_) {}
+        }).catch(expandFallback);
+      } catch(_) {expandFallback();}
+    }
+    $('fullscreen').addEventListener('click',()=>{
+      if(fullscreenElement()) {
+        try {Promise.resolve((document.exitFullscreen || document.webkitExitFullscreen).call(document)).catch(()=>{});} catch(_) {}
+      } else if(document.body.classList.contains('immersive')) {
+        document.body.classList.remove('immersive');syncFullscreen();
+        if(state.running && !state.ended)pause(true);
+      } else enterFullscreen();
+    });
+    document.addEventListener('fullscreenchange',syncFullscreen);
+    document.addEventListener('webkitfullscreenchange',syncFullscreen);
+
     function start() {
       if (state.running || portraitPhone.matches) return;
+      if(touchDevice.matches)enterFullscreen();
       state.running=true; unlockAudio(); canvas.focus({preventScroll:true});
       $('intro').hidden=true; $('hero-name').hidden=true;
       $('jump').hidden=false; $('pause').hidden=false; $('play-hint').hidden=false; $('mission').hidden=false;
@@ -648,17 +766,37 @@
     function jump() { if(portraitPhone.matches)return; unlockAudio(); if (!state.running) { start(); return; } engine.jump(state); }
     function roar() { if(portraitPhone.matches)return; unlockAudio(); engine.roar(state); }
     function pause(value=!state.paused) {
-      if (!state.running || (!value && portraitPhone.matches)) return;
+      if (!state.running || state.ended || (!value && portraitPhone.matches)) return;
       state.paused=value; $('pause-screen').hidden=!value;
       $('pause').setAttribute('aria-pressed',String(value));
       $('pause').setAttribute('aria-label',value?'Continuar aventura':'Pausar aventura');
       $('pause').querySelector('use').setAttribute('href',value?'#i-play':'#i-pause');
-      if (value) { if (audio?.state==='running') audio.suspend().catch(()=>{}); $('resume').focus({preventScroll:true}); }
+      if (value) { saveRecord();if (audio?.state==='running') audio.suspend().catch(()=>{}); $('resume').focus({preventScroll:true}); }
       else { unlockAudio(); canvas.focus({preventScroll:true}); }
     }
     $('start').addEventListener('click',start);
     $('resume').addEventListener('click',()=>pause(false));
     $('pause').addEventListener('click',()=>pause());
+    function finish() {
+      saveRecord();muteAudio();
+      $('end-score').textContent=engine.score(state);$('end-record').textContent=bestScore;
+      $('end-screen').hidden=false;$('pause-screen').hidden=true;
+      for(const id of ['jump','roar','pause','play-hint'])$(id).hidden=true;
+      $('announcement').textContent='Que aventura, Eric! Você fez '+engine.score(state)+' pontos. Aperte Vamos de novo para brincar mais.';
+      $('restart').focus({preventScroll:true});
+    }
+    $('restart').addEventListener('click',()=>{
+      if(!state.ended || portraitPhone.matches)return;
+      if(touchDevice.matches)enterFullscreen();
+      engine.restart(state);particles=[];bubbles=[];animals=[];animalIn=4;dustIn=0;
+      missionSignature='';lastFootstep=-1;last=0;lastRecordWrite=-Infinity;
+      $('end-screen').hidden=true;
+      for(const id of ['jump','roar','pause','play-hint','mission'])$(id).hidden=false;
+      $('pause').setAttribute('aria-pressed','false');$('pause').setAttribute('aria-label','Pausar aventura');
+      $('pause').querySelector('use').setAttribute('href','#i-pause');
+      updateHUD();unlockAudio();canvas.focus({preventScroll:true});
+      $('announcement').textContent='Vamos de novo, Eric! Vinte corações novinhos para brincar.';
+    });
     $('sound').addEventListener('click',()=>{soundEnabled=!soundEnabled;updateSoundButton();if(soundEnabled){unlockAudio();tone(660,.1);}else muteAudio();});
     // pointerdown funciona com mouse, caneta e toque; não registra clique duplo.
     canvas.addEventListener('pointerdown',e=>{if(!e.isPrimary || e.button>0)return;e.preventDefault();canvas.focus({preventScroll:true});jump();});
@@ -674,11 +812,13 @@
         if (e.target.closest('button')) return;
         e.preventDefault(); if (!e.repeat) jump();
       }
-      if ((e.code==='KeyP' || e.code==='Escape') && !e.repeat) pause();
+      if (e.code==='KeyP' && !e.repeat)pause();
+      if (e.code==='Escape' && !e.repeat && !fullscreenElement())pause(true);
       if (e.code==='KeyR' && !e.repeat) {e.preventDefault();roar();}
     });
     // Sair da aba pausa a aventura; os segundos dos poderes não são gastos.
-    document.addEventListener('visibilitychange',()=>{last=0;if(document.hidden && state.running)pause(true);});
+    document.addEventListener('visibilitychange',()=>{last=0;if(document.hidden){saveRecord();if(state.running)pause(true);}});
+    window.addEventListener('pagehide',saveRecord);
     window.addEventListener('blur',()=>{if(state.running && !state.paused)pause(true);});
 
     // Primitivas de desenho: todos os itens, animais e cenários são Canvas.
@@ -812,6 +952,29 @@
         eye(-9,-41);eye(10,-41);round(-11,-24,22,6,3,'#946b72');
         for(const x of [-18,18])ellipse(x,-15,2,2,'#fce2a1');
         if(!fleeing){ctx.strokeStyle='#a36766';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-17,-54);ctx.lineTo(-2,-49);ctx.moveTo(4,-49);ctx.lineTo(18,-54);ctx.stroke();}
+      } else if(m.type==='balloon') {
+        // Balão Birrento: um balão de festa com cordão e sapatinhos.
+        legs('#ba6f85');
+        ctx.strokeStyle='#ae829b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-3);ctx.bezierCurveTo(-8,-8,8,-13,0,-19);ctx.stroke();
+        ellipse(0,-44,24,26,'#ec9cb1');ellipse(-10,-53,5,9,'#ffd5dd');
+        path([[-5,-21],[5,-21],[0,-27]],'#cd7f9b');
+        eye(-10,-45);eye(10,-45);
+        if(!fleeing){path([[-20,-58],[-3,-54],[-3,-51],[-20,-55]],'#a56889');path([[3,-54],[20,-58],[20,-55],[3,-51]],'#a56889');}
+      } else if(m.type==='mushroom') {
+        // Cogumelo Resmungão: chapéu de bolinhas e botas de jardim.
+        legs('#638b79');round(-17,-38,34,34,12,'#f3dbac');
+        ellipse(0,-43,32,18,'#83b59a');round(-32,-44,64,8,4,'#619d82');
+        for(const [x,y,r] of [[-17,-49,5],[1,-55,6],[19,-48,4]])ellipse(x,y,r,r*.7,'#d6efbd');
+        eye(-9,-26);eye(10,-26);
+        if(!fleeing){ctx.strokeStyle='#9c8569';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-17,-37);ctx.lineTo(-2,-34);ctx.moveTo(4,-34);ctx.lineTo(18,-37);ctx.stroke();}
+      } else if(m.type==='car') {
+        // Carrinho Desgovernado: brinquedo de rodas que foge do rugido.
+        round(-21,-50,41,25,10,'#d0b969');round(-33,-32,66,22,8,'#e6bc64');
+        round(-15,-46,30,18,6,'#fff3d0');eye(-8,-37);eye(9,-37);
+        round(-34,-18,68,5,2,'#c49e55');ellipse(-20,-8,10,10,'#78867d');ellipse(22,-8,10,10,'#78867d');
+        for(const x of [-20,22]){ellipse(x,-8,5,5,'#cbd4b5');ctx.strokeStyle='#6e8773';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,-8);ctx.lineTo(x+Math.cos(m.phase*3)*4,-8+Math.sin(m.phase*3)*4);ctx.stroke();}
+        ellipse(-27,-26,3,3,'#fff3bb');ellipse(27,-26,3,3,'#fff3bb');
+        if(!fleeing){ctx.strokeStyle='#b18d51';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-16,-48);ctx.lineTo(-1,-44);ctx.moveTo(3,-44);ctx.lineTo(18,-48);ctx.stroke();}
       } else {
         // Nuvem Resmungona: uma almofadinha com gotas e pezinhos.
         legs('#9780ba');
@@ -950,10 +1113,10 @@
       const size=b.kind==='roar'?(W<600?32:38):25;
       ctx.save();ctx.font=`900 ${size}px "Trebuchet MS",sans-serif`;const width=ctx.measureText(b.text).width+30;
       // Rugido à direita no celular: libera o rosto e os travessos na pista.
-      const desiredX=b.kind==='roar' && W<600?W-width/2-10:b.x+(b.kind==='jump'?112:33);
+      const desiredX=b.kind==='roar' && touchDevice.matches?W-width/2-14:b.x+(b.kind==='jump'?112:33);
       const x=Math.max(width/2+8,Math.min(W-width/2-8,desiredX));
       // O BOING acompanha o salto acima do capacete, mantendo o rosto visível.
-      const minimumY=W<600?225:152;
+      const minimumY=bubbleSafeY;
       const y=b.kind==='jump'?Math.max(minimumY,ground-state.player.lift-265):Math.max(minimumY,b.y-(b.full-b.life)*25);
       ctx.globalAlpha=Math.min(1,b.life*3);ctx.translate(x,y);ctx.rotate(-.05);
       round(-width/2,-28,width,46,13,'#fffef1','#536d47');path([[-6,17],[5,33],[13,17]],'#fffef1');
@@ -983,6 +1146,13 @@
     }
     function updateHUD() {
       $('goals').textContent=state.goals; $('treasures').textContent=state.treasures; $('stars').textContent=state.stars;
+      const points=engine.score(state);bestScore=Math.max(bestScore,points);
+      $('points').textContent=points;$('highscore').textContent=bestScore;
+      $('health').textContent=state.health;$('health-bar').style.width=state.health/state.maxHealth*100+'%';
+      $('health-meter').setAttribute('aria-valuenow',state.health);
+      $('health-meter').classList.toggle('low',state.health<=5);
+      // Não grava a cada frame: no máximo uma vez por segundo, e ao sair/finalizar.
+      if(state.time-lastRecordWrite>=1){saveRecord();lastRecordWrite=state.time;}
       const signature=state.taskIndex+'.'+state.taskProgress;
       if(signature!==missionSignature) {
         missionSignature=signature;const mission=engine.task(state);
@@ -1002,9 +1172,9 @@
     }
     function frame(now) {
       const dt=last?Math.min((now-last)/1000,.04):0;last=now;
-      if(!state.paused)ambient+=dt;
+      if(!state.paused && !state.ended)ambient+=dt;
       engine.step(state,dt);
-      if(state.running && !state.paused) {
+      if(state.running && !state.paused && !state.ended) {
         consumeEvents();dustIn-=dt;
         // Passinhos discretos acompanham o contato com o chão, nunca o salto.
         const footstep=Math.floor(state.player.stride/2);
@@ -1019,6 +1189,7 @@
         animals=animals.filter(a=>a.x>-90);
         updateHUD();
       }
+      if(state.ended && $('end-screen').hidden){consumeEvents();updateHUD();finish();}
       draw();requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);

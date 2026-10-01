@@ -1,6 +1,6 @@
 # Eric · O Dino-Futebolista
 
-Uma aventura lateral alegre feita para os 4 anos do Eric. Não há Game Over: colisões fazem o personagem piscar e desacelerar um pouco; a corrida continua e os pontos permanecem.
+Uma aventura lateral alegre feita para os 4 anos do Eric. Eric começa com 20 corações. Colisões sem proteção tiram um coração, fazem piscar e desaceleram brevemente; os pontos permanecem. Ao zerar a vida, uma tela alegre mostra os pontos, o recorde e o botão “Vamos de novo!”.
 
 [**Jogar online**](https://mauriciosodre.github.io/eric-runner/)
 
@@ -18,6 +18,9 @@ Todo o HTML, CSS e JavaScript do jogo está em **um único arquivo: `index.html`
 - **Pular:** toque no cenário, botão PULAR, Espaço ou seta para cima.
 - **Rugir:** botão RUGIR ou tecla R. A onda do rugido faz os travessos visíveis fugirem e ativa o escudo por 5 segundos. O especial começa pronto e recarrega sozinho em 6 segundos.
 - **Pausar/continuar:** botão de pausa, tecla P ou Escape.
+- **Tela cheia:** no celular, começa junto com “Vamos correr!”. O botão de quatro cantos também ativa no computador e permite sair. Usa a API nativa com navegação oculta e tenta manter landscape quando o navegador permite. Ao sair da tela cheia, a partida pausa. Em navegadores que recusam a API, o cenário é ampliado dentro da página; os gestos e controles do sistema continuam disponíveis.
+- **Vida:** 20 corações. Cada esbarrão tira apenas um, com 2 segundos de proteção para evitar danos seguidos. Amigos, salto e escudo preservam a vida.
+- **Vamos de novo:** ao zerar a vida, reinicia a pista e restaura os 20 corações, preservando o recorde e a preferência de som.
 - **Som:** botão do alto-falante. Começa desligado. Sete gravações estão embutidas no HTML; não precisam de download durante o jogo.
 - **Bola:** chute automático, balão GOOOL! e confetes.
 - **Batatas:** velocidade extra e poeira por 3 segundos.
@@ -25,12 +28,18 @@ Todo o HTML, CSS e JavaScript do jogo está em **um único arquivo: `index.html`
 
 O jogo pausa ao sair da aba. A pausa preserva o tempo dos poderes.
 
+## Placar e recorde
+
+O placar soma 1 ponto por metro, 100 por gol, 25 por tesouro, 100 por estrela, 25 por travesso afugentado e 10 por encontro com um amigo. Danos não descontam pontos.
+
+O recorde é salvo no `localStorage`, na chave `eric-runner-highscore-v1`, no navegador deste aparelho. Sobrevive a reiniciar a partida e a recarregar a página. As gravações são limitadas a uma por segundo; sair da aba, pausar e terminar a partida também salvam o valor mais recente. Se o navegador bloquear armazenamento, o jogo continua e conserva o recorde durante a aba, sem prometer persistência. Limpar os dados do site apaga o recorde.
+
 ## Mais brincadeiras, sem ficar difícil
 
-- Blocos, cones e tronquinhos ficam na pista. O aviso **↑ PULE** identifica os obstáculos. Passar por cima rende uma comemoração; esbarrar apenas desacelera um pouco.
+- Blocos, cones e tronquinhos ficam na pista. O aviso **↑ PULE** identifica os obstáculos. Passar por cima rende uma comemoração; esbarrar sem escudo tira um coração e desacelera um pouco.
 - Coelhos e papagaios são **sempre amigos**, com corações verdes e posição na grama ao lado da pista. Nunca machucam nem desaceleram o Eric, mesmo sem pular. A bola também pode fazê-los brincar; o papagaio deixa uma moeda.
-- Os inimigos são os travessos **Gelequinha**, **Lata-Lelé** e **Nuvem Resmungona**: uma gelatina lilás, um robô de corda e uma nuvem com pezinhos. Eles têm silhuetas próprias e o aviso **! RUGIR**. O rugido abre seus olhos de surpresa e faz todos correrem para fora da tela, sem violência. Amigos continuam tranquilos.
-- Também é possível saltar os travessos, afastá-los com uma bola chutada ou passar protegido pelo escudo. Encostar sem proteção apenas faz piscar e desacelerar brevemente; os pontos ficam intactos.
+- Os inimigos são os travessos **Gelequinha**, **Lata-Lelé** e **Nuvem Resmungona**: uma gelatina lilás, um robô de corda e uma nuvem com pezinhos. Também aparecem o **Balão Birrento**, o **Cogumelo Resmungão** e o **Carrinho Desgovernado**: um balão com sapatinhos, um cogumelo de chapéu com bolinhas e um carrinho de brinquedo. Todos são desenhados pelo Canvas, sem imagens externas adicionais. Eles têm silhuetas próprias e o aviso **! RUGIR**. O rugido abre seus olhos de surpresa e faz todos correrem para fora da tela, sem violência. Amigos continuam tranquilos.
+- Também é possível saltar os travessos, afastá-los com uma bola chutada ou passar protegido pelo escudo. Encostar sem proteção tira um coração, faz piscar e desacelera brevemente; os pontos ficam intactos.
 - Há tarefas curtas: dois gols, dois pulos, dois encontros, três tesouros e afugentar dois travessos. Cada tarefa dá uma estrela e inicia outra. Não há prazo nem penalidade por ignorá-las.
 - O jogo mantém espaço entre obstáculos e mobs, inclusive durante o turbo e no celular.
 
@@ -75,9 +84,9 @@ As imagens foram geradas com a ferramenta integrada a partir do personagem e das
 node --test tests/game.test.cjs
 ```
 
-Os 25 testes exercitam a física extraída do próprio HTML: salto e aterrissagem, chute único, duração e expiração dos poderes, proteção, colisões sem derrota, margem de coleta, pausa, animação, amigos sem penalidade, fuga dos três inimigos, onda limitada à tela, recarga do especial, tarefas, espaçamento durante o turbo e dez minutos de corrida simulada com memória limitada.
+Os 32 testes exercitam a física extraída do próprio HTML: salto e aterrissagem, chute único, duração e expiração dos poderes, proteção, dano unitário, 20 corações, proteção de 2 segundos, fim de partida, reinício, pontuação, margem de coleta, pausa, animação, amigos sem penalidade, fuga dos seis inimigos, onda limitada à tela, recarga do especial, tarefas, espaçamento durante o turbo e dez minutos de corrida protegida simulada com memória limitada.
 
-`tests/browser.test.cjs` verifica o HTML local no Chromium com Playwright disponível no ambiente de desenvolvimento. Confere a imagem frontal aprovada no início e na pausa, inclusive no celular, as oito fases da corrida com solas no chão e sem linha preta, as seis poses do rugido com escala do rosto consistente, tarefas, teclado R, toque nos dois botões, pausa, gols, poderes, sete gravações decodificadas e reprodução do áudio anterior do rugido, fuga dos travessos sem assustar amigos, landscape em 844 × 390 e 667 × 320, convite na vertical, pausa por rotação preservando poderes e geometria preservada quando o painel é ocultado. As capturas ficam em `output/verification`. Playwright não é uma dependência do jogo.
+`tests/browser.test.cjs` verifica tela cheia nativa, pausa ao sair, fallback quando a API é recusada, vida, novos mobs, fim e reinício, recorde após reload e tratamento de storage bloqueado, além do HTML local no Chromium com Playwright disponível no ambiente de desenvolvimento. Confere a imagem frontal aprovada no início e na pausa, inclusive no celular, as oito fases da corrida com solas no chão e sem linha preta, as seis poses do rugido com escala do rosto consistente, tarefas, teclado R, toque nos dois botões, pausa, gols, poderes, sete gravações decodificadas e reprodução do áudio anterior do rugido, fuga dos travessos sem assustar amigos, landscape em 844 × 390 e 667 × 320, convite na vertical, pausa por rotação preservando poderes e geometria preservada quando o painel é ocultado. As capturas ficam em `output/verification`. Playwright não é uma dependência do jogo.
 
 Para executar a verificação do navegador, instale Playwright no ambiente de desenvolvimento e rode `node tests/browser.test.cjs`. `PLAYWRIGHT_MODULE` pode apontar para uma instalação já existente. Defina `GAME_URL` com o endereço publicado para conferir a versão online em vez do HTML local.
 

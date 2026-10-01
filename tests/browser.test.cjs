@@ -11,6 +11,16 @@ fs.mkdirSync(output, { recursive: true });
 async function observe(page) {
   await page.addInitScript(() => {
     globalThis.__spriteDraws=[];
+    globalThis.__roarBubbles=[];
+    const fillText=CanvasRenderingContext2D.prototype.fillText;
+    CanvasRenderingContext2D.prototype.fillText=function(text,...args){
+      if(this.canvas.id==='game' && text==='ROAAAAR!') {
+        const t=this.getTransform(),r=this.canvas.getBoundingClientRect();
+        __roarBubbles.push({top:r.top+(t.f-28*t.d)/this.canvas.height*r.height});
+        if(__roarBubbles.length>100)__roarBubbles.shift();
+      }
+      return fillText.call(this,text,...args);
+    };
     globalThis.__decodedAudio=[];globalThis.__sampleStarts=[];
     globalThis.__canvasErrors=[];
     addEventListener('error',()=>{
@@ -101,6 +111,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await observe(page);
     await page.goto(url);
     await page.waitForFunction(() => !!globalThis.__observedState);
+    assert.equal(await page.getByRole('button',{name:'Entrar em tela cheia'}).isVisible(),true,'há controle de tela cheia');
     const imageSize = await page.evaluate(() => new Promise(resolve => {
       const image = new Image();
       image.onload = () => resolve([image.naturalWidth, image.naturalHeight]);
@@ -213,6 +224,54 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await page.waitForFunction(()=>document.getElementById('stars').textContent==='1');
     assert.equal(await page.locator('#stars').textContent(),'1');
     assert.match(await page.locator('#mission-text').textContent(),/superpulos/);
+    // Os novos travessos têm desenhos e continuam sendo alvos do rugido.
+    await page.evaluate(()=>{
+      const s=__observedState;s.items=[];s.obstacles=[];s.mobs=[];s.shield=0;s.hurt=0;
+      for(const [i,type] of ['balloon','mushroom','car'].entries())
+        s.mobs.push({type,x:s.player.x+200+i*170,lift:0,width:48,height:48,phase:0,resolved:false});
+    });
+    await page.waitForTimeout(80);
+    await page.screenshot({path:path.join(output,'desktop-new-mobs.png'),fullPage:true});
+    const initialHealth=await page.evaluate(()=>__observedState.health);
+    await page.evaluate(()=>{
+      const s=__observedState;s.mobs=[];s.items=[];s.obstacles=[{kind:'cone',x:s.player.x,width:46,height:43,hit:false}];
+      s.health=20;s.hurt=0;s.shield=0;s.player.lift=0;s.player.vy=0;
+    });
+    await page.waitForFunction(()=>__observedState.health===19);
+    assert.equal(initialHealth,20);
+    assert.equal(await page.locator('#health').textContent(),'19');
+    await page.evaluate(()=>{
+      const s=__observedState;s.health=1;s.hurt=0;s.shield=0;s.items=[];s.mobs=[];
+      s.obstacles=[{kind:'cone',x:s.player.x,width:46,height:43,hit:false}];
+      s.goals=12;s.treasures=5;s.distance=1000;
+    });
+    await page.waitForFunction(()=>__observedState.ended);
+    assert.equal(await page.getByRole('button',{name:'Vamos de novo!'}).isVisible(),true);
+    const record=Number(await page.locator('#highscore').textContent());
+    assert.ok(record>=2325,'recorde inclui a última pontuação');
+    assert.equal(await page.locator('#end-score').textContent(),await page.locator('#points').textContent());
+    const frozenScore=await page.locator('#points').textContent();
+    await page.keyboard.press('r');await page.waitForTimeout(120);
+    assert.equal(await page.locator('#points').textContent(),frozenScore);
+    await page.screenshot({path:path.join(output,'desktop-end.png'),fullPage:true});
+    await page.getByRole('button',{name:'Vamos de novo!'}).click();
+    assert.equal(await page.evaluate(()=>__observedState.health),20);
+    assert.equal(await page.evaluate(()=>__observedState.ended),false);
+    assert.equal(await page.locator('#end-screen').isVisible(),false);
+    assert.equal(Number(await page.locator('#highscore').textContent()),record,'recomeçar preserva recorde');
+    await page.reload();
+    await page.waitForFunction(()=>!!__observedState);
+    assert.equal(Number(await page.locator('#highscore').textContent()),record,'recorde sobrevive a recarregar a página');
+    await page.getByRole('button',{name:'Entrar em tela cheia'}).click();
+    await page.waitForFunction(()=>document.fullscreenElement?.id==='stage');
+    assert.ok(await page.evaluate(()=>{
+      const r=document.getElementById('stage').getBoundingClientRect();
+      return r.width===innerWidth && r.height===innerHeight;
+    }),'tela cheia nativa ocupa o viewport');
+    await page.getByRole('button',{name:'Vamos correr!'}).click();
+    await page.getByRole('button',{name:'Sair da tela cheia'}).click();
+    await page.waitForFunction(()=>!document.fullscreenElement && __observedState.paused);
+    assert.equal(await page.locator('#pause-screen').isVisible(),true,'sair da tela cheia pausa a partida');
     assert.deepEqual(errors, []);
 
     const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
@@ -234,6 +293,8 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await mobile.screenshot({ path: path.join(output, 'mobile-start.png') });
     assert.ok(await mobile.evaluate(()=>__spriteDraws.some(d=>d.asset==='eric.png')),'início no celular usa o mesmo rosto aprovado');
     await mobile.getByRole('button', { name: 'Vamos correr!' }).tap();
+    await mobile.waitForFunction(()=>document.fullscreenElement?.id==='stage');
+    assert.equal(await mobile.getByRole('button',{name:'Sair da tela cheia'}).getAttribute('aria-pressed'),'true','começar no celular ativa tela cheia real');
     await mobile.locator('canvas').tap({ position: { x: 140, y: 260 } });
     await mobile.waitForTimeout(100);
     assert.ok(await mobile.evaluate(() => __observedState.player.lift > 20), 'toque pula de verdade');
@@ -259,8 +320,16 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await mobile.evaluate(()=>{__observedState.roarCooldown=0;});
     await mobile.getByRole('button',{name:'Rugir e afugentar os travessos'}).tap();
     await mobile.waitForTimeout(450);
+    assert.ok(await mobile.evaluate(()=>{
+      const bottom=document.querySelector('.record-line').getBoundingClientRect().bottom;
+      return __roarBubbles.slice(-10).every(b=>b.top>bottom+3);
+    }),'balão do rugido fica abaixo da vida e do recorde');
     await mobile.screenshot({path:path.join(output,'mobile-ground-roar-sequence.png')});
     assert.ok(await mobile.evaluate(()=>__spriteDraws.some(d=>d.asset==='eric-roar-actions.png' && d.lift===0)),'sequência de rugido também aparece no celular');
+    // O Chromium não permite redimensionar a janela nativa enquanto está
+    // em tela cheia. Saímos pelo mesmo botão disponível para os pais.
+    await mobile.getByRole('button',{name:'Sair da tela cheia'}).tap();
+    await mobile.waitForFunction(()=>!document.fullscreenElement && __observedState.paused);
     await mobile.setViewportSize({width:320,height:700});
     await mobile.waitForTimeout(100);
     assert.equal(await mobile.locator('#rotate-screen').isVisible(),true);
@@ -284,8 +353,42 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await mobile.screenshot({path:path.join(output,'mobile-landscape-small.png')});
     assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
     assert.ok(await mobile.evaluate(() => Number.isFinite(__observedState.player.x)));
+    assert.ok(await mobile.evaluate(()=>{
+      const health=document.getElementById('health-meter').getBoundingClientRect(),tools=document.querySelector('.tools').getBoundingClientRect(),mission=document.getElementById('mission').getBoundingClientRect();
+      return health.left>=0 && health.right<=innerWidth && tools.left>=mission.right;
+    }),'vida e controles cabem no celular pequeno');
     assert.deepEqual(mobileErrors, [],JSON.stringify(await mobile.evaluate(()=>__canvasErrors)));
-    console.log('PASS:',url,'; oito fases sem linha preta; cabeça estável; solas no chão; rugido com seis poses, transições e rosto na mesma escala; áudio anterior; travessos fogem; amigos protegidos; landscape 844×390 e 667×320; pausa preserva poderes; nenhum erro de JavaScript.');
+    // Safari ou política de navegador podem impedir fullscreen e storage.
+    // As recusas precisam manter a brincadeira funcionando.
+    const fallback=await browser.newPage({viewport:{width:667,height:320},isMobile:true,hasTouch:true});
+    const fallbackErrors=[];fallback.on('pageerror',e=>fallbackErrors.push(e.message));
+    await observe(fallback);
+    await fallback.addInitScript(()=>{
+      Element.prototype.requestFullscreen=function(){return Promise.reject(new DOMException('Indisponível','NotAllowedError'));};
+      Storage.prototype.getItem=function(){throw new DOMException('Bloqueado','SecurityError');};
+      Storage.prototype.setItem=function(){throw new DOMException('Bloqueado','SecurityError');};
+    });
+    await fallback.goto(url);
+    await fallback.getByRole('button',{name:'Vamos correr!'}).tap();
+    await fallback.waitForFunction(()=>document.body.classList.contains('immersive'));
+    await fallback.evaluate(()=>{
+      const s=__observedState;s.goals=3;s.health=1;s.shield=0;s.hurt=0;
+      s.items=[];s.mobs=[];s.spawnIn=s.obstacleIn=s.mobIn=Infinity;
+      s.obstacles=[{kind:'cone',x:s.player.x,width:46,height:43,hit:false}];
+    });
+    await fallback.getByRole('button',{name:'Vamos de novo!'}).waitFor();
+    await fallback.screenshot({path:path.join(output,'mobile-end.png')});
+    await fallback.getByRole('button',{name:'Vamos de novo!'}).tap();
+    assert.equal(await fallback.evaluate(()=>__observedState.health),20);
+    assert.ok(Number(await fallback.locator('#highscore').textContent())>=300,'sem storage, recorde ainda vale durante a aba');
+    assert.deepEqual(fallbackErrors,[],'recusas de tela cheia e armazenamento são tratadas');
+    const pointerStart=await browser.newPage({viewport:{width:844,height:390},isMobile:true,hasTouch:true});
+    await pointerStart.goto(url);
+    await pointerStart.locator('canvas').tap({position:{x:120,y:240}});
+    await pointerStart.waitForTimeout(200);
+    assert.equal(await pointerStart.evaluate(()=>document.fullscreenElement?.id),'stage','toque inicial no cenário também entra em tela cheia');
+    await pointerStart.close();
+    console.log('PASS:',url,'; tela cheia real no desktop e no celular; fallback e saída com pausa; 20 corações; novos travessos; fim e reinício; recorde preservado no reload; storage bloqueado; oito fases sem linha preta; seis poses do rugido; landscape 844×390 e 667×320; nenhum erro de JavaScript.');
     console.log('Capturas:', output);
   } finally { await browser.close(); }
 })().catch(e => { console.error(e); process.exitCode = 1; });
