@@ -25,7 +25,7 @@ async function observe(page) {
     };
     const startAudio=AudioBufferSourceNode.prototype.start;
     AudioBufferSourceNode.prototype.start=function(...args){
-      __sampleStarts.push({duration:this.buffer?.duration,rate:this.playbackRate.value});
+      __sampleStarts.push({duration:this.buffer?.duration,rate:this.playbackRate.value,offset:args[1],limit:args[2]});
       return startAudio.apply(this,args);
     };
     const drawImage=CanvasRenderingContext2D.prototype.drawImage;
@@ -145,7 +145,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await page.waitForFunction(()=>__observedState.scared===3);
     assert.ok(await page.evaluate(()=>__observedState.mobs.filter(m=>!RunnerEngine.isEnemy(m)).every(m=>!m.fleeing)),'rugido poupa os animais amigos');
     const playedSamples=await page.evaluate(()=>__sampleStarts);
-    assert.ok(playedSamples.some(s=>Math.abs(s.duration-1.25)<.002 && Math.abs(s.rate-1.08)<.001),'o especial toca a nova gravação vocal de criança: '+JSON.stringify(playedSamples));
+    assert.ok(playedSamples.some(s=>s.duration>2.37 && Math.abs(s.rate-1.9)<.001 && Math.abs(s.offset-.12)<.001 && Math.abs(s.limit-2.25)<.001),'o especial toca o áudio anterior com o mesmo trecho e velocidade: '+JSON.stringify(playedSamples));
     assert.equal(await page.locator('#roar').getAttribute('aria-disabled'),'true');
     await page.screenshot({ path: path.join(output, 'desktop-playing.png'), fullPage: true });
     await page.getByRole('button', { name: 'Desativar sons' }).click();

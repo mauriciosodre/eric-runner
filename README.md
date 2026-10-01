@@ -44,12 +44,12 @@ A pose de chute aparece ao encontrar a bola. A pose de rugido acompanha o especi
 
 ## Sons e créditos
 
-O chute tem um impacto macio com uma pequena fanfarra. A aterrissagem e os passos usam gravações discretas de grama. O turbo combina vento filtrado com uma subida musical; o pulo tem uma mola sonora. O rugido usa uma gravação de criança fazendo "RAAA!", com a vogal aberta e energia de filhote. Um tratamento leve acrescenta textura de dinossauro e preserva a voz infantil. Uma onda visual e um tremor pequeno acompanham o especial. O volume dos efeitos é equilibrado e há um compressor na saída para controlar picos. Desativar o som interrompe os efeitos em andamento.
+O chute tem um impacto macio com uma pequena fanfarra. A aterrissagem e os passos usam gravações discretas de grama. O turbo combina vento filtrado com uma subida musical; o pulo tem uma mola sonora. O rugido usa uma voz mais aguda, curta e suave, com os graves removidos para lembrar um pequeno dinossauro brincando de "rááá!". A gravação é um efeito de monstro ajustado, não uma gravação de criança. Uma onda visual e um tremor pequeno acompanham o especial. O volume dos efeitos é equilibrado e há um compressor na saída para controlar picos. Desativar o som interrompe os efeitos em andamento.
 
 Fontes das gravações, ambas com licença [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/):
 
 - **Kenney — [Impact Sounds](https://kenney.nl/assets/impact-sounds):** `impactSoft_medium_000.ogg` (chute), `impactSoft_heavy_001.ogg` (esbarrão), `footstep_grass_002.ogg` (aterrissagem), `footstep_grass_000.ogg` e `footstep_grass_001.ogg` (passos), `impactBell_heavy_000.ogg` (poder dino).
-- **wolfdoctor — [Child Saying "Raaaarrr" / Roar](https://freesound.org/people/wolfdoctor/sounds/578769/), publicado no Freesound em 01/07/2021:** gravação da filha do autor imitando um rugido. Foi selecionado o trecho de 4,20 a 5,45 segundos da prévia MP3 de alta qualidade, convertido em WAV mono com saturação leve e fades curtos. O jogo aplica volume, filtros e um ajuste pequeno de velocidade (1,08×).
+- **123agumon — [Dinosaur Growl](https://freesound.org/people/123agumon/sounds/147527/), publicado no Freesound em 23/02/2012:** trecho da prévia MP3 de alta qualidade, com velocidade, filtro e envelope ajustados para o jogo.
 
 Os efeitos musicais e de vento são sintetizados pelo próprio JavaScript. Os créditos também estão em `LICENSE_AUDIO.md`. O pacote distribuído não depende de arquivos de áudio externos.
 

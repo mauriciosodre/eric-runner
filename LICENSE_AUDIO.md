@@ -17,20 +17,19 @@ Arquivos utilizados: `impactSoft_medium_000.ogg`, `impactSoft_heavy_001.ogg`,
 
 O volume e a velocidade de alguns efeitos foram ajustados em tempo de execução.
 
-## wolfdoctor — Child Saying "Raaaarrr" / Roar
+## 123agumon — Dinosaur Growl
 
-Autor: wolfdoctor. Publicado no Freesound em 01/07/2021.
+Autor: 123agumon. Publicado no Freesound em 23/02/2012.
 
-Fonte e indicação de licença: https://freesound.org/people/wolfdoctor/sounds/578769/
+Fonte e indicação de licença: https://freesound.org/people/123agumon/sounds/147527/
 
 Licença: Creative Commons Zero (CC0 1.0 Universal).
 https://creativecommons.org/publicdomain/zero/1.0/
 
 Arquivo utilizado: prévia MP3 de alta qualidade disponibilizada na página do autor.
-O trecho de 4,20 a 5,45 segundos foi convertido para WAV mono de 44.100 Hz,
-com saturação leve e fades de 15 ms. O jogo aplica volume, filtros passa-altas
-e passa-baixas e um ajuste pequeno de velocidade (1,08×), preservando a voz
-da criança imitando um rugido.
+O jogo reproduz um trecho, com filtros passa-altas e passa-baixas, envelope de
+volume e velocidade ajustados para uma voz mais aguda e suave. Não há camada
+grave adicional.
 
 ## Síntese original do jogo
 
