@@ -58,6 +58,11 @@
     .hero-name::before { content:"↗"; margin-right:5px; font-size:20px; }
     .jump-button { position:absolute; z-index:2; bottom:19px; right:21px; min-height:53px; min-width:124px; border:2px solid white; border-radius:16px; background:#fffbeceb; color:var(--green); box-shadow:0 4px 0 #345e4824; font-weight:bold; font-size:15px; display:flex; justify-content:center; align-items:center; gap:8px; touch-action:manipulation; }
     .jump-button svg { width:21px; height:21px; }
+    .action-dock { position:absolute; inset:0; z-index:2; pointer-events:none; }
+    .action-dock button { pointer-events:auto; }
+    .desktop-key { font-size:11px; color:#52713f; background:#fffdf0; border-color:#b7cba5; padding:3px 6px; }
+    .touch-hint { display:none; }
+    @media(pointer:coarse) { .desktop-key,.keyboard-hint { display:none; } .touch-hint { display:inline; } }
     .roar-button { left:21px; right:auto; width:149px; min-width:149px; background:#e3f5b9; border-color:#fffced; color:#416c34; flex-wrap:wrap; gap:7px; padding:8px 10px; }
     .roar-button small { width:100%; font-size:8px; letter-spacing:.8px; margin-top:-4px; }
     .roar-button.recharging { background:#edeed9; color:#77826e; box-shadow:none; }
@@ -216,6 +221,16 @@
       .power-status { top:65px; } .play-hint { display:none; }
       .jump-button { min-height:53px; }
     }
+    /* Dois controles próximos, com alvos maiores para as mãos pequenas. */
+    @media(pointer:coarse) and (orientation:landscape) {
+      .action-dock { inset:auto; bottom:max(12px,env(safe-area-inset-bottom)); left:55%; transform:translateX(-50%); display:flex; gap:12px; }
+      .action-dock .jump-button { position:relative; inset:auto; width:clamp(154px,22vw,184px); min-width:154px; height:76px; min-height:76px; border-radius:20px; font-size:20px; }
+      .action-dock .jump-button svg { width:26px; height:26px; }
+      .action-dock .roar-button { padding:10px 12px; gap:8px; }
+      .action-dock .roar-button small { font-size:9px; margin-top:-3px; letter-spacing:.4px; }
+      .play-hint { bottom:max(98px,calc(env(safe-area-inset-bottom) + 94px)); font-size:10px; }
+    }
+    @media(pointer:coarse) and (orientation:landscape) and (max-width:500px) { .action-dock { left:50%; } }
   </style>
 </head>
 <body>
@@ -241,7 +256,7 @@
     <div class="heading"><div><div class="eyebrow">UMA PEQUENA GRANDE AVENTURA</div><h1>Corre, pula. <span>Brilha, Eric!</span></h1></div><p>Um mundo inteiro para explorar.<br>Do seu jeitinho, no seu tempo.</p></div>
     <section class="game-shell" aria-label="Jogo Eric, o Dino-Futebolista">
       <div class="game-stage" id="stage">
-        <canvas id="game" tabindex="0" aria-label="Aventura do Eric. Toque ou aperte Espaço para pular. R para rugir e afugentar os travessos. P para pausar.">Seu navegador precisa oferecer Canvas para brincar com o Eric.</canvas>
+        <canvas id="game" tabindex="0" aria-label="Aventura do Eric. Z ou Espaço para pular. X ou R para rugir e afugentar os travessos. P para pausar. No celular, use PULAR e RUGIR.">Seu navegador precisa oferecer Canvas para brincar com o Eric.</canvas>
         <div class="hud">
           <div class="score-group">
             <div class="score"><svg width="24" height="24" aria-hidden="true"><use href="#i-ball"/></svg><div><small>GOLS</small><strong id="goals">0</strong></div></div>
@@ -260,19 +275,21 @@
         </div>
         <div class="power-status" aria-label="Poderes ativos">
           <div class="power" id="boost-status" hidden>⚡ Supervelocidade <span id="boost-time">3s</span><span class="power-bar"><i id="boost-bar"></i></span></div>
-          <div class="power shield" id="shield-status" hidden>✦ Escudo dino <span id="shield-time">5s</span><span class="power-bar"><i id="shield-bar"></i></span></div>
+          <div class="power shield" id="shield-status" hidden>✦ Escudo dino <span id="shield-time">2s</span><span class="power-bar"><i id="shield-bar"></i></span></div>
         </div>
         <div class="mission" id="mission" hidden><svg aria-hidden="true"><use href="#i-star"/></svg><div><small>VAMOS BRINCAR DE...</small><strong id="mission-text">Chutar 2 bolas</strong></div><span class="mission-progress" id="mission-progress" aria-hidden="true"></span></div>
-        <div class="intro" id="intro"><span class="intro-tag">✦ Hoje o herói é você!</span><h2>O mundo é seu,<br> <span>Eric.</span></h2><p>Calce suas superchuteiras.<br>Tem uma aventura esperando por você!</p><button class="primary" id="start"><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos correr!</button><span class="tiny"><svg width="13" height="13" aria-hidden="true"><use href="#i-touch"/></svg> Toque na tela ou use Espaço para pular</span></div>
+        <div class="intro" id="intro"><span class="intro-tag">✦ Hoje o herói é você!</span><h2>O mundo é seu,<br> <span>Eric.</span></h2><p>Calce suas superchuteiras.<br>Tem uma aventura esperando por você!</p><button class="primary" id="start"><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos correr!</button><span class="tiny"><svg width="13" height="13" aria-hidden="true"><use href="#i-touch"/></svg><span class="keyboard-hint">Z para pular · X para rugir</span><span class="touch-hint">Toque em PULAR ou RUGIR</span></span></div>
         <span class="hero-name" id="hero-name">NOSSO PEQUENO HERÓI</span>
-        <span class="play-hint" id="play-hint" hidden>Toque em qualquer lugar para pular</span>
-        <button class="jump-button" id="jump" hidden><svg aria-hidden="true"><use href="#i-jump"/></svg> PULAR</button>
-        <button class="jump-button roar-button" id="roar" aria-label="Rugir e afugentar os travessos" title="Rugir (R)" hidden><svg aria-hidden="true"><use href="#i-dino"/></svg><span id="roar-label">RUGIR!</span><small id="roar-hint">ESPANTA OS TRAVESSOS</small></button>
+        <span class="play-hint" id="play-hint" hidden><span class="keyboard-hint">Z pula · X ruge</span><span class="touch-hint">PULAR e RUGIR, um ao lado do outro</span></span>
+        <div class="action-dock">
+          <button class="jump-button roar-button" id="roar" aria-label="Rugir e afugentar os travessos" title="Rugir (X ou R)" hidden><svg aria-hidden="true"><use href="#i-dino"/></svg><span id="roar-label">RUGIR!</span><kbd class="desktop-key">X</kbd><small id="roar-hint">ESPANTA OS TRAVESSOS</small></button>
+          <button class="jump-button" id="jump" aria-label="PULAR" title="Pular (Z ou Espaço)" hidden><svg aria-hidden="true"><use href="#i-jump"/></svg> PULAR <kbd class="desktop-key">Z</kbd></button>
+        </div>
         <div class="pause-screen" id="pause-screen" hidden><div class="pause-card"><svg width="34" height="34" style="color:#82a862" aria-hidden="true"><use href="#i-dino"/></svg><h2>Uma pausinha.</h2><p>A aventura espera por você.</p><button class="primary" id="resume"><svg aria-hidden="true"><use href="#i-play"/></svg> Continuar</button></div></div>
         <div class="pause-screen" id="end-screen" role="dialog" aria-modal="true" aria-labelledby="end-title" hidden><div class="pause-card end-card"><svg width="30" height="30" style="color:#dda449" aria-hidden="true"><use href="#i-star"/></svg><h2 id="end-title">Que aventura, Eric!</h2><p>Você brilhou. Vamos brincar mais?</p><div class="end-results"><div><small>SEUS PONTOS</small><strong id="end-score">0</strong></div><div><small>SEU RECORDE</small><strong id="end-record">0</strong></div></div><button class="primary" id="restart"><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos de novo!</button></div></div>
         <div class="rotate-screen" id="rotate-screen" aria-label="Vire o celular para brincar na horizontal"><div class="rotate-card"><svg class="rotate-illustration" viewBox="0 0 140 100" aria-hidden="true"><rect x="27" y="29" width="88" height="49" rx="10" fill="#e2f0c4" stroke="currentColor" stroke-width="3"/><rect x="36" y="36" width="69" height="34" rx="6" fill="#b5d69a"/><circle cx="110" cy="53" r="2" fill="currentColor"/><path d="M27 17c23-17 56-13 73 2m-3-15 4 16-16-2" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><use href="#i-dino" x="54" y="37" width="32" height="32"/></svg><h2>Vire o celular,<br>pequeno herói!</h2><p>Na horizontal, tem mais espaço<br>para correr, pular e rugir.</p></div></div>
       </div>
-      <div class="game-footer"><span class="controls"><svg width="15" height="15" aria-hidden="true"><use href="#i-touch"/></svg> Toque para pular <span style="color:#bdc7b4">/</span> <kbd>Espaço</kbd></span><span class="safe-note">Aqui, a diversão nunca acaba.</span></div>
+      <div class="game-footer"><span class="controls"><kbd>Z</kbd> Pular <span style="color:#bdc7b4">/</span> <kbd>X</kbd> Rugir</span><span class="safe-note">Aqui, a diversão nunca acaba.</span></div>
     </section>
     <section class="how-to" aria-label="Como brincar"><div class="section-label">PEQUENOS PODERES, GRANDES SORRISOS</div><div class="cards">
       <div class="card"><div class="item-icon"><svg aria-hidden="true"><use href="#i-ball"/></svg></div><div><h3>Um chute, um goool!</h3><p>Encontre a bola e faça a festa.</p></div></div>
@@ -288,6 +305,7 @@
   /* MOTOR DO JOGO — tempo em segundos e distâncias em pixels do mundo.
      A física é independente do Canvas para facilitar manutenção e testes. */
   globalThis.RunnerEngine = (() => {
+    const SHIELD_SECONDS=1.5;
     function create() {
       return { running:false, paused:false, time:0, width:1120, distance:0, speed:220,
         health:20, maxHealth:20, ended:false,
@@ -362,7 +380,7 @@
     }
     function roar(s) {
       if(!s.running || s.paused || s.ended || s.roarCooldown>0)return false;
-      s.roarCooldown=6;s.roarWave=1.15;s.roar=ROAR_SECONDS;s.shake=.38;s.shield=5;
+      s.roarCooldown=6;s.roarWave=1.15;s.roar=ROAR_SECONDS;s.shake=.38;s.shield=SHIELD_SECONDS;
       emit(s,'roar','ROAAAAR!',s.player.x+30,260);
       return true;
     }
@@ -375,7 +393,7 @@
       if (type === 'ball') { s.goals++; s.kick=.3; emit(s, 'goal', 'GOOOL!'); progress(s,'ball'); }
       if (type === 'fries') { s.boost=3; emit(s, 'boost', 'ZUUUM!'); }
       if (type === 'coin' || type === 'fossil') {
-        s.treasures++; s.shield=5; s.roarCooldown=0;
+        s.treasures++; s.shield=SHIELD_SECONDS; s.roarCooldown=0;
         emit(s, 'charge', 'DINO PRONTO!', s.player.x + 30, 230);
         progress(s,'treasure');
       }
@@ -485,7 +503,7 @@
       s.obstacles=s.obstacles.filter(o=>o.x > -90);
       s.mobs=s.mobs.filter(m=>m.x>-110 && (!m.fleeing || m.x<s.width+110));
     }
-    return { create, restart, score, jump, collect, step, spriteFrame, roarPhase, task, roar, isEnemy };
+    return { SHIELD_SECONDS, create, restart, score, jump, collect, step, spriteFrame, roarPhase, task, roar, isEnemy };
   })();
   </script>
   <script>
@@ -806,15 +824,15 @@
     $('roar').addEventListener('pointerdown',e=>{if(!e.isPrimary || e.button>0)return;e.preventDefault();roar();});
     $('roar').addEventListener('click',e=>{if(e.detail===0)roar();});
     document.addEventListener('keydown',e=>{
-      if (e.target.closest('input,textarea,select,[contenteditable="true"]')) return;
-      if (e.code==='Space' || e.code==='ArrowUp') {
+      if (e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input,textarea,select,[contenteditable="true"]')) return;
+      if (e.code==='KeyZ' || e.code==='Space' || e.code==='ArrowUp') {
         // Espaço sobre um botão mantém a ação acessível do próprio botão.
-        if (e.target.closest('button')) return;
+        if (e.code==='Space' && e.target.closest('button')) return;
         e.preventDefault(); if (!e.repeat) jump();
       }
       if (e.code==='KeyP' && !e.repeat)pause();
       if (e.code==='Escape' && !e.repeat && !fullscreenElement())pause(true);
-      if (e.code==='KeyR' && !e.repeat) {e.preventDefault();roar();}
+      if ((e.code==='KeyX' || e.code==='KeyR') && !e.repeat) {e.preventDefault();roar();}
     });
     // Sair da aba pausa a aventura; os segundos dos poderes não são gastos.
     document.addEventListener('visibilitychange',()=>{last=0;if(document.hidden){saveRecord();if(state.running)pause(true);}});
@@ -1162,7 +1180,7 @@
       }
       $('boost-status').hidden=state.boost<=0; $('shield-status').hidden=state.shield<=0;
       $('boost-time').textContent=Math.ceil(state.boost)+'s'; $('shield-time').textContent=Math.ceil(state.shield)+'s';
-      $('boost-bar').style.width=(state.boost/3*100)+'%'; $('shield-bar').style.width=(state.shield/5*100)+'%';
+      $('boost-bar').style.width=(state.boost/3*100)+'%'; $('shield-bar').style.width=(state.shield/engine.SHIELD_SECONDS*100)+'%';
       const ready=state.roarCooldown<=0;
       $('roar').classList.toggle('recharging',!ready);
       $('roar').setAttribute('aria-disabled',String(!ready));

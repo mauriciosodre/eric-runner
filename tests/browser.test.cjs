@@ -134,6 +134,10 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     const heads=walking.map(d=>d.head);
     assert.ok(Math.max(...heads)-Math.min(...heads)<.5,'a cabeça mantém a mesma âncora durante todo o ciclo');
     await page.locator('canvas').focus();
+    await page.keyboard.press('z');
+    await page.waitForTimeout(100);
+    assert.ok(await page.evaluate(()=>__observedState.player.lift>20),'Z pula de verdade');
+    await page.waitForTimeout(850);
     await page.keyboard.press('Space');
     await page.waitForTimeout(100);
     assert.ok(await page.evaluate(() => __observedState.player.lift > 20), 'Espaço pula de verdade');
@@ -165,7 +169,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
       const s = __observedState;
       s.items.push({ type: 'fossil', x: s.player.x + 5, lift: 100, radius: 25 });
     });
-    await page.waitForFunction(() => __observedState.shield > 4);
+    await page.waitForFunction(() => __observedState.shield > 1.3);
     assert.equal(await page.locator('#shield-status').isVisible(), true);
     // Um painel oculto fornece 0 × 0 ao ResizeObserver por um instante.
     // A geometria anterior precisa continuar válida, inclusive com escudo.
@@ -185,7 +189,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
       s.scared=0;s.shield=0;
     });
     await page.locator('canvas').focus();
-    await page.keyboard.press('r');
+    await page.keyboard.press('x');
     await page.waitForFunction(()=>__spriteDraws.some(d=>d.asset==='eric-roar-actions.png'));
     // O rugido move toda a câmera em até 1,8 px na vertical. A sola precisa
     // estar na origem local do personagem, acompanhando o chão que treme.
@@ -234,9 +238,13 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await page.screenshot({path:path.join(output,'desktop-new-mobs.png'),fullPage:true});
     const initialHealth=await page.evaluate(()=>__observedState.health);
     await page.evaluate(()=>{
-      const s=__observedState;s.mobs=[];s.items=[];s.obstacles=[{kind:'cone',x:s.player.x,width:46,height:43,hit:false}];
+      const s=__observedState;s.mobs=[];s.items=[];s.obstacles=[];
       s.health=20;s.hurt=0;s.shield=0;s.player.lift=0;s.player.vy=0;
+      s.spawnIn=s.obstacleIn=s.mobIn=Infinity;
+      RunnerEngine.collect(s,'coin');
     });
+    await page.waitForTimeout(2000);
+    await page.evaluate(()=>{const s=__observedState;s.obstacles=[{kind:'cone',x:s.player.x,width:46,height:43,hit:false}];});
     await page.waitForFunction(()=>__observedState.health===19);
     assert.equal(initialHealth,20);
     assert.equal(await page.locator('#health').textContent(),'19');
@@ -347,7 +355,9 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await mobile.waitForTimeout(150);
     const roarBounds=await mobile.locator('#roar').boundingBox(),jumpBounds=await mobile.locator('#jump').boundingBox();
     assert.ok(roarBounds.x+roarBounds.width<jumpBounds.x,'botões separados no celular pequeno em landscape');
-    assert.ok(roarBounds.height>=44 && jumpBounds.height>=44);
+    const controlGap=jumpBounds.x-(roarBounds.x+roarBounds.width);
+    assert.ok(controlGap>=8 && controlGap<=18,'botões vizinhos, com espaço para não tocar no outro sem querer');
+    assert.ok(roarBounds.height>=74 && jumpBounds.height>=74,'botões maiores para os dedinhos');
     const compactStage=await mobile.locator('#stage').boundingBox();
     assert.ok(compactStage.width===667 && compactStage.height===320);
     await mobile.screenshot({path:path.join(output,'mobile-landscape-small.png')});
@@ -388,7 +398,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await pointerStart.waitForTimeout(200);
     assert.equal(await pointerStart.evaluate(()=>document.fullscreenElement?.id),'stage','toque inicial no cenário também entra em tela cheia');
     await pointerStart.close();
-    console.log('PASS:',url,'; tela cheia real no desktop e no celular; fallback e saída com pausa; 20 corações; novos travessos; fim e reinício; recorde preservado no reload; storage bloqueado; oito fases sem linha preta; seis poses do rugido; landscape 844×390 e 667×320; nenhum erro de JavaScript.');
+    console.log('PASS:',url,'; dano após escudo breve; Z pula e X ruge; controles vizinhos de 76px; tela cheia real; 20 corações; fim e reinício; recorde no reload; storage bloqueado; corrida e rugido; landscape 844×390 e 667×320; nenhum erro de JavaScript.');
     console.log('Capturas:', output);
   } finally { await browser.close(); }
 })().catch(e => { console.error(e); process.exitCode = 1; });

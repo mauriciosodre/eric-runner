@@ -64,10 +64,10 @@ test('batatas aceleram por três segundos e depois a velocidade retorna', () => 
   assert.ok(Math.abs(state.speed - 220) < 1);
 });
 
-test('dinossauro protege por cinco segundos e absorve um obstáculo', () => {
+test('dinossauro protege brevemente e absorve um obstáculo', () => {
   const state = game();
   Engine.collect(state, 'fossil');
-  assert.equal(state.shield, 5);
+  assert.equal(state.shield, 1.5);
   state.obstacles.push({ x: state.player.x, width: 45, height: 40, hit: false });
   Engine.step(state, .016);
   assert.equal(state.slow, 0);
@@ -75,6 +75,27 @@ test('dinossauro protege por cinco segundos e absorve um obstáculo', () => {
   assert.equal(state.obstacles[0].hit, true);
   for (let i = 0; i < 51; i++) Engine.step(state, .1);
   assert.equal(state.shield, 0);
+});
+
+test('coletáveis dino não mantêm escudo permanente e cada nova colisão tira vida',()=>{
+  const s=game();Engine.collect(s,'coin');
+  for(let i=0;i<20;i++)Engine.step(s,.1);
+  s.obstacles.push({kind:'cone',x:s.player.x,width:50,height:44,hit:false});
+  Engine.step(s,.016);
+  assert.equal(s.health,19,'após dois segundos, a moeda já não absorve o obstáculo');
+  for(let i=0;i<21;i++)Engine.step(s,.1);
+  s.mobs.push({type:'robot',x:s.player.x,lift:0,width:48,height:48,phase:0,resolved:false});
+  Engine.step(s,.016);assert.equal(s.health,18,'outro travesso tira outro coração');
+  for(let i=0;i<21;i++)Engine.step(s,.1);
+  s.obstacles.push({kind:'block',x:s.player.x,width:50,height:44,hit:false});
+  Engine.step(s,.016);assert.equal(s.health,17);
+});
+
+test('rugido afugenta os mobs mas seu escudo é breve',()=>{
+  const s=game();Engine.roar(s);
+  for(let i=0;i<20;i++)Engine.step(s,.1);
+  s.obstacles.push({kind:'cone',x:s.player.x,width:50,height:44,hit:false});
+  Engine.step(s,.016);assert.equal(s.health,19,'rugir não protege quase toda a recarga');
 });
 
 test('bater sem escudo reduz velocidade temporariamente sem parar ou perder progresso', () => {
@@ -98,7 +119,7 @@ test('hitbox de coleta perdoa distâncias que seriam difíceis para uma criança
   state.items.push({ type: 'coin', x: state.player.x + 55, lift: 120, radius: 22 });
   Engine.step(state, .016);
   assert.equal(state.treasures, 1);
-  assert.ok(state.shield > 4);
+  assert.ok(state.shield > 1.4);
 });
 
 test('pausa congela física, distância e duração dos poderes', () => {
@@ -115,7 +136,7 @@ test('pausa congela física, distância e duração dos poderes', () => {
 test('sequência longa protegida mantém memória limitada', () => {
   const state = game(true);
   state.shield=1000;
-  for (let i = 0; i < 18000; i++) Engine.step(state, 1 / 30);
+  for (let i = 0; i < 18000; i++) {state.shield=1000;Engine.step(state, 1 / 30);}
   assert.equal(state.running, true);
   assert.ok(state.distance > 1000);
   assert.ok(state.items.length < 30);
@@ -214,7 +235,7 @@ test('novos travessos causam um dano e fogem do rugido, bola ou escudo',()=>{
 test('a pista gera todos os seis travessos e mantém os dois amigos',()=>{
   const s=game(true);s.shield=1000;const types=new Set();
   for(let i=0;i<3600;i++){
-    Engine.step(s,.05);
+    s.shield=1000;Engine.step(s,.05);
     for(const mob of s.mobs)types.add(mob.type);
   }
   for(const type of ['slime','robot','cloud','balloon','mushroom','car','rabbit','parrot'])
@@ -262,7 +283,7 @@ test('rugido percorre seis fases, pausa a animação e retorna à corrida', () =
   Engine.step(state,.05);
   assert.equal(state.roar,0);
   assert.ok(Engine.spriteFrame(state)<4);
-  assert.ok(state.shield>3);
+  assert.ok(state.shield>.3);
 });
 
 test('há obstáculos e mobs logo no começo com tempo para vê-los chegar', () => {
@@ -336,7 +357,7 @@ test('rugido afugenta os três inimigos visíveis e deixa os amigos tranquilos',
   for(let i=0;i<10;i++)Engine.step(s,.1);
   assert.ok(s.mobs.filter(m=>Engine.isEnemy(m)).every(m=>m.fleeing));
   assert.ok(s.mobs.filter(m=>!Engine.isEnemy(m)).every(m=>!m.fleeing));
-  assert.equal(s.scared,3);assert.ok(s.shield>3);assert.equal(s.hurt,0);
+  assert.equal(s.scared,3);assert.ok(s.shield>.3);assert.equal(s.hurt,0);
 });
 
 test('o especial recarrega sozinho, tesouros antecipam a recarga e pausa preserva tudo',()=>{
