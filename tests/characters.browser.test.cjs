@@ -78,6 +78,14 @@ async function verifyPendingRoar(browser, nextCharacter) {
     };
   });
   await page.goto(url); await page.waitForFunction(() => !!globalThis.__characterState);
+  // Este caso exercita a corrida do áudio, não a rede: prepara o próximo
+  // herói antes para permitir um reinício imediato dentro da janela de 400 ms.
+  if(nextCharacter && nextCharacter!=='eric') {
+    const name={daniel:'Daniel',samuel:'Samuel'}[nextCharacter];
+    await page.getByRole('button', {name:'Escolher '+name,exact:true}).click();
+    await page.waitForFunction(() => !document.getElementById('start').disabled);
+    await page.getByRole('button', {name:'Escolher Eric',exact:true}).click();
+  }
   await page.getByRole('button', { name: 'Vamos correr!', exact: true }).click(); await quiet(page);
   await page.getByRole('button', { name: 'Ativar sons' }).click();
   await page.waitForFunction(() => __pendingCharacterDecodes.length === 7);
@@ -235,8 +243,14 @@ async function verifyAllPoses(page, id) {
     await fallback.waitForTimeout(250);
     assert.equal(await fallback.evaluate(() => __characterState.characterId), 'daniel');
     assert.equal(await fallback.evaluate(() => __characterDraws.filter(d => d.asset.startsWith('eric')).length), 0, 'falha da imagem de Daniel nunca usa rosto do Eric');
+    await fallback.locator('#loading-retry').waitFor({state:'visible'});
+    assert.ok(await fallback.locator('#start').isDisabled(), 'imagens ausentes mantêm a partida bloqueada');
+    await fallback.keyboard.press('z');
+    assert.equal(await fallback.evaluate(() => __characterState.running), false, 'teclado também aguarda o personagem completo');
+    await fallback.unroute('**/daniel*.png*');
+    await fallback.locator('#loading-retry').click();
     await fallback.getByRole('button', { name: 'Vamos correr!', exact: true }).click(); await fallback.waitForTimeout(160);
-    assert.ok(await fallback.evaluate(() => __characterState.time > 0), 'desenho de reserva próprio mantém o jogo');
+    assert.ok(await fallback.evaluate(() => __characterState.time > 0), 'nova tentativa carrega Daniel e libera a aventura');
     await fallback.close();
 
     const blocked = await browser.newPage(); await instrument(blocked);

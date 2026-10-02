@@ -243,6 +243,23 @@
     .character-card small { color:#72826c; font-size:9px; }
     .character-card[data-character="daniel"] { --character-color:#368db0; }
     .character-card[data-character="samuel"] { --character-color:#9b76bb; }
+    /* Só libera a aventura quando todas as imagens do herói estão prontas. */
+    .asset-loading { position:absolute; z-index:8; inset:0; display:grid; place-items:center; padding:16px; background:#edf7e9f7; }
+    .loading-card { width:min(360px,100%); text-align:center; color:#315b40; }
+    .loading-icon { width:52px; height:52px; padding:11px; margin:0 auto 12px; border-radius:18px; background:#d9edba; animation:loading-bounce 1.2s ease-in-out infinite; }
+    .loading-icon svg { width:30px; height:30px; }
+    .loading-card h2 { font-size:clamp(23px,4vw,30px); margin:0 0 9px; letter-spacing:-.8px; }
+    .loading-card p { font-size:13px; line-height:1.5; margin:8px 0 15px; }
+    .loading-track { height:12px; overflow:hidden; border-radius:20px; background:#dce8d2; }
+    .loading-track i { display:block; height:100%; width:0; border-radius:20px; background:#78ac66; transition:width .2s; }
+    #loading-progress { display:block; margin:9px 0 14px; font-size:12px; }
+    .primary:disabled { cursor:wait; opacity:.6; transform:none; }
+    @keyframes loading-bounce { 50% { transform:translateY(-5px) rotate(-4deg); } }
+    @media(prefers-reduced-motion:reduce) { .loading-icon { animation:none; } .loading-track i { transition:none; } }
+    @media(pointer:coarse) and (orientation:landscape) and (max-height:350px) {
+      .loading-icon { width:44px; height:44px; padding:7px; margin-bottom:8px; }
+      .loading-card h2 { font-size:24px; } .loading-card p { margin:7px 0 10px; }
+    }
     .end-character-picker { margin:8px 0 16px; gap:7px; }
     .end-character-picker .character-card { min-height:65px; padding:4px; gap:1px; border-radius:12px; }
     .end-character-picker .character-card img { width:39px; height:38px; }
@@ -326,7 +343,7 @@
             <button class="character-card" data-character="daniel" aria-label="Escolher Daniel" aria-pressed="false"><img src="daniel.png?v=1" alt="" draggable="false" loading="lazy"><strong>Daniel</strong><small>Sopro do Ptero</small></button>
             <button class="character-card" data-character="samuel" aria-label="Escolher Samuel" aria-pressed="false"><img src="samuel.png?v=1" alt="" draggable="false" loading="lazy"><strong>Samuel</strong><small>Bolha de Abraço</small></button>
           </div>
-          <button class="primary" id="start"><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos correr!</button><span class="tiny"><svg width="13" height="13" aria-hidden="true"><use href="#i-touch"/></svg><span class="keyboard-hint" id="intro-keyboard-hint">Z para pular · X para rugir</span><span class="touch-hint" id="intro-touch-hint">Toque em PULAR ou RUGIR</span></span></div>
+          <button class="primary" id="start" disabled><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos correr!</button><span class="tiny"><svg width="13" height="13" aria-hidden="true"><use href="#i-touch"/></svg><span class="keyboard-hint" id="intro-keyboard-hint">Z para pular · X para rugir</span><span class="touch-hint" id="intro-touch-hint">Toque em PULAR ou RUGIR</span></span></div>
         <span class="hero-name" id="hero-name">NOSSO PEQUENO HERÓI</span>
         <span class="play-hint" id="play-hint" hidden><span class="keyboard-hint" id="play-keyboard-hint">Z pula · X ruge</span><span class="touch-hint" id="play-touch-hint">PULAR e RUGIR, um ao lado do outro</span></span>
         <div class="action-dock">
@@ -341,6 +358,12 @@
             <button class="character-card" data-character="samuel" aria-label="Escolher Samuel" aria-pressed="false"><img src="samuel.png?v=1" alt="" draggable="false" loading="lazy"><strong>Samuel</strong></button>
           </div>
           <button class="primary" id="restart"><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos de novo!</button></div></div>
+        <div class="asset-loading" id="asset-loading" role="status" aria-live="polite" aria-atomic="true"><div class="loading-card">
+          <div class="loading-icon" aria-hidden="true"><svg><use href="#i-dino"/></svg></div>
+          <h2 id="loading-title">Preparando a aventura!</h2><p id="loading-message">Calçando as superchuteiras do Eric…</p>
+          <div class="loading-track" id="loading-bar" role="progressbar" aria-label="Imagens prontas" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"><i id="loading-fill"></i></div>
+          <span id="loading-progress">0 de 5 imagens prontas</span><button class="primary" id="loading-retry" hidden>Tentar novamente</button>
+        </div></div>
         <div class="rotate-screen" id="rotate-screen" aria-label="Vire o celular para brincar na horizontal"><div class="rotate-card"><svg class="rotate-illustration" viewBox="0 0 140 100" aria-hidden="true"><rect x="27" y="29" width="88" height="49" rx="10" fill="#e2f0c4" stroke="currentColor" stroke-width="3"/><rect x="36" y="36" width="69" height="34" rx="6" fill="#b5d69a"/><circle cx="110" cy="53" r="2" fill="currentColor"/><path d="M27 17c23-17 56-13 73 2m-3-15 4 16-16-2" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><use href="#i-dino" x="54" y="37" width="32" height="32"/></svg><h2>Vire o celular,<br>pequeno herói!</h2><p>Na horizontal, tem mais espaço<br>para correr, pular e rugir.</p></div></div>
       </div>
       <div class="game-footer"><span class="controls"><kbd>Z</kbd> Pular <span style="color:#bdc7b4">/</span> <kbd>X</kbd> <span id="footer-special">Rugir</span></span><span class="safe-note">Aqui, a diversão nunca acaba.</span></div>
@@ -602,6 +625,66 @@
        Prefira PNG com fundo transparente, corpo inteiro e olhando à direita.
        Todo HTML, CSS e JavaScript está neste arquivo; as imagens são externas.
        ================================================================ */
+    const characterImageLoads={eric:[],daniel:[],samuel:[]};
+    let loadingUIReady=false;
+    function queueCharacterImage(id,image,url,width,height,prepare) {
+      const asset={image,url,width,height,prepare,status:'idle',attempt:0,timer:null};
+      characterImageLoads[id].push(asset);requestCharacterImage(asset);return asset;
+    }
+    function requestCharacterImage(asset) {
+      clearTimeout(asset.timer);
+      const attempt=++asset.attempt;asset.status='loading';
+      const failed=()=>{
+        if(attempt!==asset.attempt || asset.status!=='loading')return;
+        clearTimeout(asset.timer);asset.status='error';syncAssetLoading();
+      };
+      asset.image.onload=async()=>{
+        try {
+          // onload sozinho não basta: a imagem e todos os recortes precisam
+          // estar decodificados antes de liberar salto, chute e especial.
+          if(asset.image.decode)await asset.image.decode();
+          if(attempt!==asset.attempt || asset.status!=='loading')return;
+          if(!asset.image.naturalWidth || !asset.image.naturalHeight ||
+            (asset.width && (asset.image.naturalWidth!==asset.width || asset.image.naturalHeight!==asset.height)))throw new Error('Imagem incompleta');
+          asset.prepare();asset.status='ready';clearTimeout(asset.timer);syncAssetLoading();
+        } catch(_) {failed();}
+      };
+      asset.image.onerror=failed;
+      // Uma rede interrompida não deixa a criança esperando para sempre.
+      // Só os arquivos que falharam recebem nova URL na tentativa seguinte.
+      asset.timer=setTimeout(failed,30000);
+      asset.image.src=asset.url+(attempt>1?(asset.url.includes('?')?'&':'?')+'retry='+Date.now()+'-'+attempt:'');
+      syncAssetLoading();
+    }
+    function characterImagesReady() {
+      const assets=characterImageLoads[state.characterId];
+      return assets.length>0 && assets.every(asset=>asset.status==='ready');
+    }
+    function syncCharacterPortraits(id,image) {
+      // Se a URL original falhou, a miniatura deve usar a mesma imagem
+      // recuperada e validada que o Canvas, inclusive no fim da partida.
+      for(const portrait of document.querySelectorAll('[data-character="'+id+'"] img')) {
+        if(portrait.src!==image.src)portrait.src=image.src;
+      }
+    }
+    function syncAssetLoading() {
+      if(!loadingUIReady)return;
+      const assets=characterImageLoads[state.characterId],total=assets.length;
+      const done=assets.filter(asset=>asset.status==='ready').length;
+      const failed=assets.some(asset=>asset.status==='error'),waiting=!characterImagesReady();
+      const wasWaiting=!$('asset-loading').hidden;
+      $('asset-loading').hidden=!waiting;stage.setAttribute('aria-busy',String(waiting));
+      $('start').disabled=waiting;$('restart').disabled=waiting;
+      $('loading-title').textContent=failed?'Vamos tentar outra vez?':'Preparando a aventura!';
+      $('loading-message').textContent=failed?'Uma imagem não chegou. Tente novamente.':'Calçando as superchuteiras do '+activeCharacter().name+'…';
+      $('loading-progress').textContent=done+' de '+total+' imagens prontas';
+      $('loading-fill').style.width=(total?done/total*100:0)+'%';
+      $('loading-bar').setAttribute('aria-valuemax',total);$('loading-bar').setAttribute('aria-valuenow',done);
+      $('loading-retry').hidden=!failed;
+      if(wasWaiting && !waiting && document.activeElement===$('loading-retry')) {
+        (state.ended?$('restart'):$('start')).focus({preventScroll:true});
+      }
+    }
     const ERIC_IMAGE_URL = 'eric.png?v=10';
     // ANIMAÇÃO: oito imagens na folha eric-actions.png (4 colunas × 2 linhas).
     // 0–3 = passos; 4 = salto; 5 = chute; 6 = rugido; 7 = descanso.
@@ -615,9 +698,7 @@
       [52,3,362,441],[493,3,311,440],[926,5,373,439],[1416,5,310,438],
       [25,444,378,382],[455,449,405,426],[905,447,389,433],[1426,449,281,431]
     ];
-    ericActions.onload=()=>{actionsReady=ericActions.naturalWidth===1774 && ericActions.naturalHeight===887;};
-    ericActions.onerror=()=>{actionsReady=false;};
-    if(ERIC_ACTIONS_URL)ericActions.src=ERIC_ACTIONS_URL;
+    if(ERIC_ACTIONS_URL)queueCharacterImage('eric',ericActions,ERIC_ACTIONS_URL,1774,887,()=>{actionsReady=true;});
     // Corrida: oito fases menores do MESMO passo. A última coluna é a
     // âncora horizontal medida pelo rosto, evitando que a cabeça salte.
     const ERIC_RUN_URL='eric-run.png?v=7';
@@ -637,15 +718,13 @@
       return sprite;
     }
     const ericRun=new Image();let runReady=false,runSprites=[];
-    ericRun.onload=()=>{runReady=ericRun.naturalWidth===1774 && ericRun.naturalHeight===887;if(runReady)runSprites=runFrames.map(f=>isolateSprite(ericRun,f));};
-    ericRun.onerror=()=>{runReady=false;};ericRun.src=ERIC_RUN_URL;
+    queueCharacterImage('eric',ericRun,ERIC_RUN_URL,1774,887,()=>{runSprites=runFrames.map(f=>isolateSprite(ericRun,f));runReady=true;});
     // Rugido separado: expressão e garras inspiradas na referência original.
-    // Se faltar este PNG, a pose antiga da folha continua disponível.
+    // Mantém também a pose estática de reserva preparada antes da partida.
     const ERIC_ROAR_URL='eric-roar.png?v=7';
     const roarFrame=[110,11,1031,1273];
     const ericRoar=new Image();let roarReady=false;
-    ericRoar.onload=()=>{roarReady=ericRoar.naturalWidth===1199 && ericRoar.naturalHeight===1312;};
-    ericRoar.onerror=()=>{roarReady=false;};ericRoar.src=ERIC_ROAR_URL;
+    queueCharacterImage('eric',ericRoar,ERIC_ROAR_URL,1199,1312,()=>{roarReady=true;});
     // Preparação → força → rugido → relaxar. Os dois últimos valores
     // medem o centro e a largura do rosto para manter a mesma câmera.
     const ERIC_ROAR_ACTIONS_URL='eric-roar-actions.png?v=9';
@@ -655,23 +734,21 @@
       [588,520,385,497,791.5,110],[1091,516,339,501,1276.5,108]
     ];
     const ericRoarActions=new Image();let roarActionsReady=false,roarSprites=[];
-    ericRoarActions.onload=()=>{roarActionsReady=ericRoarActions.naturalWidth===1536 && ericRoarActions.naturalHeight===1024;if(roarActionsReady)roarSprites=roarFrames.map(f=>isolateSprite(ericRoarActions,f));};
-    ericRoarActions.onerror=()=>{roarActionsReady=false;};ericRoarActions.src=ERIC_ROAR_ACTIONS_URL;
+    queueCharacterImage('eric',ericRoarActions,ERIC_ROAR_ACTIONS_URL,1536,1024,()=>{roarSprites=roarFrames.map(f=>isolateSprite(ericRoarActions,f));roarActionsReady=true;});
     const roarBlendCanvas=document.createElement('canvas');
     roarBlendCanvas.width=512;roarBlendCanvas.height=512;
     const roarBlendContext=roarBlendCanvas.getContext('2d');
     const ericImage = new Image();
     let imageReady=false,standingFrame;
-    ericImage.onload=()=>{
+    queueCharacterImage('eric',ericImage,ERIC_IMAGE_URL,0,0,()=>{
       // A pose frontal aprovada aparece no início e na pausa. O recorte
       // remove só as margens transparentes, preservando o rosto original.
       standingFrame=ericImage.naturalWidth===1024 && ericImage.naturalHeight===1536
         ?[57,8,867,1498,530]
         :[0,0,ericImage.naturalWidth,ericImage.naturalHeight,ericImage.naturalWidth*.52];
       imageReady=true;
-    };
-    ericImage.onerror=()=>{ imageReady=false; console.warn('Coloque eric.png na mesma pasta do HTML. O desenho provisório mantém o jogo funcionando.'); };
-    ericImage.src=ERIC_IMAGE_URL;
+      syncCharacterPortraits('eric',ericImage);
+    });
 
     // Cada personagem tem seus próprios recortes. Estes dados estão embutidos
     // para a escolha e as animações funcionarem abrindo o HTML diretamente.
@@ -686,16 +763,16 @@
     function loadExtraCharacter(id) {
       if(id==='eric' || extras[id])return;
       const config=characters[id],entry=extras[id]={atlases:{},standing:null,image:new Image(),ready:false};
-      entry.image.onload=()=>{
+      const standing=EXTRA_CHARACTER_FRAMES[id]?.standing;
+      queueCharacterImage(id,entry.image,config.file,standing?.sourceWidth,standing?.sourceHeight,()=>{
         // Os recortes já foram medidos fora do navegador. Não lê os pixels:
         // assim, a pose aprovada também funciona em file:// com Canvas protegido.
         const f=EXTRA_CHARACTER_FRAMES[id]?.standing;
         entry.standing=f && f.sourceWidth===entry.image.naturalWidth && f.sourceHeight===entry.image.naturalHeight
           ?f:{x:0,y:0,width:entry.image.naturalWidth,height:entry.image.naturalHeight,sole:entry.image.naturalHeight,headX:entry.image.naturalWidth*.5};
         entry.ready=true;
-        draw();
-      };
-      entry.image.onerror=()=>{entry.ready=false;};entry.image.src=config.file;
+        syncCharacterPortraits(id,entry.image);
+      });
       const manifests=EXTRA_CHARACTER_FRAMES[id] || {};
       if(manifests.run?.frames?.length) {
         const heights=manifests.run.frames.map(f=>f.height).sort((a,b)=>a-b);
@@ -705,17 +782,15 @@
       for(const name of ['run','actions','special']) {
         const manifest=manifests[name];if(!manifest?.frames?.length)continue;
         const atlas=entry.atlases[name]={manifest,image:new Image(),ready:false,sprites:[]};
-        atlas.image.onload=()=>{
-          atlas.ready=atlas.image.naturalWidth===manifest.width && atlas.image.naturalHeight===manifest.height;
-          if(atlas.ready)atlas.sprites=manifest.frames.map(f=>isolateSprite(atlas.image,[f.x,f.y,f.width,f.height]));
-        };
-        atlas.image.onerror=()=>{atlas.ready=false;};atlas.image.src=manifest.file+'?v=1';
+        queueCharacterImage(id,atlas.image,manifest.file+'?v=1',manifest.width,manifest.height,()=>{
+          atlas.sprites=manifest.frames.map(f=>isolateSprite(atlas.image,[f.x,f.y,f.width,f.height]));atlas.ready=true;
+        });
       }
     }
 
     const $=id=>document.getElementById(id);
     const canvas=$('game'),ctx=canvas.getContext('2d'),stage=$('stage');
-    if (!ctx) { $('start').disabled=true; $('start').textContent='Canvas indisponível'; return; }
+    if (!ctx) { $('asset-loading').hidden=true; $('start').disabled=true; $('start').textContent='Canvas indisponível'; return; }
     const engine=globalThis.RunnerEngine, state=engine.create();
     function activeCharacter(){return characters[state.characterId] || characters.eric;}
     function syncCharacterUI() {
@@ -739,7 +814,7 @@
     }
     function selectCharacter(id,persist=true) {
       if(!characters[id] || !engine.setCharacter(state,id))return false;
-      loadExtraCharacter(id);syncCharacterUI();
+      loadExtraCharacter(id);syncCharacterUI();syncAssetLoading();
       if(persist)try{localStorage.setItem(CHARACTER_KEY,id);}catch(_){}
       draw();return true;
     }
@@ -747,6 +822,10 @@
     try {const saved=localStorage.getItem(CHARACTER_KEY);if(Object.hasOwn(characters,saved))savedCharacter=saved;}catch(_){}
     // Não desenha antes da primeira medição do Canvas; apenas inicia os assets escolhidos.
     engine.setCharacter(state,savedCharacter);loadExtraCharacter(savedCharacter);syncCharacterUI();
+    loadingUIReady=true;syncAssetLoading();
+    $('loading-retry').addEventListener('click',()=>{
+      for(const asset of characterImageLoads[state.characterId])if(asset.status==='error')requestCharacterImage(asset);
+    });
     for(const button of document.querySelectorAll('[data-character]'))button.addEventListener('click',()=>selectCharacter(button.dataset.character));
     // Recorde local: funciona sem conta. Se o navegador bloquear o armazenamento,
     // o jogo continua normalmente e mantém o recorde enquanto esta aba estiver aberta.
@@ -935,7 +1014,7 @@
     document.addEventListener('webkitfullscreenchange',syncFullscreen);
 
     function start() {
-      if (state.running || portraitPhone.matches) return;
+      if (state.running || portraitPhone.matches || !characterImagesReady()) return;
       adventureToken++;
       if(touchDevice.matches)enterFullscreen();
       state.running=true; unlockAudio(); canvas.focus({preventScroll:true});
@@ -970,7 +1049,7 @@
       $('restart').focus({preventScroll:true});
     }
     $('restart').addEventListener('click',()=>{
-      if(!state.ended || portraitPhone.matches)return;
+      if(!state.ended || portraitPhone.matches || !characterImagesReady())return;
       adventureToken++;
       if(touchDevice.matches)enterFullscreen();
       engine.restart(state);particles=[];bubbles=[];animals=[];animalIn=4;dustIn=0;
@@ -1323,6 +1402,8 @@
       } else fallbackCharacter(id,size);
     }
     function player() {
+      // Aguarda o herói completo também no menu, sem exibir o desenho provisório.
+      if(!characterImagesReady())return;
       const p=state.player,mobile=W<600;
       const character=activeCharacter();
       const size=state.running?character.playSize:(mobile?character.playSize*168/190:character.playSize*252/190);
