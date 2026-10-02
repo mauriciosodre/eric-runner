@@ -918,16 +918,16 @@
       if (kind==='goal') {sample('kick',.25,1.08);[523,659,784,1047].forEach((f,i)=>tone(f,.23,.07+i*.09,'triangle',f,.035));}
       if (kind==='land') sample('land',.11);
       if (kind==='boost') {whoosh();tone(170,.38,0,'triangle',980,.035);}
-      if (kind==='roar') {
-        if(state.characterId!=='eric')return;
-        // Eric ruge com a própria voz: gravação inteira, sem mudar a velocidade.
+      if (kind==='roar' || kind==='wind' || kind==='bubble') {
+        // Todos os dinos rugem ao usar o especial. Daniel e Samuel usam a voz
+        // do Eric provisoriamente: gravação inteira, sem mudar a velocidade.
         // Para trocar o áudio, prepare o WAV e rode scripts/embed-audio.py.
         if(soundBuffers.roar)sample('roar',.4);
         else if(audioLoading){
-          const triggered=performance.now(),token=adventureToken;
+          const triggered=performance.now(),token=adventureToken,characterId=state.characterId;
           // A gravação pode terminar de carregar após trocar ou reiniciar o herói.
           // Só a partida e o personagem que pediram o rugido podem reproduzi-lo.
-          audioLoading.then(()=>{if(token===adventureToken && state.characterId==='eric' && state.running && performance.now()-triggered<400 && !state.paused && !state.ended)sample('roar',.4);});
+          audioLoading.then(()=>{if(token===adventureToken && state.characterId===characterId && state.running && performance.now()-triggered<400 && !state.paused && !state.ended)sample('roar',.4);});
         }
       }
       if (kind==='wind') {whoosh();tone(390,.3,0,'sine',790,.04);tone(790,.2,.2,'sine',980,.025);}

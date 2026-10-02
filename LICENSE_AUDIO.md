@@ -28,8 +28,12 @@ embutido no HTML; a gravação M4A original permanece apenas no computador.
 
 Esta gravação familiar não recebe a licença CC0 dos efeitos de Kenney.
 
+O rugido acompanha os especiais dos três personagens. Daniel e Samuel usam
+provisoriamente a mesma gravação do Eric, inteira e na velocidade natural,
+até a inclusão de vozes próprias.
+
 ## Síntese original do jogo
 
-As notas musicais, a mola do pulo, o vento do turbo, o Sopro do Ptero do Daniel
-e as bolhas do Samuel são gerados pelo JavaScript do jogo e não utilizam
-gravações de terceiros. Daniel e Samuel não reutilizam a voz do Eric.
+As notas musicais, a mola do pulo, o vento do turbo, o vento do Sopro do Ptero
+do Daniel e os sons leves das bolhas do Samuel são gerados pelo JavaScript
+do jogo e não utilizam gravações de terceiros.

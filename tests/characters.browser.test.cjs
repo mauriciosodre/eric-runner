@@ -45,7 +45,7 @@ async function instrument(page, saved) {
     };
     const audioStart = AudioBufferSourceNode.prototype.start;
     AudioBufferSourceNode.prototype.start = function(...args) {
-      __characterSamples.push({ duration: this.buffer?.duration, rate: this.playbackRate.value });
+      __characterSamples.push({ duration: this.buffer?.duration, rate: this.playbackRate.value, offset: args[1] || 0, playedDuration: args[2] });
       return audioStart.apply(this, args);
     };
     const toneStart = OscillatorNode.prototype.start;
@@ -66,7 +66,14 @@ async function quiet(page) {
     s.shield = 0; s.hurt = 0;
   });
 }
-async function verifyPendingRoar(browser, nextCharacter) {
+function assertNaturalRoar(samples, message) {
+  const roars = samples.filter(s => Math.abs(s.duration - 2.58) < .005);
+  assert.equal(roars.length, 1, message);
+  assert.equal(roars[0].rate, 1, 'rugido mantém a velocidade natural da gravação');
+  assert.equal(roars[0].offset, 0, 'rugido começa no início da gravação');
+  assert.ok(Math.abs(roars[0].playedDuration - 2.58) < .005, 'rugido reproduz a gravação inteira');
+}
+async function verifyPendingRoar(browser, nextCharacter, currentCharacter = 'eric') {
   const page = await browser.newPage(); await instrument(page);
   await page.addInitScript(() => {
     const decode = AudioContext.prototype.decodeAudioData;
@@ -80,12 +87,13 @@ async function verifyPendingRoar(browser, nextCharacter) {
   await page.goto(url); await page.waitForFunction(() => !!globalThis.__characterState);
   // Este caso exercita a corrida do áudio, não a rede: prepara o próximo
   // herói antes para permitir um reinício imediato dentro da janela de 400 ms.
-  if(nextCharacter && nextCharacter!=='eric') {
-    const name={daniel:'Daniel',samuel:'Samuel'}[nextCharacter];
+  if(nextCharacter && nextCharacter!==currentCharacter) {
+    const name={eric:'Eric',daniel:'Daniel',samuel:'Samuel'}[nextCharacter];
     await page.getByRole('button', {name:'Escolher '+name,exact:true}).click();
     await page.waitForFunction(() => !document.getElementById('start').disabled);
-    await page.getByRole('button', {name:'Escolher Eric',exact:true}).click();
   }
+  const currentName={eric:'Eric',daniel:'Daniel',samuel:'Samuel'}[currentCharacter];
+  await page.getByRole('button', {name:'Escolher '+currentName,exact:true}).click();
   await page.getByRole('button', { name: 'Vamos correr!', exact: true }).click(); await quiet(page);
   await page.getByRole('button', { name: 'Ativar sons' }).click();
   await page.waitForFunction(() => __pendingCharacterDecodes.length === 7);
@@ -94,7 +102,7 @@ async function verifyPendingRoar(browser, nextCharacter) {
   if (nextCharacter === null) {
     await page.evaluate(() => { __pendingCharacterDecodes.forEach(release => release()); });
     await page.waitForTimeout(120);
-    assert.ok(await page.evaluate(() => __characterSamples.some(s => Math.abs(s.duration - 2.58) < .005)), 'a gravação pendente ainda toca normalmente na mesma aventura do Eric');
+    assertNaturalRoar(await page.evaluate(() => __characterSamples), `a gravação pendente toca uma vez na mesma aventura de ${currentName}`);
     await page.close(); return;
   }
   await page.evaluate(() => { __characterState.ended = true; __characterState.health = 0; });
@@ -106,7 +114,7 @@ async function verifyPendingRoar(browser, nextCharacter) {
     return document.getElementById('announcement').textContent;
   }, nextCharacter);
   await page.waitForTimeout(120);
-  assert.ok(await page.evaluate(() => __characterSamples.every(s => Math.abs(s.duration - 2.58) > .005)), `rugido pendente da aventura anterior não toca após reiniciar com ${nextCharacter}`);
+  assert.ok(await page.evaluate(() => __characterSamples.every(s => Math.abs(s.duration - 2.58) > .005)), `rugido pendente de ${currentName} não toca após reiniciar com ${nextCharacter}`);
   const name = { eric: 'Eric', daniel: 'Daniel', samuel: 'Samuel' }[nextCharacter];
   assert.match(announcement, new RegExp(`Vamos de novo, ${name}!`), 'reinício anuncia o nome escolhido');
   await page.close();
@@ -143,6 +151,11 @@ async function verifyAllPoses(page, id) {
   const browser = await chromium.launch({ headless: true });
   try {
     for (const character of [null, 'eric', 'daniel', 'samuel']) await verifyPendingRoar(browser, character);
+    for (const id of ['daniel', 'samuel']) {
+      await verifyPendingRoar(browser, null, id);
+      await verifyPendingRoar(browser, id, id);
+      await verifyPendingRoar(browser, id === 'daniel' ? 'samuel' : 'eric', id);
+    }
     // A abertura file:// comum pode impedir leitura dos pixels, mas ainda permite
     // desenhar o PNG. As poses frontais usam o recorte medido, sem getImageData.
     for (const id of ['daniel', 'samuel']) {
@@ -191,8 +204,8 @@ async function verifyAllPoses(page, id) {
     draws = await page.evaluate(() => __characterDraws.filter(d => d.asset === 'daniel-special.png'));
     assert.equal(new Set(draws.map(d => `${d.sx},${d.sy}`)).size, 6, 'Daniel demonstra seis poses do sopro');
     assert.ok(draws.every(d => d.alpha === 1 && Math.abs(d.localSole) < .01), 'sopro tem uma pose por quadro, sem rostos sobrepostos');
-    assert.ok(await page.evaluate(() => __characterSamples.every(s => Math.abs(s.duration - 2.58) > .005)), 'Daniel não toca a voz do Eric');
-    assert.ok(await page.evaluate(() => __characterTones > 0), 'sopro tem som próprio');
+    assertNaturalRoar(await page.evaluate(() => __characterSamples), 'sopro do Daniel inclui um rugido natural');
+    assert.ok(await page.evaluate(() => __characterTones > 0), 'sopro mantém seu efeito sonoro junto com o rugido');
     await verifyAllPoses(page, 'daniel');
     await page.getByRole('button', { name: 'Pausar aventura' }).click();
     assert.match(await page.locator('#pause-screen p').textContent(), /Daniel/);
@@ -217,8 +230,8 @@ async function verifyAllPoses(page, id) {
     await page.waitForFunction(() => __characterDraws.some(d => d.asset === 'samuel-special.png'));
     await page.waitForFunction(() => __characterState.mobs.some(m => m.bubbled && m.fleeLift > 0));
     await page.waitForTimeout(900);
-    assert.ok(await page.evaluate(() => __characterSamples.every(s => Math.abs(s.duration - 2.58) > .005)), 'Samuel também não toca a voz do Eric');
-    assert.ok(await page.evaluate(() => __characterTones > 0), 'bolhas têm sons suaves próprios');
+    assertNaturalRoar(await page.evaluate(() => __characterSamples), 'bolhas do Samuel incluem um rugido natural');
+    assert.ok(await page.evaluate(() => __characterTones > 0), 'bolhas mantêm seus sons suaves junto com o rugido');
     await page.screenshot({ path: path.join(output, 'samuel-bubbles.png'), fullPage: true });
     await verifyAllPoses(page, 'samuel');
     assert.deepEqual(errors, [], 'nenhum erro com troca de heróis e especiais');
@@ -263,6 +276,6 @@ async function verifyAllPoses(page, id) {
     await invalid.goto(url); await invalid.waitForFunction(() => !!globalThis.__characterState);
     assert.equal(await invalid.evaluate(() => __characterState.characterId), 'eric', 'escolha gravada inválida volta ao Eric');
     await invalid.close();
-    console.log('Personagens: seleção, persistência, sprites, especiais, sons próprios, mobile e reservas passaram.');
+    console.log('Personagens: seleção, persistência, sprites, especiais com rugidos naturais, áudio pendente, mobile e reservas passaram.');
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });
