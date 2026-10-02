@@ -204,7 +204,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await page.waitForFunction(()=>__observedState.scared===3);
     assert.ok(await page.evaluate(()=>__observedState.mobs.filter(m=>!RunnerEngine.isEnemy(m)).every(m=>!m.fleeing)),'rugido poupa os animais amigos');
     const playedSamples=await page.evaluate(()=>__sampleStarts);
-    assert.ok(playedSamples.some(s=>s.duration>2.37 && Math.abs(s.rate-1.9)<.001 && Math.abs(s.offset-.12)<.001 && Math.abs(s.limit-2.25)<.001),'o especial toca o áudio anterior com o mesmo trecho e velocidade: '+JSON.stringify(playedSamples));
+    assert.ok(playedSamples.some(s=>Math.abs(s.duration-2.58)<.002 && s.rate===1 && s.offset===0 && Math.abs(s.limit-s.duration)<.001),'o especial toca a gravação inteira do Eric, sem acelerar ou alterar sua voz: '+JSON.stringify(playedSamples));
     assert.equal(await page.locator('#roar').getAttribute('aria-disabled'),'true');
     await page.screenshot({ path: path.join(output, 'desktop-playing.png'), fullPage: true });
     await page.getByRole('button', { name: 'Desativar sons' }).click();

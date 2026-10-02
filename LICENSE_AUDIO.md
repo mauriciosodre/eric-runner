@@ -17,19 +17,16 @@ Arquivos utilizados: `impactSoft_medium_000.ogg`, `impactSoft_heavy_001.ogg`,
 
 O volume e a velocidade de alguns efeitos foram ajustados em tempo de execução.
 
-## 123agumon — Dinosaur Growl
+## Eric — rugido original
 
-Autor: 123agumon. Publicado no Freesound em 23/02/2012.
+Voz: Eric. Gravação fornecida pelo pai para inclusão neste jogo.
 
-Fonte e indicação de licença: https://freesound.org/people/123agumon/sounds/147527/
+O trecho de 2,58 segundos foi preparado com corte das bordas, filtragem leve
+de ruído grave e chiado, transições suaves e ajuste de volume. A afinação e a
+velocidade da voz são as da gravação original. O WAV mono de 24 kHz está
+embutido no HTML; a gravação M4A original permanece apenas no computador.
 
-Licença: Creative Commons Zero (CC0 1.0 Universal).
-https://creativecommons.org/publicdomain/zero/1.0/
-
-Arquivo utilizado: prévia MP3 de alta qualidade disponibilizada na página do autor.
-O jogo reproduz um trecho, com filtros passa-altas e passa-baixas, envelope de
-volume e velocidade ajustados para uma voz mais aguda e suave. Não há camada
-grave adicional.
+Esta gravação familiar não recebe a licença CC0 dos efeitos de Kenney.
 
 ## Síntese original do jogo
 

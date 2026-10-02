@@ -1,4 +1,4 @@
-"""Atualiza somente os áudios CC0 embutidos no HTML, sem alterar o jogo."""
+"""Embute o rugido do Eric e os efeitos CC0 no HTML, sem arquivos externos."""
 from pathlib import Path
 import base64
 import json
@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'output' / 'audio'
 KENNEY = SOURCE / 'kenney' / 'Audio'
 files = {
-    'roar': SOURCE / 'dinosaur-growl-123agumon.mp3',
+    'roar': SOURCE / 'eric-roar.wav',
     'kick': KENNEY / 'impactSoft_medium_000.ogg',
     'bump': KENNEY / 'impactSoft_heavy_001.ogg',
     'land': KENNEY / 'footstep_grass_002.ogg',
