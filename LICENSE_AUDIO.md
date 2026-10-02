@@ -30,5 +30,6 @@ Esta gravação familiar não recebe a licença CC0 dos efeitos de Kenney.
 
 ## Síntese original do jogo
 
-As notas musicais, a mola do pulo e o vento do turbo são gerados pelo JavaScript
-do jogo e não utilizam gravações de terceiros.
+As notas musicais, a mola do pulo, o vento do turbo, o Sopro do Ptero do Daniel
+e as bolhas do Samuel são gerados pelo JavaScript do jogo e não utilizam
+gravações de terceiros. Daniel e Samuel não reutilizam a voz do Eric.

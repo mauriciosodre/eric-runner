@@ -231,6 +231,46 @@
       .play-hint { bottom:max(98px,calc(env(safe-area-inset-bottom) + 94px)); font-size:10px; }
     }
     @media(pointer:coarse) and (orientation:landscape) and (max-width:500px) { .action-dock { left:50%; } }
+    /* A criança escolhe pelo retrato. Durante a corrida, estes cartões ficam ocultos. */
+    .intro { right:5%; width:52%; max-width:480px; top:20%; }
+    .intro p { display:none; }
+    .intro h2 { font-size:clamp(28px,3.8vw,44px); margin:10px 0; }
+    .character-picker { display:flex; gap:9px; margin:13px 0 16px; }
+    .character-card { display:flex; flex:1; flex-direction:column; align-items:center; gap:3px; min-width:0; min-height:100px; padding:7px 8px; background:#fffffff2; border:2px solid #e3ecd3; border-radius:16px; color:#42664b; box-shadow:0 3px 0 #325e3c16; }
+    .character-card[aria-pressed="true"] { background:#f4ffdb; border-color:var(--character-color,#6ca15c); box-shadow:0 3px 0 var(--character-color,#6ca15c); }
+    .character-card img { display:block; width:62px; height:63px; object-fit:cover; object-position:50% 0%; pointer-events:none; }
+    .character-card strong { font-size:13px; }
+    .character-card small { color:#72826c; font-size:9px; }
+    .character-card[data-character="daniel"] { --character-color:#368db0; }
+    .character-card[data-character="samuel"] { --character-color:#9b76bb; }
+    .end-character-picker { margin:8px 0 16px; gap:7px; }
+    .end-character-picker .character-card { min-height:65px; padding:4px; gap:1px; border-radius:12px; }
+    .end-character-picker .character-card img { width:39px; height:38px; }
+    .end-character-picker .character-card strong { font-size:11px; }
+    .end-character-picker .character-card small { display:none; }
+    @media(pointer:coarse) and (orientation:landscape) {
+      .intro { top:24%; right:5%; width:53%; max-width:440px; }
+      .intro-tag,.intro .tiny { display:none; }
+      .intro h2 { font-size:28px; margin:0 0 8px; }
+      .character-picker { gap:7px; margin:8px 0 12px; }
+      .character-card { min-height:78px; padding:5px 7px; gap:1px; border-radius:13px; }
+      .character-card img { width:47px; height:48px; }
+      .character-card strong { font-size:12px; }
+      .character-card small { font-size:8px; }
+      .end-card { padding:12px 20px; }
+      .end-card > svg { height:22px; }
+      .end-card h2 { font-size:23px; }
+      .end-card p { font-size:11px; margin:6px 0; }
+      .end-results { margin:8px 0; }
+      .end-results strong { font-size:25px; }
+      .end-character-picker { margin:8px 0 12px; }
+    }
+    @media(pointer:coarse) and (orientation:landscape) and (max-height:350px) {
+      .intro { top:25%; }
+      .intro h2 { font-size:24px; }
+      .character-card { min-height:70px; }
+      .character-card img { width:41px; height:41px; }
+    }
   </style>
 </head>
 <body>
@@ -247,6 +287,8 @@
     <symbol id="i-mute" viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3zM16 9l5 6m0-6-5 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></symbol>
     <symbol id="i-jump" viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6M5 21h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-fullscreen" viewBox="0 0 24 24"><path d="M4 9V4h5m6 0h5v5m0 6v5h-5m-6 0H4v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h12a3 3 0 1 0-3-3M2 12h17a3 3 0 1 1-3 3M4 17h6a2 2 0 1 1-2 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-bubbles" viewBox="0 0 24 24"><circle cx="9" cy="14" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="6" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="19" cy="19" r="2" fill="currentColor"/><path d="M6 13c0-2 1-3 3-3M15 5l1-1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
   </defs></svg>
   <header class="site-header">
     <div class="brand"><span class="brand-icon"><svg width="29" height="29" aria-hidden="true"><use href="#i-dino"/></svg></span><div><div class="brand-name">ERIC<span>RUN</span></div><div class="brand-sub">O DINO-FUTEBOLISTA</div></div></div>
@@ -278,23 +320,35 @@
           <div class="power shield" id="shield-status" hidden>✦ Escudo dino <span id="shield-time">2s</span><span class="power-bar"><i id="shield-bar"></i></span></div>
         </div>
         <div class="mission" id="mission" hidden><svg aria-hidden="true"><use href="#i-star"/></svg><div><small>VAMOS BRINCAR DE...</small><strong id="mission-text">Chutar 2 bolas</strong></div><span class="mission-progress" id="mission-progress" aria-hidden="true"></span></div>
-        <div class="intro" id="intro"><span class="intro-tag">✦ Hoje o herói é você!</span><h2>O mundo é seu,<br> <span>Eric.</span></h2><p>Calce suas superchuteiras.<br>Tem uma aventura esperando por você!</p><button class="primary" id="start"><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos correr!</button><span class="tiny"><svg width="13" height="13" aria-hidden="true"><use href="#i-touch"/></svg><span class="keyboard-hint">Z para pular · X para rugir</span><span class="touch-hint">Toque em PULAR ou RUGIR</span></span></div>
+        <div class="intro" id="intro"><span class="intro-tag">✦ Hoje o herói é você!</span><h2>O mundo é seu,<br> <span id="intro-character-name">Eric.</span></h2><p>Calce suas superchuteiras.<br>Tem uma aventura esperando por você!</p>
+          <div class="character-picker" id="character-picker" role="group" aria-label="Escolha seu herói">
+            <button class="character-card" data-character="eric" aria-label="Escolher Eric" aria-pressed="true"><img src="eric.png?v=10" alt="" draggable="false"><strong>Eric</strong><small>Rugido do dino</small></button>
+            <button class="character-card" data-character="daniel" aria-label="Escolher Daniel" aria-pressed="false"><img src="daniel.png?v=1" alt="" draggable="false" loading="lazy"><strong>Daniel</strong><small>Sopro do Ptero</small></button>
+            <button class="character-card" data-character="samuel" aria-label="Escolher Samuel" aria-pressed="false"><img src="samuel.png?v=1" alt="" draggable="false" loading="lazy"><strong>Samuel</strong><small>Bolha de Abraço</small></button>
+          </div>
+          <button class="primary" id="start"><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos correr!</button><span class="tiny"><svg width="13" height="13" aria-hidden="true"><use href="#i-touch"/></svg><span class="keyboard-hint" id="intro-keyboard-hint">Z para pular · X para rugir</span><span class="touch-hint" id="intro-touch-hint">Toque em PULAR ou RUGIR</span></span></div>
         <span class="hero-name" id="hero-name">NOSSO PEQUENO HERÓI</span>
-        <span class="play-hint" id="play-hint" hidden><span class="keyboard-hint">Z pula · X ruge</span><span class="touch-hint">PULAR e RUGIR, um ao lado do outro</span></span>
+        <span class="play-hint" id="play-hint" hidden><span class="keyboard-hint" id="play-keyboard-hint">Z pula · X ruge</span><span class="touch-hint" id="play-touch-hint">PULAR e RUGIR, um ao lado do outro</span></span>
         <div class="action-dock">
           <button class="jump-button roar-button" id="roar" aria-label="Rugir e afugentar os travessos" title="Rugir (X ou R)" hidden><svg aria-hidden="true"><use href="#i-dino"/></svg><span id="roar-label">RUGIR!</span><kbd class="desktop-key">X</kbd><small id="roar-hint">ESPANTA OS TRAVESSOS</small></button>
           <button class="jump-button" id="jump" aria-label="PULAR" title="Pular (Z ou Espaço)" hidden><svg aria-hidden="true"><use href="#i-jump"/></svg> PULAR <kbd class="desktop-key">Z</kbd></button>
         </div>
         <div class="pause-screen" id="pause-screen" hidden><div class="pause-card"><svg width="34" height="34" style="color:#82a862" aria-hidden="true"><use href="#i-dino"/></svg><h2>Uma pausinha.</h2><p>A aventura espera por você.</p><button class="primary" id="resume"><svg aria-hidden="true"><use href="#i-play"/></svg> Continuar</button></div></div>
-        <div class="pause-screen" id="end-screen" role="dialog" aria-modal="true" aria-labelledby="end-title" hidden><div class="pause-card end-card"><svg width="30" height="30" style="color:#dda449" aria-hidden="true"><use href="#i-star"/></svg><h2 id="end-title">Que aventura, Eric!</h2><p>Você brilhou. Vamos brincar mais?</p><div class="end-results"><div><small>SEUS PONTOS</small><strong id="end-score">0</strong></div><div><small>SEU RECORDE</small><strong id="end-record">0</strong></div></div><button class="primary" id="restart"><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos de novo!</button></div></div>
+        <div class="pause-screen" id="end-screen" role="dialog" aria-modal="true" aria-labelledby="end-title" hidden><div class="pause-card end-card"><svg width="30" height="30" style="color:#dda449" aria-hidden="true"><use href="#i-star"/></svg><h2 id="end-title">Que aventura, Eric!</h2><p>Você brilhou. Escolha quem vem brincar agora!</p><div class="end-results"><div><small>SEUS PONTOS</small><strong id="end-score">0</strong></div><div><small>SEU RECORDE</small><strong id="end-record">0</strong></div></div>
+          <div class="character-picker end-character-picker" id="end-character-picker" role="group" aria-label="Escolha o herói da próxima aventura">
+            <button class="character-card" data-character="eric" aria-label="Escolher Eric" aria-pressed="true"><img src="eric.png?v=10" alt="" draggable="false" loading="lazy"><strong>Eric</strong></button>
+            <button class="character-card" data-character="daniel" aria-label="Escolher Daniel" aria-pressed="false"><img src="daniel.png?v=1" alt="" draggable="false" loading="lazy"><strong>Daniel</strong></button>
+            <button class="character-card" data-character="samuel" aria-label="Escolher Samuel" aria-pressed="false"><img src="samuel.png?v=1" alt="" draggable="false" loading="lazy"><strong>Samuel</strong></button>
+          </div>
+          <button class="primary" id="restart"><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos de novo!</button></div></div>
         <div class="rotate-screen" id="rotate-screen" aria-label="Vire o celular para brincar na horizontal"><div class="rotate-card"><svg class="rotate-illustration" viewBox="0 0 140 100" aria-hidden="true"><rect x="27" y="29" width="88" height="49" rx="10" fill="#e2f0c4" stroke="currentColor" stroke-width="3"/><rect x="36" y="36" width="69" height="34" rx="6" fill="#b5d69a"/><circle cx="110" cy="53" r="2" fill="currentColor"/><path d="M27 17c23-17 56-13 73 2m-3-15 4 16-16-2" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><use href="#i-dino" x="54" y="37" width="32" height="32"/></svg><h2>Vire o celular,<br>pequeno herói!</h2><p>Na horizontal, tem mais espaço<br>para correr, pular e rugir.</p></div></div>
       </div>
-      <div class="game-footer"><span class="controls"><kbd>Z</kbd> Pular <span style="color:#bdc7b4">/</span> <kbd>X</kbd> Rugir</span><span class="safe-note">Aqui, a diversão nunca acaba.</span></div>
+      <div class="game-footer"><span class="controls"><kbd>Z</kbd> Pular <span style="color:#bdc7b4">/</span> <kbd>X</kbd> <span id="footer-special">Rugir</span></span><span class="safe-note">Aqui, a diversão nunca acaba.</span></div>
     </section>
     <section class="how-to" aria-label="Como brincar"><div class="section-label">PEQUENOS PODERES, GRANDES SORRISOS</div><div class="cards">
       <div class="card"><div class="item-icon"><svg aria-hidden="true"><use href="#i-ball"/></svg></div><div><h3>Um chute, um goool!</h3><p>Encontre a bola e faça a festa.</p></div></div>
       <div class="card"><div class="item-icon fries"><svg aria-hidden="true"><use href="#i-fries"/></svg></div><div><h3>Batatinhas turbo</h3><p>Pegue e corra como um foguete.</p></div></div>
-      <div class="card"><div class="item-icon fossil"><svg aria-hidden="true"><use href="#i-dino"/></svg></div><div><h3>Um rugido poderoso!</h3><p>Aperte RUGIR e veja os travessos fugirem.</p></div></div>
+      <div class="card"><div class="item-icon fossil"><svg aria-hidden="true"><use href="#i-dino"/></svg></div><div><h3 id="special-card-title">Um rugido poderoso!</h3><p id="special-card-description">Aperte RUGIR e veja os travessos fugirem.</p></div></div>
     </div><div class="encounter-guide" aria-label="Quem é quem na aventura"><span><i class="guide-icon">♥</i> Bichinhos são amigos</span><span><i class="guide-icon obstacle">↑</i> Pule os brinquedos</span><span><i class="guide-icon enemy">!</i> Espante os travessos</span></div></section>
     <div class="sr-only" id="announcement" role="status" aria-live="polite"></div>
     <noscript><p>Ative o JavaScript no navegador para brincar.</p></noscript>
@@ -306,8 +360,10 @@
      A física é independente do Canvas para facilitar manutenção e testes. */
   globalThis.RunnerEngine = (() => {
     const SHIELD_SECONDS=1.5;
+    const SPECIAL_SECONDS={eric:1.05,daniel:1.2,samuel:1.4};
     function create() {
       return { running:false, paused:false, time:0, width:1120, distance:0, speed:220,
+        characterId:'eric', wind:0, bubble:0,
         health:20, maxHealth:20, ended:false,
         goals:0, treasures:0, friends:0, stars:0, taskIndex:0, taskProgress:0,
         boost:0, shield:0, hurt:0, slow:0, shake:0, kick:0, roar:0,
@@ -321,7 +377,14 @@
     }
     function restart(s) {
       const next=create();next.width=s.width;next.player.x=s.player.x;next.running=true;
+      next.characterId=['eric','daniel','samuel'].includes(s.characterId)?s.characterId:'eric';
       Object.assign(s,next);
+    }
+    // A escolha ocorre no menu ou ao terminar; não troca o herói no meio de um salto.
+    function setCharacter(s,id) {
+      if(!['eric','daniel','samuel'].includes(id) || (s.running && !s.ended))return false;
+      s.characterId=id;
+      return true;
     }
     function damage(s,slow) {
       if(s.ended || s.shield>0 || s.hurt>0)return;
@@ -361,9 +424,13 @@
       if(s.kick>0)return 5;
       return Math.floor(s.player.stride)%4;
     }
-    const ROAR_SECONDS=1.05;
     function roarPhase(s) {
-      return Math.min(5,Math.max(0,(1-s.roar/ROAR_SECONDS)*6));
+      const duration=SPECIAL_SECONDS[s.characterId] || SPECIAL_SECONDS.eric;
+      return Math.min(5,Math.max(0,(1-s.roar/duration)*6));
+    }
+    function pose(s) {
+      const frame=spriteFrame(s);
+      return frame===4?'jump':frame===5?'kick':frame===6?'roar':frame===7?'idle':'run';
     }
     function befriend(s,mob,text) {
       if(mob.resolved)return;
@@ -375,13 +442,21 @@
     function scare(s,mob,reason='roar') {
       if(!isEnemy(mob) || mob.resolved)return;
       mob.resolved=true;mob.fleeing=true;mob.celebrate=1.5;s.scared++;
+      if(reason==='bubble'){mob.bubbled=true;mob.fleeLift=0;}
       emit(s,'flee',reason==='ball'?'QUE CHUTE!':'',mob.x,170);
       progress(s,'scare');
     }
     function roar(s) {
       if(!s.running || s.paused || s.ended || s.roarCooldown>0)return false;
-      s.roarCooldown=6;s.roarWave=1.15;s.roar=ROAR_SECONDS;s.shake=.38;s.shield=SHIELD_SECONDS;
-      emit(s,'roar','ROAAAAR!',s.player.x+30,260);
+      s.roarCooldown=6;s.roarWave=1.15;s.roar=SPECIAL_SECONDS[s.characterId] || SPECIAL_SECONDS.eric;
+      s.shield=s.characterId==='samuel'?3:SHIELD_SECONDS;
+      if(s.characterId==='daniel') {
+        s.wind=1.2;emit(s,'wind','SOPRO!',s.player.x+30,260);
+      } else if(s.characterId==='samuel') {
+        s.bubble=3;emit(s,'bubble','ABRAÇO!',s.player.x+30,260);
+      } else {
+        s.shake=.38;emit(s,'roar','ROAAAAR!',s.player.x+30,260);
+      }
       return true;
     }
     function roomForHazard(s) {
@@ -393,7 +468,7 @@
       if (type === 'ball') { s.goals++; s.kick=.3; emit(s, 'goal', 'GOOOL!'); progress(s,'ball'); }
       if (type === 'fries') { s.boost=3; emit(s, 'boost', 'ZUUUM!'); }
       if (type === 'coin' || type === 'fossil') {
-        s.treasures++; s.shield=SHIELD_SECONDS; s.roarCooldown=0;
+        s.treasures++; s.shield=Math.max(s.shield,SHIELD_SECONDS); s.roarCooldown=0;
         emit(s, 'charge', 'DINO PRONTO!', s.player.x + 30, 230);
         progress(s,'treasure');
       }
@@ -402,7 +477,7 @@
       if (!s.running || s.paused || s.ended) return;
       dt = Math.min(Math.max(dt,0),.1);
       s.time += dt;
-      for (const name of ['boost','shield','hurt','slow','shake','kick','roar','roarCooldown','roarWave']) s[name]=Math.max(0,s[name]-dt);
+      for (const name of ['boost','shield','hurt','slow','shake','kick','roar','roarCooldown','roarWave','wind','bubble']) s[name]=Math.max(0,s[name]-dt);
       const target = 220 * (s.boost > 0 ? 1.65 : 1) * (s.slow > 0 ? .63 : 1);
       s.speed += (target-s.speed) * Math.min(1,dt*7);
       const travel=s.speed*dt;
@@ -443,10 +518,14 @@
       // A bola chutada e os bichinhos usam a mesma física do mundo.
       for(const mob of s.mobs) {
         mob.oldX=mob.x;mob.x+=mob.fleeing?dt*450:-travel;mob.phase+=dt*(mob.fleeing?15:5);
+        if(mob.bubbled && mob.fleeing)mob.fleeLift=(mob.fleeLift || 0)+dt*110;
         if(mob.celebrate>0){mob.celebrate=Math.max(0,mob.celebrate-dt);if(mob.type==='parrot')mob.lift+=dt*45;}
         // A onda varre a área visível. Amigos continuam brincando normalmente.
         const radius=140+(1.15-s.roarWave)*1100;
-        if(s.roarWave>0 && mob.x>=p.x-70 && mob.x<=s.width+30 && mob.x-p.x<radius)scare(s,mob);
+        if(s.roarWave>0 && mob.x<=s.width+30) {
+          if(s.characterId==='samuel' && mob.x>=0)scare(s,mob,'bubble');
+          else if(mob.x>=p.x-70 && mob.x-p.x<radius)scare(s,mob,s.characterId==='daniel'?'wind':'roar');
+        }
       }
       for (const item of s.items) {
         if (item.kicked) {
@@ -464,6 +543,12 @@
         }
         const oldX=item.x;
         item.x-=travel;
+        // O sopro ajuda a alcançar tesouros próximos. Bolas continuam no chão;
+        // as já chutadas seguem sua trajetória e itens fora da tela não são puxados.
+        if(s.wind>0 && !item.collected && item.x>=0 && item.x<=s.width && Math.hypot(item.x-p.x,item.lift-(p.lift+88))<=430) {
+          item.x+=Math.sign(p.x-item.x)*Math.min(Math.abs(p.x-item.x),dt*430);
+          if(item.type!=='ball')item.lift+=(p.lift+88-item.lift)*Math.min(1,dt*6);
+        }
         // Coleta generosa: há margem lateral e vertical, inclusive entre quadros.
         const nearX=item.x <= p.x+62+item.radius && oldX >= p.x-62-item.radius;
         const nearY=Math.abs(item.lift-(p.lift+88)) < 90+item.radius;
@@ -477,9 +562,10 @@
         const nearX=mob.x-mob.width/2<p.x+26 && mob.oldX+mob.width/2>p.x-26;
         if(!mob.resolved && nearX) {
           if(!isEnemy(mob)) {
-            befriend(s,mob,mob.type==='rabbit'?'OI, AMIGO!':'OI, ERIC!');
+            const name={eric:'ERIC',daniel:'DANIEL',samuel:'SAMUEL'}[s.characterId] || 'ERIC';
+            befriend(s,mob,mob.type==='rabbit'?'OI, AMIGO!':'OI, '+name+'!');
             if(mob.type==='parrot')s.items.push({type:'coin',x:p.x+95,lift:110,radius:25,phase:0});
-          } else if(s.shield>0)scare(s,mob,'shield');
+          } else if(s.shield>0)scare(s,mob,s.bubble>0?'bubble':'shield');
           else if(p.lift>=mob.height) {mob.resolved=true;emit(s,'clear','BOA!',mob.x,140);}
           else if(p.lift<mob.height-4) {
             mob.resolved=true;
@@ -503,7 +589,7 @@
       s.obstacles=s.obstacles.filter(o=>o.x > -90);
       s.mobs=s.mobs.filter(m=>m.x>-110 && (!m.fleeing || m.x<s.width+110));
     }
-    return { SHIELD_SECONDS, create, restart, score, jump, collect, step, spriteFrame, roarPhase, task, roar, isEnemy };
+    return { SHIELD_SECONDS, create, setCharacter, restart, score, jump, collect, step, spriteFrame, pose, roarPhase, task, roar, isEnemy };
   })();
   </script>
   <script>
@@ -587,10 +673,81 @@
     ericImage.onerror=()=>{ imageReady=false; console.warn('Coloque eric.png na mesma pasta do HTML. O desenho provisório mantém o jogo funcionando.'); };
     ericImage.src=ERIC_IMAGE_URL;
 
+    // Cada personagem tem seus próprios recortes. Estes dados estão embutidos
+    // para a escolha e as animações funcionarem abrindo o HTML diretamente.
+    const EXTRA_CHARACTER_FRAMES = {"daniel":{"run":{"file":"daniel-run.png","width":1774,"height":887,"columns":4,"rows":2,"frames":[{"x":107,"y":11,"width":267,"height":430,"sole":441,"headX":276.0,"headWidth":144,"index":0},{"x":529,"y":11,"width":255,"height":429,"sole":440,"headX":683.0,"headWidth":144,"index":1},{"x":962,"y":10,"width":260,"height":428,"sole":438,"headX":1117.0,"headWidth":144,"index":2},{"x":1384,"y":10,"width":277,"height":427,"sole":437,"headX":1551.5,"headWidth":145,"index":3},{"x":107,"y":451,"width":275,"height":426,"sole":877,"headX":269.5,"headWidth":145,"index":4},{"x":529,"y":451,"width":253,"height":427,"sole":878,"headX":696.0,"headWidth":146,"index":5},{"x":969,"y":451,"width":260,"height":427,"sole":878,"headX":1132.5,"headWidth":145,"index":6},{"x":1408,"y":452,"width":292,"height":420,"sole":872,"headX":1576.5,"headWidth":143,"index":7}]},"actions":{"file":"daniel-actions.png","width":1536,"height":1024,"columns":3,"rows":2,"frames":[{"x":140,"y":15,"width":335,"height":494,"sole":509,"headX":361.0,"headWidth":166,"index":0},{"x":590,"y":9,"width":354,"height":466,"sole":475,"headX":758.5,"headWidth":169,"index":1},{"x":1024,"y":9,"width":369,"height":499,"sole":508,"headX":1212.0,"headWidth":168,"index":2},{"x":129,"y":512,"width":352,"height":495,"sole":1007,"headX":344.5,"headWidth":167,"index":3},{"x":581,"y":512,"width":397,"height":495,"sole":1007,"headX":745.5,"headWidth":163,"index":4},{"x":1065,"y":518,"width":306,"height":489,"sole":1007,"headX":1224.5,"headWidth":161,"index":5}]},"special":{"file":"daniel-special.png","width":1536,"height":1024,"columns":3,"rows":2,"frames":[{"x":88,"y":6,"width":320,"height":499,"sole":505,"headX":255.5,"headWidth":161,"index":0},{"x":595,"y":5,"width":348,"height":504,"sole":509,"headX":756.0,"headWidth":164,"index":1},{"x":1072,"y":6,"width":355,"height":504,"sole":510,"headX":1247.0,"headWidth":162,"index":2},{"x":51,"y":509,"width":398,"height":507,"sole":1016,"headX":260.5,"headWidth":169,"index":3},{"x":588,"y":512,"width":350,"height":500,"sole":1012,"headX":769.0,"headWidth":168,"index":4},{"x":1095,"y":512,"width":325,"height":501,"sole":1013,"headX":1261.5,"headWidth":163,"index":5}]},"standing":{"file":"daniel.png","x":18,"y":25,"width":939,"height":1428,"sole":1453,"headX":544,"headWidth":434,"sourceWidth":1024,"sourceHeight":1536}},"samuel":{"run":{"file":"samuel-run.png","width":1774,"height":887,"columns":4,"rows":2,"frames":[{"x":107,"y":7,"width":273,"height":435,"sole":442,"headX":263.5,"headWidth":231,"index":0},{"x":527,"y":7,"width":254,"height":434,"sole":441,"headX":666.5,"headWidth":227,"index":1},{"x":932,"y":5,"width":265,"height":437,"sole":442,"headX":1080.5,"headWidth":229,"index":2},{"x":1331,"y":7,"width":268,"height":430,"sole":437,"headX":1480.5,"headWidth":233,"index":3},{"x":116,"y":449,"width":266,"height":430,"sole":879,"headX":264.0,"headWidth":230,"index":4},{"x":521,"y":449,"width":260,"height":430,"sole":879,"headX":664.5,"headWidth":229,"index":5},{"x":928,"y":447,"width":270,"height":432,"sole":879,"headX":1081.5,"headWidth":231,"index":6},{"x":1352,"y":445,"width":274,"height":434,"sole":879,"headX":1507.0,"headWidth":234,"index":7}]},"actions":{"file":"samuel-actions.png","width":1536,"height":1024,"columns":3,"rows":2,"frames":[{"x":155,"y":12,"width":368,"height":491,"sole":503,"headX":390.5,"headWidth":265,"index":0},{"x":590,"y":5,"width":354,"height":483,"sole":488,"headX":762.0,"headWidth":254,"index":1},{"x":1065,"y":22,"width":346,"height":482,"sole":504,"headX":1271.5,"headWidth":263,"index":2},{"x":130,"y":511,"width":341,"height":496,"sole":1007,"headX":327.0,"headWidth":252,"index":3},{"x":583,"y":511,"width":397,"height":494,"sole":1005,"headX":759.0,"headWidth":254,"index":4},{"x":1101,"y":511,"width":326,"height":500,"sole":1011,"headX":1284.0,"headWidth":260,"index":5}]},"special":{"file":"samuel-special.png","width":1536,"height":1024,"columns":3,"rows":2,"frames":[{"x":114,"y":4,"width":301,"height":503,"sole":507,"headX":274.5,"headWidth":247,"index":0},{"x":622,"y":1,"width":283,"height":505,"sole":506,"headX":763.5,"headWidth":249,"index":1},{"x":1104,"y":2,"width":318,"height":505,"sole":507,"headX":1252.5,"headWidth":253,"index":2},{"x":104,"y":513,"width":374,"height":504,"sole":1017,"headX":276.5,"headWidth":263,"index":3},{"x":603,"y":514,"width":303,"height":503,"sole":1017,"headX":761.0,"headWidth":260,"index":4},{"x":1095,"y":514,"width":304,"height":504,"sole":1018,"headX":1253.0,"headWidth":256,"index":5}]},"standing":{"file":"samuel.png","x":50,"y":27,"width":911,"height":1419,"sole":1446,"headX":500,"headWidth":606,"sourceWidth":1024,"sourceHeight":1536}}}; // CHARACTER_FRAMES_EMBED
+    const characters={
+      eric:{name:'Eric',playSize:190,color:'#6fa468',button:'RUGIR!',verb:'rugir',short:'ruge',icon:'#i-dino',hint:'ESPANTA OS TRAVESSOS',special:'Rugido do dino'},
+      daniel:{name:'Daniel',playSize:194,color:'#378eae',button:'SOPRAR!',verb:'soprar',short:'sopra',icon:'#i-wind',hint:'SOPRA E ATRAI TESOUROS',special:'Sopro do Ptero',file:'daniel.png?v=1'},
+      samuel:{name:'Samuel',playSize:156,color:'#9c78bd',button:'BOLHAS!',verb:'criar bolhas',short:'faz bolhas',icon:'#i-bubbles',hint:'UM ABRAÇO PROTETOR',special:'Bolha de Abraço',file:'samuel.png?v=1'}
+    };
+    const CHARACTER_KEY='eric-runner-character-v1';
+    const extras={};
+    function loadExtraCharacter(id) {
+      if(id==='eric' || extras[id])return;
+      const config=characters[id],entry=extras[id]={atlases:{},standing:null,image:new Image(),ready:false};
+      entry.image.onload=()=>{
+        // Os recortes já foram medidos fora do navegador. Não lê os pixels:
+        // assim, a pose aprovada também funciona em file:// com Canvas protegido.
+        const f=EXTRA_CHARACTER_FRAMES[id]?.standing;
+        entry.standing=f && f.sourceWidth===entry.image.naturalWidth && f.sourceHeight===entry.image.naturalHeight
+          ?f:{x:0,y:0,width:entry.image.naturalWidth,height:entry.image.naturalHeight,sole:entry.image.naturalHeight,headX:entry.image.naturalWidth*.5};
+        entry.ready=true;
+        draw();
+      };
+      entry.image.onerror=()=>{entry.ready=false;};entry.image.src=config.file;
+      const manifests=EXTRA_CHARACTER_FRAMES[id] || {};
+      if(manifests.run?.frames?.length) {
+        const heights=manifests.run.frames.map(f=>f.height).sort((a,b)=>a-b);
+        const heads=manifests.run.frames.map(f=>f.headWidth).sort((a,b)=>a-b);
+        entry.referenceHeight=heights[Math.floor(heights.length/2)];entry.referenceHead=heads[Math.floor(heads.length/2)];
+      }
+      for(const name of ['run','actions','special']) {
+        const manifest=manifests[name];if(!manifest?.frames?.length)continue;
+        const atlas=entry.atlases[name]={manifest,image:new Image(),ready:false,sprites:[]};
+        atlas.image.onload=()=>{
+          atlas.ready=atlas.image.naturalWidth===manifest.width && atlas.image.naturalHeight===manifest.height;
+          if(atlas.ready)atlas.sprites=manifest.frames.map(f=>isolateSprite(atlas.image,[f.x,f.y,f.width,f.height]));
+        };
+        atlas.image.onerror=()=>{atlas.ready=false;};atlas.image.src=manifest.file+'?v=1';
+      }
+    }
+
     const $=id=>document.getElementById(id);
     const canvas=$('game'),ctx=canvas.getContext('2d'),stage=$('stage');
     if (!ctx) { $('start').disabled=true; $('start').textContent='Canvas indisponível'; return; }
     const engine=globalThis.RunnerEngine, state=engine.create();
+    function activeCharacter(){return characters[state.characterId] || characters.eric;}
+    function syncCharacterUI() {
+      const character=activeCharacter(),id=state.characterId || 'eric';
+      $('intro-character-name').textContent=character.name+'.';
+      $('health-meter').setAttribute('aria-label','Vida do '+character.name);
+      $('game').setAttribute('aria-label','Aventura do '+character.name+'. Z ou Espaço para pular. X ou R para '+character.verb+'. P para pausar. No celular, use PULAR e '+character.button.replace('!','')+'.');
+      $('roar').setAttribute('aria-label',id==='eric'?'Rugir e afugentar os travessos':id==='daniel'?'Soprar e afugentar os travessos':'Criar bolhas protetoras');
+      $('roar').setAttribute('title',character.special+' (X ou R)');
+      $('roar').querySelector('use').setAttribute('href',character.icon);
+      $('roar-label').textContent=character.button;$('roar-hint').textContent=character.hint;
+      $('intro-keyboard-hint').textContent='Z para pular · X para '+character.verb;
+      $('intro-touch-hint').textContent='Toque em PULAR ou '+character.button.replace('!','');
+      $('play-keyboard-hint').textContent='Z pula · X '+character.short;
+      $('play-touch-hint').textContent='PULAR e '+character.button.replace('!','')+', um ao lado do outro';
+      $('footer-special').textContent=character.button[0]+character.button.slice(1,-1).toLowerCase();
+      $('special-card-title').textContent=character.special+'!';
+      $('special-card-description').textContent=id==='daniel'?'Aperte SOPRAR: os travessos fogem e os tesouros vêm para perto.':id==='samuel'?'Aperte BOLHAS para se proteger e fazer os travessos flutuarem.':'Aperte RUGIR e veja os travessos fugirem.';
+      $('pause-screen').querySelector('p').textContent=character.name+' está descansando. A aventura espera por você.';
+      for(const button of document.querySelectorAll('[data-character]'))button.setAttribute('aria-pressed',String(button.dataset.character===id));
+    }
+    function selectCharacter(id,persist=true) {
+      if(!characters[id] || !engine.setCharacter(state,id))return false;
+      loadExtraCharacter(id);syncCharacterUI();
+      if(persist)try{localStorage.setItem(CHARACTER_KEY,id);}catch(_){}
+      draw();return true;
+    }
+    let savedCharacter='eric';
+    try {const saved=localStorage.getItem(CHARACTER_KEY);if(Object.hasOwn(characters,saved))savedCharacter=saved;}catch(_){}
+    // Não desenha antes da primeira medição do Canvas; apenas inicia os assets escolhidos.
+    engine.setCharacter(state,savedCharacter);loadExtraCharacter(savedCharacter);syncCharacterUI();
+    for(const button of document.querySelectorAll('[data-character]'))button.addEventListener('click',()=>selectCharacter(button.dataset.character));
     // Recorde local: funciona sem conta. Se o navegador bloquear o armazenamento,
     // o jogo continua normalmente e mantém o recorde enquanto esta aba estiver aberta.
     const RECORD_KEY='eric-runner-highscore-v1';
@@ -612,7 +769,7 @@
     const palette=['#f9c85a','#f58b70','#74b68a','#72bfd0','#c0a2df'];
     let audio=null, soundEnabled=false, master=null, audioLoading=null;
     const soundBuffers={}, activeSources=new Set();
-    let lastFootstep=-1;
+    let lastFootstep=-1,adventureToken=0;
     // Rugido real do Eric, fornecido pelo pai, e efeitos CC0 de Kenney.
     // A voz foi limpa e nivelada, mantendo afinação e velocidade naturais.
     // O áudio permanece dentro deste HTML: funciona também sem internet.
@@ -683,11 +840,19 @@
       if (kind==='land') sample('land',.11);
       if (kind==='boost') {whoosh();tone(170,.38,0,'triangle',980,.035);}
       if (kind==='roar') {
+        if(state.characterId!=='eric')return;
         // Eric ruge com a própria voz: gravação inteira, sem mudar a velocidade.
         // Para trocar o áudio, prepare o WAV e rode scripts/embed-audio.py.
         if(soundBuffers.roar)sample('roar',.4);
-        else if(audioLoading){const triggered=performance.now();audioLoading.then(()=>{if(performance.now()-triggered<400 && !state.paused && !state.ended)sample('roar',.4);});}
+        else if(audioLoading){
+          const triggered=performance.now(),token=adventureToken;
+          // A gravação pode terminar de carregar após trocar ou reiniciar o herói.
+          // Só a partida e o personagem que pediram o rugido podem reproduzi-lo.
+          audioLoading.then(()=>{if(token===adventureToken && state.characterId==='eric' && state.running && performance.now()-triggered<400 && !state.paused && !state.ended)sample('roar',.4);});
+        }
       }
+      if (kind==='wind') {whoosh();tone(390,.3,0,'sine',790,.04);tone(790,.2,.2,'sine',980,.025);}
+      if (kind==='bubble') {[490,650,820,1050].forEach((f,i)=>tone(f,.16,i*.095,'sine',f*1.25,.034));}
       if (kind==='shield' || kind==='charge') {sample('bell',.1,1.4);tone(660,.22,0,'sine',990,.028);}
       if (kind==='bump') sample('bump',.16,.92);
       if (kind==='friend' || kind==='clear') {tone(660,.14,0,'sine',700,.035);tone(880,.2,.09,'sine',920,.03);}
@@ -771,12 +936,14 @@
 
     function start() {
       if (state.running || portraitPhone.matches) return;
+      adventureToken++;
       if(touchDevice.matches)enterFullscreen();
       state.running=true; unlockAudio(); canvas.focus({preventScroll:true});
       $('intro').hidden=true; $('hero-name').hidden=true;
       $('jump').hidden=false; $('pause').hidden=false; $('play-hint').hidden=false; $('mission').hidden=false;
       $('roar').hidden=false;
-      $('announcement').textContent='Vamos correr, Eric! Pule os brinquedos. Coelhos e papagaios são amigos. Aperte RUGIR para espantar os travessos.';
+      const character=activeCharacter();
+      $('announcement').textContent='Vamos correr, '+character.name+'! Pule os brinquedos. Coelhos e papagaios são amigos. Use '+character.special+' para espantar os travessos.';
     }
     function jump() { if(portraitPhone.matches)return; unlockAudio(); if (!state.running) { start(); return; } engine.jump(state); }
     function roar() { if(portraitPhone.matches)return; unlockAudio(); engine.roar(state); }
@@ -793,24 +960,28 @@
     $('resume').addEventListener('click',()=>pause(false));
     $('pause').addEventListener('click',()=>pause());
     function finish() {
+      adventureToken++;
       saveRecord();muteAudio();
+      $('end-title').textContent='Que aventura, '+activeCharacter().name+'!';
       $('end-score').textContent=engine.score(state);$('end-record').textContent=bestScore;
       $('end-screen').hidden=false;$('pause-screen').hidden=true;
       for(const id of ['jump','roar','pause','play-hint'])$(id).hidden=true;
-      $('announcement').textContent='Que aventura, Eric! Você fez '+engine.score(state)+' pontos. Aperte Vamos de novo para brincar mais.';
+      $('announcement').textContent='Que aventura, '+activeCharacter().name+'! Você fez '+engine.score(state)+' pontos. Escolha seu herói e aperte Vamos de novo para brincar mais.';
       $('restart').focus({preventScroll:true});
     }
     $('restart').addEventListener('click',()=>{
       if(!state.ended || portraitPhone.matches)return;
+      adventureToken++;
       if(touchDevice.matches)enterFullscreen();
       engine.restart(state);particles=[];bubbles=[];animals=[];animalIn=4;dustIn=0;
+      syncCharacterUI();
       missionSignature='';lastFootstep=-1;last=0;lastRecordWrite=-Infinity;
       $('end-screen').hidden=true;
       for(const id of ['jump','roar','pause','play-hint','mission'])$(id).hidden=false;
       $('pause').setAttribute('aria-pressed','false');$('pause').setAttribute('aria-label','Pausar aventura');
       $('pause').querySelector('use').setAttribute('href','#i-pause');
       updateHUD();unlockAudio();canvas.focus({preventScroll:true});
-      $('announcement').textContent='Vamos de novo, Eric! Vinte corações novinhos para brincar.';
+      $('announcement').textContent='Vamos de novo, '+activeCharacter().name+'! Vinte corações novinhos para brincar.';
     });
     $('sound').addEventListener('click',()=>{soundEnabled=!soundEnabled;updateSoundButton();if(soundEnabled){unlockAudio();tone(660,.1);}else muteAudio();});
     // pointerdown funciona com mouse, caneta e toque; não registra clique duplo.
@@ -1003,12 +1174,20 @@
       else {ctx.strokeStyle='#795774';ctx.lineWidth=2;ctx.beginPath();ctx.arc(3,-9,8,Math.PI+.3,Math.PI*2-.3);ctx.stroke();}
       ctx.restore();
       if(!m.resolved && m.x>state.player.x && m.x-state.player.x<430){
-        round(m.x-33,ground-97,66,24,9,'#f9efff','#b79aca');ctx.fillStyle='#89679b';ctx.font='bold 10px "Trebuchet MS",sans-serif';ctx.textAlign='center';ctx.fillText('! RUGIR',m.x,ground-81);
+        round(m.x-35,ground-97,70,24,9,'#f9efff','#b79aca');ctx.fillStyle='#89679b';ctx.font='bold 10px "Trebuchet MS",sans-serif';ctx.textAlign='center';ctx.fillText('! '+activeCharacter().button.replace('!',''),m.x,ground-81);
       }
       if(fleeing){ctx.fillStyle='#95709a';ctx.font='bold 18px sans-serif';ctx.textAlign='center';ctx.fillText('!!',m.x,ground-79-hop);}
     }
     function mob(m) {
-      if(engine.isEnemy(m)){enemy(m);return;}
+      if(engine.isEnemy(m)){
+        if(m.bubbled) {
+          // A bolha e o brinquedo sobem juntos; a colisão já foi resolvida pelo motor.
+          const lift=Math.max(0,m.fleeLift || 0),y=ground-lift-36;
+          ctx.save();ctx.translate(0,-lift);enemy(m);ctx.restore();
+          soapBubble(m.x,y,48+Math.sin(ambient*4)*2,.78);
+        } else enemy(m);
+        return;
+      }
       // Amigos ficam na grama ao lado da pista e usam um coração verde.
       ctx.save();ctx.translate(m.x*2,0);ctx.scale(-1,1);
       const a={...m,scale:m.type==='rabbit'?.84:1.02,y:m.type==='rabbit'?ground-35:ground-m.lift};
@@ -1018,6 +1197,26 @@
       if(m.celebrate>0){star(m.x+23,y+8,7,'#efc25d',ambient);star(m.x-24,y+8,4,'#fff4b8');}
     }
     function roarWave() {
+      if(state.characterId==='daniel') {
+        if(state.wind<=0)return;
+        const age=1.2-state.wind,x=state.player.x+28,y=ground-state.player.lift-100;
+        ctx.save();ctx.globalAlpha=Math.min(.8,state.wind);ctx.lineWidth=4;ctx.lineCap='round';
+        for(let i=0;i<5;i++) {
+          const lead=x+age*460+i*42,offset=(i-2)*19;
+          ctx.strokeStyle=i%2?'#e3f9ff':'#70bac8';ctx.beginPath();
+          ctx.moveTo(lead-100,y+offset);ctx.bezierCurveTo(lead-45,y+offset-13,lead+20,y+offset+10,lead+67,y+offset-4);ctx.stroke();
+        }
+        ctx.restore();return;
+      }
+      if(state.characterId==='samuel') {
+        if(state.bubble<=0)return;
+        for(let i=0;i<7;i++) {
+          const age=(ambient*.65+i*.16)%1,x=state.player.x+40+age*260+i*7;
+          const y=ground-state.player.lift-35-age*160+Math.sin(ambient*3+i)*14;
+          soapBubble(x,y,10+i%3*5,Math.min(1,state.bubble)*(1-age)*.8);
+        }
+        return;
+      }
       if(state.roarWave<=0)return;
       const age=1.15-state.roarWave,radius=140+age*1100;
       ctx.save();ctx.globalAlpha=Math.min(.65,state.roarWave)*.6;
@@ -1025,6 +1224,14 @@
       ctx.beginPath();ctx.ellipse(state.player.x,ground-state.player.lift-90,radius,radius*.65,0,-1.3,1.3);ctx.stroke();
       ctx.strokeStyle='#7ab686';ctx.lineWidth=3;
       ctx.beginPath();ctx.ellipse(state.player.x,ground-state.player.lift-90,Math.max(60,radius-35),Math.max(45,radius*.65-25),0,-1.3,1.3);ctx.stroke();ctx.restore();
+    }
+    function soapBubble(x,y,r,alpha=1) {
+      ctx.save();ctx.globalAlpha=alpha;
+      const glow=ctx.createRadialGradient(x-r*.2,y-r*.2,r*.1,x,y,r);
+      glow.addColorStop(0,'#f9fcff03');glow.addColorStop(.8,'#dfdbff35');glow.addColorStop(1,'#d5f9ee9c');
+      ellipse(x,y,r,r,glow);ctx.lineWidth=2;ctx.strokeStyle='#f3efffcc';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();
+      ctx.strokeStyle='#e3baff';ctx.beginPath();ctx.arc(x,y,r-.7,.5,1.8);ctx.stroke();
+      ctx.strokeStyle='#ffffffed';ctx.lineWidth=Math.max(2,r*.08);ctx.beginPath();ctx.arc(x,y,r*.78,3.6,4.3);ctx.stroke();ctx.restore();
     }
     function burst(x,y,count=22,dust=false) {
       for(let i=0;i<count;i++) {const angle=Math.random()*Math.PI*2,v=dust?30+Math.random()*50:90+Math.random()*160;particles.push({x,y,vx:Math.cos(angle)*v-(dust?80:0),vy:dust?-Math.random()*35:Math.sin(angle)*v-100,life:dust?.6:1.3,full:dust?.6:1.3,size:dust?5+Math.random()*6:4+Math.random()*4,color:dust?'#ead8b2':palette[i%palette.length],rotation:Math.random()*6,spin:Math.random()*8-4,dust});}
@@ -1034,13 +1241,16 @@
       while(state.events.length) {
         const event=state.events.shift();playSound(event.type);
         if(event.text) {
-          if(event.type==='roar')bubbles=bubbles.filter(b=>b.kind!=='jump' && b.kind!=='charge');
-          bubbles.push({text:event.text,x:event.x,y:ground-event.lift,life:event.type==='roar'?1.7:1.15,full:event.type==='roar'?1.7:1.15,kind:event.type});
+          const special=['roar','wind','bubble'].includes(event.type);
+          if(special)bubbles=bubbles.filter(b=>b.kind!=='jump' && b.kind!=='charge');
+          bubbles.push({text:event.text,x:event.x,y:ground-event.lift,life:special?1.7:1.15,full:special?1.7:1.15,kind:event.type});
           if(bubbles.length>5)bubbles.shift();
           if(event.type!=='jump')$('announcement').textContent=event.text;
         }
         if(event.type==='goal')burst(state.player.x+50,ground-120,30);
         if(event.type==='roar')burst(state.player.x,ground-95,24);
+        if(event.type==='wind')burst(state.player.x+35,ground-95,13);
+        if(event.type==='bubble')burst(state.player.x,ground-80,13);
         if(event.type==='land' || event.type==='boost' || event.type==='bump')burst(state.player.x-25,ground,10,true);
         if(event.type==='shield' || event.type==='charge')burst(state.player.x,ground-60,15);
         if(event.type==='flee')burst(event.x,ground-40,8,true);
@@ -1077,9 +1287,45 @@
       buffer.globalAlpha=1;buffer.globalCompositeOperation='source-over';
       ctx.drawImage(roarBlendCanvas,0,0,512,512,-128,-250,256,256);
     }
+    function fallbackCharacter(id,size) {
+      // Reserva desenhada para cada traje: nunca empresta o rosto de outro menino.
+      const color=characters[id].color,isSamuel=id==='samuel';
+      ctx.save();ctx.scale(size/180,size/180);
+      path([[-21,-87],[-53,-81],[-29,-32]],isSamuel?'#e5bc5a':'#ef9a65');
+      round(-23,-91,46,55,13,color);round(-23,-38,20,33,7,color);round(5,-38,20,33,7,color);
+      round(-27,-11,29,12,6,'#faf4df');round(3,-11,29,12,6,'#faf4df');
+      ellipse(0,-129,39,42,color);ellipse(0,-124,29,29,'#f4c9a0');
+      ellipse(-10,-129,3,4,'#3e4a47');ellipse(10,-129,3,4,'#3e4a47');
+      ctx.strokeStyle='#a9755e';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-120,11,.2,Math.PI-.2);ctx.stroke();
+      if(isSamuel) {for(const x of [-23,0,23])path([[x-5,-157],[x,-179],[x+6,-157]],'#f5df98');}
+      else {path([[-12,-158],[3,-179],[16,-158]],'#ed9a62');path([[19,-156],[54,-143],[20,-142]],'#ed9a62');}
+      star(0,-67,12,isSamuel?'#ffe398':'#ffd59f');round(-35,-84,13,37,7,color);round(22,-84,13,37,7,color);
+      ctx.restore();
+    }
+    function drawExtraCharacter(size) {
+      const id=state.characterId,entry=extras[id],p=state.player;
+      if(!entry){fallbackCharacter(id,size);return;}
+      const idle=!state.running || state.paused || state.ended;
+      let name='run',index=0;
+      if(state.player.lift>0) {name='actions';index=p.vy< -280?0:p.vy<100?1:2;}
+      else if(state.roar>0){name='special';index=Math.floor(engine.roarPhase(state));}
+      else if(state.kick>0){name='actions';index=3+Math.min(2,Math.floor((.3-state.kick)/.3*3));}
+      else index=Math.floor(p.stride*2)%8;
+      const atlas=entry.atlases[name],run=EXTRA_CHARACTER_FRAMES[id]?.run;
+      if(!idle && atlas?.ready && run?.frames?.length) {
+        const f=atlas.manifest.frames[Math.min(index,atlas.manifest.frames.length-1)];
+        // Escala pelo capacete medido, mantendo rosto e câmera constantes entre ações.
+        const scale=size/entry.referenceHeight*entry.referenceHead/f.headWidth;
+        ctx.drawImage(atlas.sprites[Math.min(index,atlas.sprites.length-1)],2,2,f.width,f.height,(f.x-f.headX)*scale+size*.10,-(f.sole-f.y)*scale,f.width*scale,f.height*scale);
+      } else if(entry.ready) {
+        const f=entry.standing,scale=size/f.height;
+        ctx.drawImage(entry.image,f.x,f.y,f.width,f.height,(f.x-f.headX)*scale,-(f.sole-f.y)*scale,f.width*scale,f.height*scale);
+      } else fallbackCharacter(id,size);
+    }
     function player() {
       const p=state.player,mobile=W<600;
-      const size=state.running?190:(mobile?168:252);
+      const character=activeCharacter();
+      const size=state.running?character.playSize:(mobile?character.playSize*168/190:character.playSize*252/190);
       const x=state.running?p.x:(mobile?W*.5:W*.27);
       const lift=state.running?p.lift:0;
       const tilt=lift>0?-.04:0;
@@ -1091,9 +1337,11 @@
         const gradient=ctx.createRadialGradient(x,y-size*.5,30,x,y-size*.5,118);gradient.addColorStop(0,'#fbffe910');gradient.addColorStop(.7,'#dcffb530');gradient.addColorStop(1,'#9ee5b500');
         ellipse(x,y-size*.5,98,113,gradient);ctx.strokeStyle='#edffd2';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(x,y-size*.5,83,101,0,0,Math.PI*2);ctx.stroke();
         for(let i=0;i<5;i++){const a=ambient*.8+i*Math.PI*2/5;star(x+Math.cos(a)*89,y-size*.5+Math.sin(a)*105,5,'#ffffc0');}ctx.restore();
+        if(state.characterId==='samuel')soapBubble(x,y-size*.47,size*.57,.8);
       }
       ctx.save();if(state.hurt>0 && Math.floor(state.time*10)%2===0)ctx.globalAlpha=.36;
       ctx.translate(x,y);ctx.rotate(tilt);
+      if(state.characterId!=='eric'){drawExtraCharacter(size);ctx.restore();return;}
       const index=engine.spriteFrame(state);
       if(index===7 && imageReady) {
         // Usar diretamente o PNG aprovado evita reinterpretar o rosto
@@ -1124,11 +1372,11 @@
       ctx.restore();
     }
     function drawBubble(b) {
-      const colors={goal:'#f4b450',boost:'#eda36b',roar:'#6fa468',jump:'#87aabb',bump:'#d39b77',shield:'#73af91',charge:'#73af91',friend:'#73a67b',celebrate:'#dea344',clear:'#83a86d',wave:'#91b6ba',flee:'#a487bf'};
-      const size=b.kind==='roar'?(W<600?32:38):25;
+      const colors={goal:'#f4b450',boost:'#eda36b',roar:'#6fa468',wind:'#378eae',bubble:'#9c78bd',jump:'#87aabb',bump:'#d39b77',shield:'#73af91',charge:'#73af91',friend:'#73a67b',celebrate:'#dea344',clear:'#83a86d',wave:'#91b6ba',flee:'#a487bf'};
+      const special=['roar','wind','bubble'].includes(b.kind),size=special?(W<600?32:38):25;
       ctx.save();ctx.font=`900 ${size}px "Trebuchet MS",sans-serif`;const width=ctx.measureText(b.text).width+30;
       // Rugido à direita no celular: libera o rosto e os travessos na pista.
-      const desiredX=b.kind==='roar' && touchDevice.matches?W-width/2-14:b.x+(b.kind==='jump'?112:33);
+      const desiredX=special && touchDevice.matches?W-width/2-14:b.x+(b.kind==='jump'?112:33);
       const x=Math.max(width/2+8,Math.min(W-width/2-8,desiredX));
       // O BOING acompanha o salto acima do capacete, mantendo o rosto visível.
       const minimumY=bubbleSafeY;
@@ -1177,12 +1425,12 @@
       }
       $('boost-status').hidden=state.boost<=0; $('shield-status').hidden=state.shield<=0;
       $('boost-time').textContent=Math.ceil(state.boost)+'s'; $('shield-time').textContent=Math.ceil(state.shield)+'s';
-      $('boost-bar').style.width=(state.boost/3*100)+'%'; $('shield-bar').style.width=(state.shield/engine.SHIELD_SECONDS*100)+'%';
+      $('boost-bar').style.width=(state.boost/3*100)+'%'; $('shield-bar').style.width=(state.shield/(state.characterId==='samuel'?3:engine.SHIELD_SECONDS)*100)+'%';
       const ready=state.roarCooldown<=0;
       $('roar').classList.toggle('recharging',!ready);
       $('roar').setAttribute('aria-disabled',String(!ready));
-      $('roar-label').textContent=ready?'RUGIR!':Math.ceil(state.roarCooldown)+'s';
-      $('roar-hint').textContent=ready?'ESPANTA OS TRAVESSOS':'DINO RECARREGANDO';
+      $('roar-label').textContent=ready?activeCharacter().button:Math.ceil(state.roarCooldown)+'s';
+      $('roar-hint').textContent=ready?activeCharacter().hint:'PODER RECARREGANDO';
       if(state.time>11)$('play-hint').hidden=true;
     }
     function frame(now) {

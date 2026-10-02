@@ -413,3 +413,164 @@ test('brincadeira do rugido premia a fuga dos travessos com uma estrela',()=>{
   Engine.roar(s);for(let i=0;i<6;i++)Engine.step(s,.1);
   assert.equal(s.stars,1);assert.equal(Engine.task(s).key,'ball');
 });
+
+test('Eric é o padrão e a seleção de personagem só acontece antes da corrida ou após o fim',()=>{
+  const s=Engine.create();
+  assert.equal(s.characterId,'eric');
+  assert.equal(typeof Engine.setCharacter,'function');
+  assert.equal(Engine.setCharacter(s,'daniel'),true);
+  assert.equal(s.characterId,'daniel');
+  assert.equal(Engine.setCharacter(s,'toString'),false);
+  assert.equal(Engine.setCharacter(s,'samuel '),false);
+  assert.equal(s.characterId,'daniel');
+  s.running=true;
+  assert.equal(Engine.setCharacter(s,'samuel'),false);
+  s.paused=true;
+  assert.equal(Engine.setCharacter(s,'samuel'),false,'pausar não muda a identidade durante a partida');
+  s.ended=true;
+  assert.equal(Engine.setCharacter(s,'samuel'),true);
+  assert.equal(s.characterId,'samuel');
+});
+
+test('reiniciar mantém o personagem escolhido e restaura os vinte corações',()=>{
+  const s=game();s.characterId='samuel';s.health=0;s.ended=true;s.wind=1;s.bubble=2;
+  Engine.restart(s);
+  assert.equal(s.characterId,'samuel');assert.equal(s.health,20);
+  assert.equal(s.wind,0);assert.equal(s.bubble,0);
+  assert.equal(s.running,true);assert.equal(s.ended,false);
+});
+
+test('Daniel ativa sopro com recarga comum e seis fases de ação',()=>{
+  const s=game();s.characterId='daniel';
+  assert.equal(Engine.roar(s),true);
+  assert.equal(s.roarCooldown,6);assert.equal(s.wind,1.2);
+  assert.ok(s.events.some(e=>e.type==='wind' && e.text==='SOPRO!'));
+  assert.ok(!s.events.some(e=>e.type==='roar'),'a voz gravada do Eric não pertence ao Daniel');
+  assert.equal(typeof Engine.pose,'function');assert.equal(Engine.pose(s),'roar');
+  assert.equal(Engine.roarPhase(s),0);
+  const phases=new Set();
+  for(let i=0;i<48;i++){phases.add(Math.floor(Engine.roarPhase(s)));Engine.step(s,.025);}
+  assert.deepEqual([...phases],[0,1,2,3,4,5]);
+  Engine.step(s,.05);assert.equal(s.wind,0);assert.equal(s.roar,0);assert.equal(Engine.pose(s),'run');
+});
+
+test('sopro aproxima tesouros e bolas visíveis sem alterar bolas chutadas nem itens fora do alcance',()=>{
+  const s=game();s.characterId='daniel';
+  const normal=game();normal.characterId='daniel';
+  const items=[
+    {type:'fries',x:500,lift:220,radius:25},
+    {type:'ball',x:530,lift:21,radius:23,kicked:false},
+    {type:'coin',x:1000,lift:95,radius:25},
+    {type:'fossil',x:s.width+50,lift:95,radius:25},
+    {type:'ball',x:750,lift:90,radius:23,kicked:true,vx:700,vy:-120}
+  ];
+  s.items=items.map(i=>({...i}));normal.items=items.map(i=>({...i}));
+  Engine.roar(s);Engine.step(s,.1);Engine.step(normal,.1);
+  assert.ok(s.items[0].x<normal.items[0].x);assert.ok(s.items[0].lift<normal.items[0].lift);
+  assert.ok(s.items[1].x<normal.items[1].x);assert.equal(s.items[1].lift,21);
+  for(const i of [2,3,4])assert.deepEqual(s.items[i],normal.items[i],'fora da tela/alcance ou já chutado: '+i);
+});
+
+test('coleta pelo sopro premia cada item uma vez e afugenta os travessos',()=>{
+  const s=game();s.characterId='daniel';
+  s.items=[{type:'coin',x:520,lift:190,radius:25},{type:'ball',x:550,lift:21,radius:23,kicked:false}];
+  s.mobs.push({type:'robot',x:600,lift:0,width:48,height:48,phase:0,resolved:false});
+  Engine.roar(s);
+  for(let i=0;i<4;i++)Engine.step(s,.1);
+  assert.equal(s.treasures,1);assert.equal(s.goals,1);assert.equal(s.scared,1);
+  assert.equal(s.events.filter(e=>e.type==='goal').length,1);
+  for(let i=0;i<12;i++)Engine.step(s,.1);
+  assert.equal(s.treasures,1);assert.equal(s.goals,1);assert.equal(s.scared,1);
+});
+
+test('Samuel envolve inimigos visíveis em bolhas e deixa amigos e mobs fora da tela tranquilos',()=>{
+  const s=game();s.characterId='samuel';
+  for(const [i,type] of ['slime','robot','cloud','rabbit','parrot'].entries())
+    s.mobs.push({type,x:250+i*100,lift:0,width:48,height:48,phase:0,resolved:false});
+  s.mobs.push({type:'car',x:2000,lift:0,width:48,height:48,phase:0,resolved:false});
+  assert.equal(Engine.roar(s),true);
+  assert.equal(s.shield,3);assert.equal(s.bubble,3);
+  assert.ok(s.events.some(e=>e.type==='bubble' && e.text==='ABRAÇO!'));
+  assert.ok(!s.events.some(e=>e.type==='roar'));
+  Engine.step(s,.016);Engine.step(s,.1);
+  assert.equal(s.scared,3);
+  for(const mob of s.mobs.filter(m=>['slime','robot','cloud'].includes(m.type))){
+    assert.equal(mob.bubbled,true);assert.equal(mob.fleeing,true);assert.ok(mob.fleeLift>0);
+  }
+  for(const mob of s.mobs.filter(m=>['rabbit','parrot','car'].includes(m.type))){
+    assert.ok(!mob.bubbled);assert.ok(!mob.fleeing);
+  }
+  assert.equal(s.health,20);
+});
+
+test('a bolha protege por três segundos, a pausa congela sua duração e depois há dano normal',()=>{
+  const s=game();s.characterId='samuel';Engine.roar(s);
+  s.paused=true;Engine.step(s,10);
+  assert.equal(s.bubble,3);assert.equal(s.shield,3);assert.equal(s.roarCooldown,6);
+  s.paused=false;
+  for(let i=0;i<20;i++)Engine.step(s,.1);
+  s.obstacles.push({x:s.player.x,width:50,height:44,hit:false});Engine.step(s,.016);
+  assert.equal(s.health,20);
+  for(let i=0;i<12;i++)Engine.step(s,.1);
+  assert.equal(s.shield,0);assert.equal(s.bubble,0);
+  s.obstacles.push({x:s.player.x,width:50,height:44,hit:false});Engine.step(s,.016);
+  assert.equal(s.health,19);
+});
+
+test('tesouro recarrega ambos os especiais sem encurtar uma bolha ainda ativa',()=>{
+  for(const characterId of ['daniel','samuel']){
+    const s=game();s.characterId=characterId;Engine.roar(s);
+    assert.equal(Engine.roar(s),false);
+    Engine.step(s,.1);
+    const protection=s.shield;
+    Engine.collect(s,'fossil');
+    assert.equal(s.roarCooldown,0);assert.ok(s.shield>=protection);
+    assert.equal(Engine.roar(s),true);assert.equal(s.roarCooldown,6);
+  }
+  const s=game();s.characterId='samuel';Engine.roar(s);Engine.step(s,.1);Engine.collect(s,'coin');
+  for(let i=0;i<20;i++)Engine.step(s,.1);
+  s.obstacles.push({x:s.player.x,width:50,height:44,hit:false});Engine.step(s,.016);
+  assert.equal(s.health,20,'recarregar com moeda preserva a duração restante da bolha');
+});
+
+test('a proteção final da bolha afugenta outro inimigo uma vez e ele sai da memória',()=>{
+  const s=game();s.characterId='samuel';Engine.roar(s);
+  for(let i=0;i<20;i++)Engine.step(s,.1);
+  s.mobs.push({type:'mushroom',x:s.player.x,lift:0,width:48,height:48,phase:0,resolved:false});
+  Engine.step(s,.016);
+  assert.equal(s.mobs[0].bubbled,true);assert.equal(s.scared,1);assert.equal(s.health,20);
+  for(let i=0;i<40;i++)Engine.step(s,.1);
+  assert.equal(s.scared,1);assert.equal(s.mobs.length,0);assert.equal(s.bubble,0);
+});
+
+test('pausa e fim da partida congelam a atração e a duração do sopro',()=>{
+  const s=game();s.characterId='daniel';Engine.roar(s);
+  s.items.push({type:'coin',x:500,lift:150,radius:25});
+  s.paused=true;Engine.step(s,10);
+  assert.equal(s.wind,1.2);assert.equal(s.items[0].x,500);
+  s.paused=false;s.ended=true;Engine.step(s,.1);
+  assert.equal(s.wind,1.2);assert.equal(s.items[0].x,500);assert.equal(Engine.roar(s),false);
+});
+
+test('os três heróis usam o mesmo salto, coleta generosa e dano comum',()=>{
+  for(const characterId of ['eric','daniel','samuel']){
+    const s=game();s.characterId=characterId;
+    assert.equal(Engine.jump(s),true);
+    let peak=0;
+    for(let i=0;i<100;i++){Engine.step(s,.016);peak=Math.max(peak,s.player.lift);}
+    assert.ok(peak>90);assert.equal(s.player.lift,0);
+    s.items.push({type:'fries',x:s.player.x+55,lift:120,radius:22});Engine.step(s,.016);
+    assert.equal(s.boost,3);
+    s.obstacles.push({x:s.player.x,width:50,height:44,hit:false});Engine.step(s,.016);
+    assert.equal(s.health,19);assert.equal(s.hurt,2);
+  }
+});
+
+test('o papagaio chama o herói escolhido pelo nome',()=>{
+  for(const [characterId,name] of [['eric','ERIC'],['daniel','DANIEL'],['samuel','SAMUEL']]){
+    const s=game();s.characterId=characterId;
+    s.mobs.push({type:'parrot',x:s.player.x,lift:126,width:48,height:48,phase:0,resolved:false});
+    Engine.step(s,.016);
+    assert.equal(s.events.find(e=>e.type==='friend').text,'OI, '+name+'!');
+  }
+});
