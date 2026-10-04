@@ -22,9 +22,11 @@ Se uma imagem falhar ou demorar mais de 30 segundos, aparece **Tentar novamente*
 - **Pular:** toque no cenário, botão PULAR ou tecla **Z**. Espaço e seta para cima continuam como alternativas.
 - **Especial:** botão RUGIR, SOPRAR ou BOLHAS conforme o herói, ou tecla **X**. R continua como alternativa. O especial começa pronto e recarrega sozinho em 6 segundos.
 - **Pausar/continuar:** botão de pausa, tecla P ou Escape.
+- **Voltar ao início:** na pausa, encerra a corrida atual e volta à seleção dos três heróis. Conserva o recorde, a escolha atual, a preferência de som, as imagens carregadas e a tela cheia. A nova partida aguarda “Vamos correr!”, com vinte corações e a pista limpa.
 - **Tela cheia:** no celular, começa junto com “Vamos correr!”. O botão de quatro cantos também ativa no computador e permite sair. Usa a API nativa com navegação oculta e tenta manter landscape quando o navegador permite. Ao sair da tela cheia, a partida pausa. Em navegadores que recusam a API, o cenário é ampliado dentro da página; os gestos e controles do sistema continuam disponíveis.
 - **Vida:** 20 corações. Cada esbarrão tira apenas um, com 2 segundos de proteção para evitar danos seguidos. Amigos, salto e escudo preservam a vida.
 - **Vamos de novo:** ao zerar a vida, reinicia a pista e restaura os 20 corações, preservando o herói escolhido, o recorde e a preferência de som. Também é possível escolher outro herói antes de reiniciar.
+- **Trocar personagem:** na tela final, volta à seleção inicial. Também é possível tocar diretamente nos cartões da tela final e depois em “Vamos de novo!”.
 - **Som:** botão do alto-falante. Começa desligado. Sete gravações estão embutidas no HTML; não precisam de download durante o jogo.
 - **Bola:** chute automático, balão GOOOL! e confetes.
 - **Batatas:** velocidade extra e poeira por 3 segundos.
@@ -108,6 +110,8 @@ Os 46 testes exercitam a física extraída do próprio HTML: salto e aterrissage
 
 `tests/loading.browser.test.cjs` usa um servidor temporário e respostas de rede controladas para conferir downloads e decodificação atrasados, progresso, bloqueio de botões/teclado/toque, falhas de rede/dimensões/decodificação, timeout e nova tentativa apenas dos arquivos faltantes. Também confere os três heróis, espera antes do reinício e o loading no celular em landscape. Não exige servidor nem dependências adicionais para jogar.
 
-Para executar a verificação do navegador, instale Playwright no ambiente de desenvolvimento e rode `node tests/browser.test.cjs`, `node tests/characters.browser.test.cjs` e `node tests/loading.browser.test.cjs`. `PLAYWRIGHT_MODULE` pode apontar para uma instalação já existente. Defina `GAME_URL` com o endereço publicado para conferir a versão online nas duas primeiras suítes. A suíte de loading sempre usa seu servidor temporário para reproduzir a rede lenta e as falhas.
+`tests/navigation.browser.test.cjs` usa cliques e toques reais no computador e em dois tamanhos de celular. Encerra a aventura por colisão, troca pelos cartões da tela final e pelo botão “Trocar personagem”. Confere “Continuar” e “Voltar ao início” na pausa, a pista limpa, vinte corações, preservação do recorde e preferência de som, e a nova partida com outro herói. Os botões devem aparecer inteiros na tela.
+
+Para executar a verificação do navegador, instale Playwright no ambiente de desenvolvimento e rode `node tests/browser.test.cjs`, `node tests/characters.browser.test.cjs`, `node tests/loading.browser.test.cjs` e `node tests/navigation.browser.test.cjs`. `PLAYWRIGHT_MODULE` pode apontar para uma instalação já existente. Defina `GAME_URL` com o endereço publicado para conferir as suítes online. A suíte de loading sempre usa seu servidor temporário para reproduzir a rede lenta e as falhas.
 
 Os arquivos de criação e pacotes em `output/` ficam no ambiente local e não são enviados ao repositório. O site utiliza o HTML e as 13 imagens dos personagens; os sons estão embutidos.
