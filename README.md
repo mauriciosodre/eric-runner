@@ -27,6 +27,7 @@ Se uma imagem falhar ou demorar mais de 30 segundos, aparece **Tentar novamente*
 - **Vida:** 20 corações. Cada esbarrão tira apenas um, com 2 segundos de proteção para evitar danos seguidos. Amigos, salto e escudo preservam a vida.
 - **Vamos de novo:** ao zerar a vida, reinicia a pista e restaura os 20 corações, preservando o herói escolhido, o recorde e a preferência de som. Também é possível escolher outro herói antes de reiniciar.
 - **Trocar personagem:** na tela final, volta à seleção inicial. Também é possível tocar diretamente nos cartões da tela final e depois em “Vamos de novo!”.
+- **Álbum:** botão do álbum no alto da tela, ou “Ver álbum” na pausa e no resultado. Escolha um filhote já descoberto para acompanhar o herói, ou “Sem companheiro”. Fechar o álbum retoma a corrida somente se ela estava em andamento; na pausa e no resultado, volta à mesma tela.
 - **Som:** botão do alto-falante. Começa desligado. Sete gravações estão embutidas no HTML; não precisam de download durante o jogo.
 - **Bola:** chute automático, balão GOOOL! e confetes.
 - **Batatas:** velocidade extra e poeira por 3 segundos.
@@ -58,6 +59,16 @@ O recorde é salvo no `localStorage`, na chave `eric-runner-highscore-v1`, no na
 - Também é possível saltar os travessos, afastá-los com uma bola chutada ou passar protegido pelo escudo. Encostar sem proteção tira um coração, faz piscar e desacelera brevemente; os pontos ficam intactos.
 - Há tarefas curtas: dois gols, dois pulos, dois encontros, três tesouros e afugentar dois travessos. Cada tarefa dá uma estrela e inicia outra. Não há prazo nem penalidade por ignorá-las.
 - O jogo mantém espaço entre obstáculos e mobs, inclusive durante o turbo e no celular.
+
+## Ovos, festas e amigos dinos
+
+Cada missão concluída racha o ovo no alto da tela. Na terceira, nasce um filhote e a aventura pausa para mostrar o novo amigo. “Brincar com ele!” escolhe esse companheiro e continua a corrida; “Continuar” mantém a escolha anterior. Não há prazo para abrir o ovo, e as rachaduras permanecem ao reiniciar ou trocar de herói.
+
+O álbum reúne seis amigos, descobertos em sequência sem repetir: **Pipo** (T-rex), **Lili** (Tricerátops), **Tico** (Pterossauro), **Bubi** (Estegossauro), **Nino** (Braquiossauro) e **Zazu** (Anquilossauro). O escolhido acompanha qualquer um dos três heróis, com pequenos movimentos e saltos; não recebe dano nem altera as colisões. Com a família completa, novos ovos continuam rendendo uma comemoração.
+
+A primeira festa chega após vinte segundos de corrida. A **Chuva de bolas** oferece dez segundos de gols fáceis. Depois de trinta segundos de pista normal, a **Festa do vulcão** lança confetes e oferece moedas e batatas em alturas acessíveis. As festas se alternam; retiram os perigos presentes e não geram obstáculos nem causam dano durante seus dez segundos. Pausar, abrir o álbum ou revelar um filhote congela esses tempos. Uma nova partida começa novamente com a Chuva de bolas.
+
+O álbum, o companheiro escolhido e as rachaduras ficam na chave `eric-runner-album-v1` do `localStorage`, compartilhados entre Eric, Daniel e Samuel neste navegador. Sobrevivem a recarregar a página; limpar os dados do site apaga essa coleção. Se o armazenamento estiver bloqueado, continuam funcionando durante a sessão. Os filhotes são desenhos SVG internos ao HTML e as festas usam Canvas, sem novos arquivos para baixar.
 
 ## Animação com os pés no chão
 
@@ -99,10 +110,12 @@ As imagens foram geradas com a ferramenta integrada a partir dos personagens e d
 ## Verificação
 
 ```powershell
-node --test tests/game.test.cjs
+node --test tests/game.test.cjs tests/adventure.test.cjs tests/album.test.cjs
 ```
 
 Os 46 testes exercitam a física extraída do próprio HTML: salto e aterrissagem, chute único, duração e expiração dos poderes, proteção, dano unitário, 20 corações, proteção de 2 segundos, escudo breve sem imunidade permanente, dano em colisões sucessivas, fim de partida, reinício, pontuação, margem de coleta, pausa, animação, amigos sem penalidade, fuga dos seis inimigos, onda limitada à tela, recarga do especial, tarefas, espaçamento durante o turbo e dez minutos de corrida protegida simulada com memória limitada. Também verificam seleção e reinício com cada herói, fases dos especiais, atração de itens, bolhas e duração da proteção, pontuação única e amigos preservados.
+
+Mais nove testes verificam ovos a cada três missões, progresso após reinício, sequência e duração das festas, congelamento na pausa, retirada de perigos preservando amigos, coleta acessível e retorno do dano depois da festa. Dez testes do álbum verificam os seis filhotes, seleção, persistência, coleção sem duplicatas, validação de dados e armazenamento bloqueado: **65 testes no total**.
 
 `tests/browser.test.cjs` verifica tela cheia nativa, pausa ao sair, fallback quando a API é recusada, vida, novos mobs, fim e reinício, recorde após reload e tratamento de storage bloqueado, além do HTML local no Chromium com Playwright disponível no ambiente de desenvolvimento. Confere a imagem frontal aprovada no início e na pausa, inclusive no celular, as oito fases da corrida com solas no chão e sem linha preta, as seis poses do rugido com escala do rosto consistente, tarefas, teclas Z/X e alternativa Espaço, toque nos dois botões de 76 px com intervalo de 12 px, perda de vida após coletar moeda e deixar o escudo expirar, pausa, gols, poderes, sete gravações decodificadas e reprodução completa do rugido real do Eric em velocidade natural, fuga dos travessos sem assustar amigos, landscape em 844 × 390 e 667 × 320, convite na vertical, pausa por rotação preservando poderes e geometria preservada quando o painel é ocultado. As capturas ficam em `output/verification`. Playwright não é uma dependência do jogo.
 
@@ -112,6 +125,8 @@ Os 46 testes exercitam a física extraída do próprio HTML: salto e aterrissage
 
 `tests/navigation.browser.test.cjs` usa cliques e toques reais no computador e em dois tamanhos de celular. Encerra a aventura por colisão, troca pelos cartões da tela final e pelo botão “Trocar personagem”. Confere “Continuar” e “Voltar ao início” na pausa, a pista limpa, vinte corações, preservação do recorde e preferência de som, e a nova partida com outro herói. Os botões devem aparecer inteiros na tela.
 
-Para executar a verificação do navegador, instale Playwright no ambiente de desenvolvimento e rode `node tests/browser.test.cjs`, `node tests/characters.browser.test.cjs`, `node tests/loading.browser.test.cjs` e `node tests/navigation.browser.test.cjs`. `PLAYWRIGHT_MODULE` pode apontar para uma instalação já existente. Defina `GAME_URL` com o endereço publicado para conferir as suítes online. A suíte de loading sempre usa seu servidor temporário para reproduzir a rede lenta e as falhas.
+`tests/adventure.browser.test.cjs` confere o álbum vazio, a descoberta dos seis filhotes por missões, escolha e retirada do companheiro, rachaduras entre partidas e após reload, troca de herói, festas seguras e seus tempos, retomada correta ao fechar o álbum e armazenamento bloqueado. Também verifica missões concluídas imediatamente antes de pausar ou sair da aba, salvamento sem duplicar filhotes e foco de teclado dentro das escolhas. Usa cliques e toques reais no computador e em celulares de 844 × 390 e 667 × 320, conferindo que os botões do álbum e do nascimento cabem na tela.
+
+Para executar a verificação do navegador, instale Playwright no ambiente de desenvolvimento e rode `node tests/browser.test.cjs`, `node tests/characters.browser.test.cjs`, `node tests/loading.browser.test.cjs`, `node tests/navigation.browser.test.cjs` e `node tests/adventure.browser.test.cjs`. `PLAYWRIGHT_MODULE` pode apontar para uma instalação já existente. Defina `GAME_URL` com o endereço publicado para conferir as suítes online. A suíte de loading sempre usa seu servidor temporário para reproduzir a rede lenta e as falhas.
 
 Os arquivos de criação e pacotes em `output/` ficam no ambiente local e não são enviados ao repositório. O site utiliza o HTML e as 13 imagens dos personagens; os sons estão embutidos.

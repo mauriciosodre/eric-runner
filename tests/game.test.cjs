@@ -22,7 +22,7 @@ function game(spawn=false) {
   const state = Engine.create();
   state.running = true;
   // Testes de poderes usam um mundo controlado, sem novas coletas no caminho.
-  if(!spawn)state.spawnIn=state.obstacleIn=state.mobIn=Infinity;
+  if(!spawn)state.spawnIn=state.obstacleIn=state.mobIn=state.festivalIn=Infinity;
   return state;
 }
 

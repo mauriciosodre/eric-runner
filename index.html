@@ -92,7 +92,67 @@
     .pause-card p { color:var(--muted); font-size:13px; margin-bottom:22px; }
     .menu-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
     .menu-actions .primary { min-width:0; padding:0 9px; gap:6px; font-size:13px; line-height:1.25; }
+    .album-link { display:inline-flex; align-items:center; gap:8px; min-height:44px; margin-top:12px; padding:4px 8px; border:0; background:transparent; color:#795895; font:700 12px "Trebuchet MS",Arial,sans-serif; cursor:pointer; }
+    .album-link svg { width:22px; height:22px; }
+    .end-heading-tools { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    .end-heading-tools .album-link { margin:0; font-size:11px; }
+    .end-heading-tools > svg { width:22px; height:22px; }
     .primary.secondary { background:#edf4e6; color:var(--green); border:1px solid #d4e3c9; box-shadow:0 3px 0 #c5d7b9; }
+    /* Ovo e álbum: desenhos grandes, poucos passos e nenhum download novo. */
+    #album { position:relative; color:#8c6aaa; }
+    .album-badge { position:absolute; top:-5px; right:-5px; padding:2px 4px; border-radius:8px; background:#f7edff; color:#77578f; font-size:9px; font-weight:bold; border:1px solid #dccbea; }
+    .mission { min-width:218px; }
+    #egg-progress { flex:none; width:44px; height:53px; position:relative; }
+    #egg-progress svg { width:44px; height:53px; }
+    .egg-crack { opacity:0; }
+    #egg-progress[data-progress="1"] .crack-one,#egg-progress[data-progress="2"] .egg-crack { opacity:1; }
+    .egg-dots { display:flex; gap:4px; margin-top:5px; }
+    .egg-dots i { width:6px; height:6px; border-radius:50%; background:#e4dfc4; }
+    .egg-dots i.done { background:#c98d45; }
+    .mission-heading { display:flex; align-items:center; gap:6px; }
+    #mission-symbol { flex:none; width:19px; height:19px; color:#6c9c64; }
+    .festival-banner { position:absolute; z-index:2; left:50%; top:150px; transform:translateX(-50%); padding:8px 15px; border-radius:100px; background:#fff0b5ed; color:#815833; border:2px solid #fffef2; font-weight:bold; font-size:13px; white-space:nowrap; pointer-events:none; }
+    .discovery-screen { z-index:7; padding:12px; }
+    .album-card { width:min(560px,100%); max-height:100%; overflow:auto; padding:22px; border-radius:24px; background:#fffef8; border:2px solid white; text-align:center; }
+    .album-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .album-heading h2 { margin:0; font-size:27px; letter-spacing:-1px; }
+    #album-count { color:#87669e; font-size:15px; font-weight:bold; background:#f2e8fb; border-radius:12px; padding:7px 11px; }
+    .album-card p { font-size:12px; color:#6e8269; margin:8px 0 15px; }
+    .pet-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+    .pet-card { border:2px solid #e1e9d6; border-radius:17px; padding:9px; background:#f4f8ec; color:#375b43; display:flex; flex-direction:column; align-items:center; gap:3px; min-height:120px; }
+    .pet-card svg { width:88px; height:77px; max-width:100%; }
+    .pet-card strong { font-size:13px; }
+    .pet-card small { font-size:9px; color:#7d8b77; }
+    .pet-card[aria-pressed="true"] { border-color:#8db265; background:#ebf7cc; box-shadow:0 3px 0 #8db265; }
+    .pet-card:disabled { opacity:1; cursor:default; background:#f6f4ec; color:#9b9c85; }
+    .album-actions { display:flex; justify-content:center; gap:10px; margin-top:15px; }
+    .album-actions .primary { min-height:46px; font-size:12px; padding:0 15px; }
+    .hatch-card { width:min(350px,100%); padding:22px; border-radius:26px; background:#fffef4; text-align:center; border:3px solid #efcf83; box-shadow:0 12px 35px #4c775322; }
+    .hatch-card h2 { margin:0 0 8px; font-size:27px; letter-spacing:-1px; }
+    .hatch-card p { color:#6e8269; font-size:13px; margin:7px 0 16px; }
+    #hatch-dino svg { width:160px; height:140px; }
+    #hatch-name { display:block; font-size:23px; color:#5d8853; }
+    #hatch-count { display:block; font-size:11px; color:#8c9178; margin-top:4px; }
+    @media(pointer:coarse) and (orientation:landscape) {
+      .mission { top:67px; min-width:190px; max-width:35vw; padding:5px 9px; }
+      #egg-progress,#egg-progress svg { width:32px; height:39px; }
+      #mission-symbol { width:16px; height:16px; }
+      .festival-banner { top:122px; font-size:11px; padding:6px 12px; }
+      .album-card { padding:14px 18px; }
+      .album-heading h2 { font-size:23px; }
+      .album-card p { margin:5px 0 8px; font-size:11px; }
+      .pet-grid { gap:7px; }
+      .pet-card { min-height:78px; padding:4px; gap:1px; }
+      .pet-card svg { width:57px; height:50px; }
+      .pet-card strong { font-size:11px; }
+      .pet-card small { display:none; }
+      .album-actions { margin-top:10px; }
+      .hatch-card { width:440px; padding:14px 20px; }
+      .hatch-card h2 { font-size:24px; }
+      .hatch-reveal { display:flex; align-items:center; justify-content:center; gap:18px; }
+      #hatch-dino svg { width:125px; height:110px; }
+      .hatch-card p { margin:6px 0 13px; font-size:12px; }
+    }
     .game-footer { display:flex; justify-content:space-between; align-items:center; padding:15px 20px 9px; gap:12px; font-size:11px; color:var(--muted); }
     .controls { display:flex; align-items:center; gap:8px; }
     .controls svg { color:#7e9878; }
@@ -278,7 +338,6 @@
       .character-card strong { font-size:12px; }
       .character-card small { font-size:8px; }
       .end-card { padding:12px 20px; }
-      .end-card > svg { height:22px; }
       .end-card h2 { font-size:23px; }
       .end-card p { font-size:11px; margin:6px 0; }
       .end-results { margin:8px 0; }
@@ -310,6 +369,7 @@
     <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h12a3 3 0 1 0-3-3M2 12h17a3 3 0 1 1-3 3M4 17h6a2 2 0 1 1-2 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
     <symbol id="i-bubbles" viewBox="0 0 24 24"><circle cx="9" cy="14" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="6" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="19" cy="19" r="2" fill="currentColor"/><path d="M6 13c0-2 1-3 3-3M15 5l1-1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
     <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11 12 3l9 8M5 10v11h5v-7h4v7h5V10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-album" viewBox="0 0 24 24"><rect x="4" y="3" width="17" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3v18M2 7h4M2 12h4M2 17h4" fill="none" stroke="currentColor" stroke-width="2"/><path d="m14 7 1 3 3 1-3 1-1 3-1-3-3-1 3-1Z" fill="currentColor"/></symbol>
   </defs></svg>
   <header class="site-header">
     <div class="brand"><span class="brand-icon"><svg width="29" height="29" aria-hidden="true"><use href="#i-dino"/></svg></span><div><div class="brand-name">ERIC<span>RUN</span></div><div class="brand-sub">O DINO-FUTEBOLISTA</div></div></div>
@@ -327,6 +387,7 @@
             <div class="score adventure"><svg width="19" height="19" aria-hidden="true"><use href="#i-star"/></svg><div><small>ESTRELAS</small><strong id="stars">0</strong></div></div>
           </div>
           <div class="tools">
+            <button class="icon-button" id="album" aria-label="Abrir álbum de dinos" title="Álbum de dinos"><svg aria-hidden="true"><use href="#i-album"/></svg><span class="album-badge" id="album-badge" aria-hidden="true">0/6</span></button>
             <button class="icon-button" id="fullscreen" aria-label="Entrar em tela cheia" aria-pressed="false" title="Tela cheia"><svg aria-hidden="true"><use href="#i-fullscreen"/></svg></button>
             <button class="icon-button" id="sound" aria-label="Ativar sons" aria-pressed="false" title="Ativar sons"><svg aria-hidden="true"><use href="#i-mute"/></svg></button>
             <button class="icon-button" id="pause" aria-label="Pausar aventura" aria-pressed="false" title="Pausar (P)" hidden><svg aria-hidden="true"><use href="#i-pause"/></svg></button>
@@ -340,7 +401,8 @@
           <div class="power" id="boost-status" hidden>⚡ Supervelocidade <span id="boost-time">3s</span><span class="power-bar"><i id="boost-bar"></i></span></div>
           <div class="power shield" id="shield-status" hidden>✦ Escudo dino <span id="shield-time">2s</span><span class="power-bar"><i id="shield-bar"></i></span></div>
         </div>
-        <div class="mission" id="mission" hidden><svg aria-hidden="true"><use href="#i-star"/></svg><div><small>VAMOS BRINCAR DE...</small><strong id="mission-text">Chutar 2 bolas</strong></div><span class="mission-progress" id="mission-progress" aria-hidden="true"></span></div>
+        <div class="mission" id="mission" hidden><span id="egg-progress" data-progress="0" role="img" aria-label="Ovo: 0 de 3 missões"><svg viewBox="0 0 44 53" aria-hidden="true"><path d="M22 3C12 3 4 22 4 34a18 16 0 0 0 36 0C40 22 32 3 22 3Z" fill="#fff1be" stroke="#d8b365" stroke-width="2"/><ellipse cx="13" cy="28" rx="4" ry="5" fill="#d4ddb1"/><ellipse cx="29" cy="36" rx="4" ry="3" fill="#d4ddb1"/><path class="egg-crack crack-one" d="m25 6-8 11 10 6-9 9" fill="none" stroke="#ab8758" stroke-width="2.2"/><path class="egg-crack crack-two" d="m18 32 11 6-7 12M18 17l-9 3m18 3 10-1" fill="none" stroke="#ab8758" stroke-width="2.2"/></svg></span><div><small>VAMOS ABRIR O OVO!</small><div class="mission-heading"><svg id="mission-symbol" aria-hidden="true"><use href="#i-ball"/></svg><strong id="mission-text">Chutar 2 bolas</strong></div><span class="mission-progress" id="mission-progress" aria-hidden="true"></span><span class="egg-dots" id="egg-dots" aria-hidden="true"><i></i><i></i><i></i></span></div></div>
+        <div class="festival-banner" id="festival-banner" hidden>⚽ CHUVA DE BOLAS!</div>
         <div class="intro" id="intro"><span class="intro-tag">✦ Hoje o herói é você!</span><h2>O mundo é seu,<br> <span id="intro-character-name">Eric.</span></h2><p>Calce suas superchuteiras.<br>Tem uma aventura esperando por você!</p>
           <div class="character-picker" id="character-picker" role="group" aria-label="Escolha seu herói">
             <button class="character-card" data-character="eric" aria-label="Escolher Eric" aria-pressed="true"><img src="eric.png?v=10" alt="" draggable="false"><strong>Eric</strong><small>Rugido do dino</small></button>
@@ -354,14 +416,16 @@
           <button class="jump-button roar-button" id="roar" aria-label="Rugir e afugentar os travessos" title="Rugir (X ou R)" hidden><svg aria-hidden="true"><use href="#i-dino"/></svg><span id="roar-label">RUGIR!</span><kbd class="desktop-key">X</kbd><small id="roar-hint">ESPANTA OS TRAVESSOS</small></button>
           <button class="jump-button" id="jump" aria-label="PULAR" title="Pular (Z ou Espaço)" hidden><svg aria-hidden="true"><use href="#i-jump"/></svg> PULAR <kbd class="desktop-key">Z</kbd></button>
         </div>
-        <div class="pause-screen" id="pause-screen" hidden><div class="pause-card"><svg width="34" height="34" style="color:#82a862" aria-hidden="true"><use href="#i-dino"/></svg><h2>Uma pausinha.</h2><p>A aventura espera por você.</p><div class="menu-actions"><button class="primary" id="resume"><svg aria-hidden="true"><use href="#i-play"/></svg> Continuar</button><button class="primary secondary" id="home"><svg aria-hidden="true"><use href="#i-home"/></svg> Voltar ao início</button></div></div></div>
-        <div class="pause-screen" id="end-screen" role="dialog" aria-modal="true" aria-labelledby="end-title" hidden><div class="pause-card end-card"><svg width="30" height="30" style="color:#dda449" aria-hidden="true"><use href="#i-star"/></svg><h2 id="end-title">Que aventura, Eric!</h2><p>Você brilhou. Escolha quem vem brincar agora!</p><div class="end-results"><div><small>SEUS PONTOS</small><strong id="end-score">0</strong></div><div><small>SEU RECORDE</small><strong id="end-record">0</strong></div></div>
+        <div class="pause-screen" id="pause-screen" hidden><div class="pause-card"><svg width="34" height="34" style="color:#82a862" aria-hidden="true"><use href="#i-dino"/></svg><h2>Uma pausinha.</h2><p>A aventura espera por você.</p><div class="menu-actions"><button class="primary" id="resume"><svg aria-hidden="true"><use href="#i-play"/></svg> Continuar</button><button class="primary secondary" id="home"><svg aria-hidden="true"><use href="#i-home"/></svg> Voltar ao início</button></div><button class="album-link" id="pause-album" aria-label="Ver álbum de dinos"><svg aria-hidden="true"><use href="#i-album"/></svg> Ver álbum</button></div></div>
+        <div class="pause-screen" id="end-screen" role="dialog" aria-modal="true" aria-labelledby="end-title" hidden><div class="pause-card end-card"><div class="end-heading-tools"><svg style="color:#dda449" aria-hidden="true"><use href="#i-star"/></svg><button class="album-link" id="end-album" aria-label="Ver álbum de dinos"><svg aria-hidden="true"><use href="#i-album"/></svg> Ver álbum</button></div><h2 id="end-title">Que aventura, Eric!</h2><p>Você brilhou. Escolha quem vem brincar agora!</p><div class="end-results"><div><small>SEUS PONTOS</small><strong id="end-score">0</strong></div><div><small>SEU RECORDE</small><strong id="end-record">0</strong></div></div>
           <div class="character-picker end-character-picker" id="end-character-picker" role="group" aria-label="Escolha o herói da próxima aventura">
             <button class="character-card" data-character="eric" aria-label="Escolher Eric" aria-pressed="true"><img src="eric.png?v=10" alt="" draggable="false" loading="lazy"><strong>Eric</strong></button>
             <button class="character-card" data-character="daniel" aria-label="Escolher Daniel" aria-pressed="false"><img src="daniel.png?v=1" alt="" draggable="false" loading="lazy"><strong>Daniel</strong></button>
             <button class="character-card" data-character="samuel" aria-label="Escolher Samuel" aria-pressed="false"><img src="samuel.png?v=1" alt="" draggable="false" loading="lazy"><strong>Samuel</strong></button>
           </div>
           <div class="menu-actions"><button class="primary" id="restart"><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos de novo!</button><button class="primary secondary" id="change-character"><svg aria-hidden="true"><use href="#i-dino"/></svg> Trocar personagem</button></div></div></div>
+        <div class="pause-screen discovery-screen" id="album-screen" role="dialog" aria-modal="true" aria-labelledby="album-title" hidden><div class="album-card"><div class="album-heading"><h2 id="album-title">Seus amigos dinos</h2><span id="album-count">0/6</span></div><p id="album-note">Abra ovos e encontre seis filhotes para brincar!</p><div class="pet-grid" id="pet-grid"></div><div class="album-actions"><button class="primary secondary" id="companion-none">Sem companheiro</button><button class="primary" id="album-close">Voltar ao jogo</button></div></div></div>
+        <div class="pause-screen discovery-screen" id="hatch-screen" role="dialog" aria-modal="true" aria-labelledby="hatch-title" hidden><div class="hatch-card"><h2 id="hatch-title">Nasceu um amigo!</h2><div class="hatch-reveal"><div id="hatch-dino"></div><div><strong id="hatch-name">Pipo</strong><span id="hatch-count">1 de 6 amigos</span></div></div><p>Seu novo amigo pode correr com você.</p><div class="menu-actions"><button class="primary" id="hatch-play">Brincar com ele!</button><button class="primary secondary" id="hatch-continue">Continuar</button></div></div></div>
         <div class="asset-loading" id="asset-loading" role="status" aria-live="polite" aria-atomic="true"><div class="loading-card">
           <div class="loading-icon" aria-hidden="true"><svg><use href="#i-dino"/></svg></div>
           <h2 id="loading-title">Preparando a aventura!</h2><p id="loading-message">Calçando as superchuteiras do Eric…</p>
@@ -382,6 +446,64 @@
   </main>
   <footer class="site-footer"><span>Feito com <span class="heart">♥</span> para o Eric. Feliz 4 anos, pequeno explorador!</span><span>Sem pressa. Sempre dá para brincar de novo.</span></footer>
 
+  <script id="dino-album">
+  // O álbum pertence ao navegador: os três heróis compartilham as descobertas.
+  // Nenhuma conta é necessária; se o armazenamento estiver bloqueado, continua em memória.
+  (() => {
+    const KEY = 'eric-runner-album-v1';
+    const CATALOG = Object.freeze([
+      {id:'pipo',name:'Pipo',species:'T-rex',color:'#8dd9b1'},
+      {id:'lili',name:'Lili',species:'Tricerátops',color:'#b5a0e6'},
+      {id:'tico',name:'Tico',species:'Pterossauro',color:'#8bc8ec'},
+      {id:'bubi',name:'Bubi',species:'Estegossauro',color:'#efaa98'},
+      {id:'nino',name:'Nino',species:'Braquiossauro',color:'#efd36f'},
+      {id:'zazu',name:'Zazu',species:'Anquilossauro',color:'#68c6bf'}
+    ].map(dino => Object.freeze(dino)));
+
+    function create(storage) {
+      if (storage === undefined) {
+        try { storage = globalThis.localStorage; } catch (_) { storage = null; }
+      }
+      let eggProgress = 0, unlocked = [], selected = null;
+      try {
+        const saved = JSON.parse(storage?.getItem(KEY) || 'null');
+        const safe = saved && typeof saved === 'object' && !Array.isArray(saved) && saved.version === 1 &&
+          !['__proto__','constructor','prototype'].some(key => Object.prototype.hasOwnProperty.call(saved,key));
+        if (safe) {
+          if (Number.isInteger(saved.eggProgress) && saved.eggProgress >= 0 && saved.eggProgress <= 2) eggProgress = saved.eggProgress;
+          if (Array.isArray(saved.unlocked)) unlocked = CATALOG.filter(dino => saved.unlocked.includes(dino.id)).map(dino => dino.id);
+          if (typeof saved.selected === 'string' && unlocked.includes(saved.selected)) selected = saved.selected;
+        }
+      } catch (_) { /* Um registro quebrado não interrompe a brincadeira. */ }
+
+      function save() {
+        try { storage?.setItem(KEY,JSON.stringify({version:1,eggProgress,unlocked,selected})); }
+        catch (_) { /* A coleção desta sessão permanece mesmo sem espaço para salvar. */ }
+      }
+
+      return {
+        get eggProgress() { return eggProgress; },
+        get unlocked() { return unlocked.slice(); },
+        get selected() { return selected; },
+        setEggProgress(progress) {
+          if (!Number.isInteger(progress) || progress < 0 || progress > 2) return false;
+          eggProgress = progress; save(); return true;
+        },
+        hatch() {
+          const next = CATALOG.find(dino => !unlocked.includes(dino.id));
+          if (next) unlocked.push(next.id);
+          eggProgress = 0; save();
+          return {id:next?.id || selected || CATALOG[0].id,isNew:!!next,complete:unlocked.length === CATALOG.length};
+        },
+        select(id) {
+          if (id !== null && !unlocked.includes(id)) return false;
+          selected = id; save(); return true;
+        }
+      };
+    }
+    globalThis.DinoAlbum = Object.freeze({CATALOG,create});
+  })();
+  </script>
   <script id="game-engine">
   /* MOTOR DO JOGO — tempo em segundos e distâncias em pixels do mundo.
      A física é independente do Canvas para facilitar manutenção e testes. */
@@ -393,6 +515,7 @@
         characterId:'eric', wind:0, bubble:0,
         health:20, maxHealth:20, ended:false,
         goals:0, treasures:0, friends:0, stars:0, taskIndex:0, taskProgress:0,
+        eggProgress:0, festival:0, festivalKind:'balls', festivalIn:20, festivalCount:0, festivalSpawnIn:0,
         boost:0, shield:0, hurt:0, slow:0, shake:0, kick:0, roar:0,
         roarCooldown:0, roarWave:0, scared:0,
         player:{ x:235, lift:0, vy:0, stride:0 }, items:[], obstacles:[], mobs:[], events:[],
@@ -405,6 +528,8 @@
     function restart(s) {
       const next=create();next.width=s.width;next.player.x=s.player.x;next.running=true;
       next.characterId=['eric','daniel','samuel'].includes(s.characterId)?s.characterId:'eric';
+      // O filhote continua sendo descoberto, mesmo após voltar ao menu ou perder.
+      next.eggProgress=Math.min(2,Math.max(0,Math.floor(s.eggProgress || 0)));
       Object.assign(s,next);
     }
     // A escolha ocorre no menu ou ao terminar; não troca o herói no meio de um salto.
@@ -414,13 +539,13 @@
       return true;
     }
     function damage(s,slow) {
-      if(s.ended || s.shield>0 || s.hurt>0)return;
+      if(s.ended || s.festival>0 || s.shield>0 || s.hurt>0)return;
       s.health=Math.max(0,s.health-1);s.hurt=2;s.slow=slow;
       emit(s,'bump','OPA!',s.player.x,185);
       if(s.health===0){s.ended=true;emit(s,'finish','QUE AVENTURA!',s.player.x,230);}
     }
-    function emit(s, type, text, x=s.player.x, lift=210) {
-      s.events.push({ type, text, x, lift });
+    function emit(s, type, text, x=s.player.x, lift=210, details={}) {
+      s.events.push({ type, text, x, lift, ...details });
       // O renderer consome esta fila a cada quadro; o limite evita acúmulo.
       if (s.events.length > 32) s.events.shift();
     }
@@ -442,7 +567,13 @@
     function progress(s,key) {
       if(task(s).key!==key)return;
       s.taskProgress++;
-      if(s.taskProgress>=task(s).target){s.stars++;s.taskProgress=0;s.taskIndex++;emit(s,'celebrate','ESTRELA!',s.player.x+60,290);}
+      if(s.taskProgress>=task(s).target) {
+        s.stars++;s.taskProgress=0;s.taskIndex++;emit(s,'celebrate','ESTRELA!',s.player.x+60,290);
+        s.eggProgress++;
+        if(s.eggProgress===3) {
+          s.eggProgress=0;emit(s,'hatch','NASCEU UM AMIGO!',s.player.x+40,300);
+        } else emit(s,'egg','O OVO ESTÁ ABRINDO!',s.player.x+40,285,{progress:s.eggProgress});
+      }
     }
     function spriteFrame(s) {
       if(!s.running || s.paused || s.ended)return 7;
@@ -500,10 +631,39 @@
         progress(s,'treasure');
       }
     }
+    // Uma surpresa curta, sem perigo, seguida por um tempo de corrida normal.
+    function updateFestival(s,dt) {
+      if(s.festival>0) {
+        s.festival=Math.max(0,s.festival-dt);
+        if(s.festival===0) {
+          s.festivalIn=30;s.festivalSpawnIn=0;
+          s.obstacleIn=Math.max(.9,s.obstacleIn);s.mobIn=Math.max(1.5,s.mobIn);
+        }
+      } else {
+        s.festivalIn-=dt;
+        if(s.festivalIn<=0) {
+          s.festivalKind=s.festivalCount%2===0?'balls':'volcano';
+          s.festivalCount++;s.festival=10;s.festivalSpawnIn=0;
+          s.obstacles=[];s.mobs=s.mobs.filter(m=>!isEnemy(m));s.slow=0;
+          emit(s,'festival',s.festivalKind==='balls'?'CHUVA DE BOLAS!':'FESTA DO VULCÃO!',s.player.x+60,300,{kind:s.festivalKind});
+        }
+      }
+      if(s.festival>0) {
+        s.festivalSpawnIn-=dt;
+        if(s.festivalSpawnIn<=0) {
+          const balls=s.festivalKind==='balls';
+          const type=balls?'ball':(s.sequence++%3===2?'fries':'coin');
+          // A pista fica abundante, mas o número de itens continua limitado.
+          if(s.items.length<28)s.items.push({type,x:s.width+45,lift:balls?21:94,radius:balls?23:25,kicked:false,phase:Math.random()*6});
+          s.festivalSpawnIn=balls?.45:.6;
+        }
+      }
+    }
     function step(s, dt) {
       if (!s.running || s.paused || s.ended) return;
       dt = Math.min(Math.max(dt,0),.1);
       s.time += dt;
+      updateFestival(s,dt);
       for (const name of ['boost','shield','hurt','slow','shake','kick','roar','roarCooldown','roarWave','wind','bubble']) s[name]=Math.max(0,s[name]-dt);
       const target = 220 * (s.boost > 0 ? 1.65 : 1) * (s.slow > 0 ? .63 : 1);
       s.speed += (target-s.speed) * Math.min(1,dt*7);
@@ -516,31 +676,33 @@
         p.lift -= p.vy*dt;
         if (p.lift <= 0) { p.lift=0; p.vy=0; emit(s,'land',''); }
       }
-      s.spawnIn-=dt;
-      if (s.spawnIn <= 0) {
-        const types=['ball','fries','ball','coin','ball','fossil','fries','ball'];
-        const type=types[s.sequence++ % types.length];
-        s.items.push({ type, x:s.width+45, lift:type==='ball'?21:(s.sequence%3===0?145:94), radius:type==='ball'?23:25, kicked:false, phase:Math.random()*6 });
-        s.spawnIn=1.2 + Math.random()*.35;
-      }
-      s.obstacleIn-=dt;
-      if (s.obstacleIn <= 0) {
-        // Dá tempo para ver cada desafio; não forma uma parede de obstáculos.
-        if(roomForHazard(s)) {
-          const kind=['block','cone','log'][s.hazardSequence++%3];
-          s.obstacles.push({ x:s.width+50, width:kind==='log'?64:46, height:kind==='cone'?43:36, hit:false, kind });
-          s.obstacleIn=3.3 + Math.random()*.9;
-        } else s.obstacleIn=.45;
-      }
-      s.mobIn-=dt;
-      if(s.mobIn<=0) {
-        const types=['slime','rabbit','robot','parrot','cloud','rabbit','balloon','parrot','mushroom','rabbit','car','parrot'];
-        const type=types[s.mobSequence%types.length];
-        if(!isEnemy({type}) || roomForHazard(s)) {
-          s.mobSequence++;
-          s.mobs.push({type,x:s.width+50,lift:type==='parrot'?126:0,height:48,width:48,phase:0,resolved:false,friendly:!isEnemy({type}),celebrate:0});
-          s.mobIn=3.8+Math.random()*.8;
-        } else s.mobIn=.45;
+      if(s.festival===0) {
+        s.spawnIn-=dt;
+        if (s.spawnIn <= 0) {
+          const types=['ball','fries','ball','coin','ball','fossil','fries','ball'];
+          const type=types[s.sequence++ % types.length];
+          s.items.push({ type, x:s.width+45, lift:type==='ball'?21:(s.sequence%3===0?145:94), radius:type==='ball'?23:25, kicked:false, phase:Math.random()*6 });
+          s.spawnIn=1.2 + Math.random()*.35;
+        }
+        s.obstacleIn-=dt;
+        if (s.obstacleIn <= 0) {
+          // Dá tempo para ver cada desafio; não forma uma parede de obstáculos.
+          if(roomForHazard(s)) {
+            const kind=['block','cone','log'][s.hazardSequence++%3];
+            s.obstacles.push({ x:s.width+50, width:kind==='log'?64:46, height:kind==='cone'?43:36, hit:false, kind });
+            s.obstacleIn=3.3 + Math.random()*.9;
+          } else s.obstacleIn=.45;
+        }
+        s.mobIn-=dt;
+        if(s.mobIn<=0) {
+          const types=['slime','rabbit','robot','parrot','cloud','rabbit','balloon','parrot','mushroom','rabbit','car','parrot'];
+          const type=types[s.mobSequence%types.length];
+          if(!isEnemy({type}) || roomForHazard(s)) {
+            s.mobSequence++;
+            s.mobs.push({type,x:s.width+50,lift:type==='parrot'?126:0,height:48,width:48,phase:0,resolved:false,friendly:!isEnemy({type}),celebrate:0});
+            s.mobIn=3.8+Math.random()*.8;
+          } else s.mobIn=.45;
+        }
       }
       // A bola chutada e os bichinhos usam a mesma física do mundo.
       for(const mob of s.mobs) {
@@ -796,6 +958,99 @@
     const canvas=$('game'),ctx=canvas.getContext('2d'),stage=$('stage');
     if (!ctx) { $('asset-loading').hidden=true; $('start').disabled=true; $('start').textContent='Canvas indisponível'; return; }
     const engine=globalThis.RunnerEngine, state=engine.create();
+    const album=globalThis.DinoAlbum.create();
+    state.eggProgress=album.eggProgress;
+    const babyImages={};
+    let albumResume=false,hatchResume=false,currentHatch=null,pendingHatches=[],eggSignature=-1;
+    // Os seis amigos são ilustrações vetoriais locais, sem esperar pela rede.
+    function babySVG(id) {
+      const pet=globalThis.DinoAlbum.CATALOG.find(p=>p.id===id),color=pet.color;
+      const neck=id==='nino',hx=neck?87:94,hy=neck?27:48;
+      const details={
+        pipo:'<path d="m46 48 5-10 7 10m5-4 5-9 6 11" fill="#e9ce87"/>',
+        lili:'<ellipse cx="78" cy="48" rx="18" ry="24" fill="#b999d5" stroke="#75628a" stroke-width="2"/><path d="m84 31-5-14 13 12m12 8 3-14 5 17m8 12 9-6-4 13" fill="#fff1c5"/>',
+        tico:'<path d="M67 62Q28 5 13 31L31 58 45 50 61 72M75 61Q100 7 122 25L108 47 98 43 84 71" fill="#b9e4ee" stroke="#568f9c" stroke-width="2"/>',
+        bubi:'<path d="m24 62 3-19 14 10m-2-1 5-24 18 18m-2 0 11-23 16 27m-2 1 13-18 8 24" fill="#f2b073" stroke="#bb845d" stroke-width="2"/>',
+        nino:'<path d="M73 64Q72 43 73 26L93 22 98 69" fill="'+color+'" stroke="#9a8859" stroke-width="2"/>',
+        zazu:'<path d="m34 57 4-9 10 4 8-10 11 4 9-7 13 16" fill="#a4c9b4" stroke="#638c79" stroke-width="2"/><circle cx="15" cy="73" r="9" fill="#a4c9b4"/>'
+      }[id];
+      return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 112" aria-hidden="true"><ellipse cx="65" cy="99" rx="43" ry="5" fill="#416c4020"/><path d="M43 61Q17 45 10 68Q18 84 45 80" fill="'+color+'" stroke="#5d8068" stroke-width="2"/>'+details+'<ellipse cx="65" cy="68" rx="31" ry="22" fill="'+color+'" stroke="#5d8068" stroke-width="2"/><ellipse cx="67" cy="76" rx="20" ry="12" fill="#fff0c6"/><rect x="42" y="80" width="15" height="18" rx="6" fill="'+color+'"/><rect x="71" y="80" width="16" height="18" rx="6" fill="'+color+'"/><ellipse cx="'+hx+'" cy="'+hy+'" rx="23" ry="22" fill="'+color+'" stroke="#5d8068" stroke-width="2"/><ellipse cx="'+(hx+14)+'" cy="'+(hy+9)+'" rx="15" ry="10" fill="'+color+'"/><ellipse cx="'+hx+'" cy="'+(hy-5)+'" rx="6" ry="7" fill="white"/><circle cx="'+(hx+2)+'" cy="'+(hy-4)+'" r="3" fill="#304c3f"/><circle cx="'+(hx+3)+'" cy="'+(hy-5)+'" r="1" fill="white"/><circle cx="'+(hx+21)+'" cy="'+(hy+6)+'" r="1.7" fill="#547158"/><ellipse cx="'+(hx+2)+'" cy="'+(hy+9)+'" rx="5" ry="3" fill="#eea18e" opacity=".6"/><path d="M'+(hx+9)+' '+(hy+12)+'q7 7 14 0" fill="none" stroke="#47634e" stroke-width="2" stroke-linecap="round"/><path d="M82 65q8 1 8 8" fill="none" stroke="#5d8068" stroke-width="5" stroke-linecap="round"/><circle cx="47" cy="64" r="3" fill="#ffffff80"/><circle cx="56" cy="58" r="2" fill="#ffffff80"/></svg>';
+    }
+    for(const pet of globalThis.DinoAlbum.CATALOG) {
+      const image=babyImages[pet.id]=new Image();image.onload=()=>draw();
+      image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(babySVG(pet.id));
+    }
+    function renderAlbum() {
+      const unlocked=album.unlocked;
+      $('album-badge').textContent=$('album-count').textContent=unlocked.length+'/6';
+      $('album-note').textContent=unlocked.length?'Escolha um amigo para correr com você.':'Abra ovos e encontre seis filhotes para brincar!';
+      $('pet-grid').innerHTML=globalThis.DinoAlbum.CATALOG.map(p=>{
+        const ready=unlocked.includes(p.id);
+        const picture=ready?babySVG(p.id):'<svg viewBox="0 0 128 112" aria-hidden="true"><path d="M64 12C41 12 24 57 24 77a40 27 0 0 0 80 0C104 57 87 12 64 12Z" fill="#ece7d6"/><ellipse cx="49" cy="58" rx="8" ry="10" fill="#d8d7be"/><ellipse cx="77" cy="82" rx="8" ry="6" fill="#d8d7be"/><text x="64" y="78" text-anchor="middle" font-size="28" fill="#a7a38c">?</text></svg>';
+        return '<button class="pet-card" data-pet="'+p.id+'" aria-label="'+(ready?'Brincar com '+p.name:'Amigo para descobrir')+'" aria-pressed="'+(ready && album.selected===p.id)+'" '+(ready?'':'disabled')+'>'+picture+'<strong>'+(ready?p.name:'?')+'</strong><small>'+(ready?p.species:'Abra outro ovo')+'</small></button>';
+      }).join('');
+      $('companion-none').setAttribute('aria-pressed',String(album.selected===null));
+    }
+    function discoveryDialog() {
+      return !$('hatch-screen').hidden?$('hatch-screen'):!$('album-screen').hidden?$('album-screen'):null;
+    }
+    function setDiscoveryDialog(dialog) {
+      // O teclado e os toques ficam somente na escolha que está aberta.
+      for(const child of stage.children)child.inert=!!dialog && child!==dialog;
+    }
+    function saveDiscoveries() {
+      // Guarda a recompensa antes de pausar ou sair da aba, sem esperar
+      // o próximo quadro. A marca impede duplicação ao mostrar a descoberta.
+      for(const event of state.events) {
+        if(event.albumSaved || !['egg','hatch'].includes(event.type))continue;
+        if(event.type==='egg')album.setEggProgress(event.progress);
+        else {pendingHatches.push(album.hatch());renderAlbum();}
+        event.albumSaved=true;
+      }
+    }
+    function openAlbum() {
+      if(!$('hatch-screen').hidden || !characterImagesReady())return;
+      albumResume=state.running && !state.paused && !state.ended;
+      if(albumResume)pause(true);
+      $('pause-screen').hidden=true;renderAlbum();$('album-screen').hidden=false;
+      $('album-close').textContent=state.ended?'Voltar ao resultado':albumResume?'Voltar ao jogo':state.running?'Voltar à pausa':'Voltar ao início';
+      setDiscoveryDialog($('album-screen'));
+      $('album-close').focus({preventScroll:true});
+    }
+    function closeAlbum() {
+      $('album-screen').hidden=true;
+      setDiscoveryDialog(null);
+      if(albumResume)pause(false);
+      albumResume=false;
+      $('pause-screen').hidden=!(state.running && state.paused && !state.ended);
+      (state.ended?$('end-album'):state.paused?$('resume'):$('album')).focus({preventScroll:true});
+    }
+    function showHatch() {
+      if(!pendingHatches.length)return;
+      if($('hatch-screen').hidden) {
+        hatchResume=state.running && !state.paused && !state.ended;
+        if(hatchResume){pause(true);muteAudio();unlockAudio();playSound('celebrate');}
+      }
+      currentHatch=pendingHatches.shift();
+      const pet=globalThis.DinoAlbum.CATALOG.find(p=>p.id===currentHatch.id);
+      $('hatch-title').textContent=currentHatch.isNew?'Nasceu um amigo!':'Sua família dino está completa!';
+      $('hatch-name').textContent=pet.name;$('hatch-dino').innerHTML=babySVG(pet.id);
+      $('hatch-count').textContent=album.unlocked.length+' de 6 amigos';
+      $('pause-screen').hidden=true;$('hatch-screen').hidden=false;
+      setDiscoveryDialog($('hatch-screen'));
+      $('hatch-play').focus({preventScroll:true});
+    }
+    function closeHatch(useCompanion=false) {
+      if(useCompanion && currentHatch)album.select(currentHatch.id);
+      renderAlbum();
+      if(pendingHatches.length){showHatch();return;}
+      $('hatch-screen').hidden=true;currentHatch=null;
+      setDiscoveryDialog(null);
+      if(hatchResume)pause(false);
+      hatchResume=false;
+      $('pause-screen').hidden=!(state.running && state.paused && !state.ended);
+      (state.ended?$('restart'):state.paused?$('resume'):$('game')).focus({preventScroll:true});
+    }
     function activeCharacter(){return characters[state.characterId] || characters.eric;}
     function syncCharacterUI() {
       const character=activeCharacter(),id=state.characterId || 'eric';
@@ -940,6 +1195,7 @@
       if (kind==='bump') sample('bump',.16,.92);
       if (kind==='friend' || kind==='clear') {tone(660,.14,0,'sine',700,.035);tone(880,.2,.09,'sine',920,.03);}
       if (kind==='celebrate') [523,659,784,1047].forEach((f,i)=>tone(f,.32,i*.11,'triangle',f,.032));
+      if (kind==='festival') [659,784,1047,1319].forEach((f,i)=>tone(f,.25,i*.1,'sine',f,.035));
     }
     function muteAudio() {
       if(!audio)return;
@@ -1018,7 +1274,7 @@
     document.addEventListener('webkitfullscreenchange',syncFullscreen);
 
     function start() {
-      if (state.running || portraitPhone.matches || !characterImagesReady()) return;
+      if (state.running || discoveryDialog() || portraitPhone.matches || !characterImagesReady()) return;
       adventureToken++;
       if(touchDevice.matches)enterFullscreen();
       state.running=true; unlockAudio(); canvas.focus({preventScroll:true});
@@ -1031,6 +1287,8 @@
     function jump() { if(portraitPhone.matches)return; unlockAudio(); if (!state.running) { start(); return; } engine.jump(state); }
     function roar() { if(portraitPhone.matches)return; unlockAudio(); engine.roar(state); }
     function pause(value=!state.paused) {
+      saveDiscoveries();
+      if(discoveryDialog())return;
       if (!state.running || state.ended || (!value && portraitPhone.matches)) return;
       state.paused=value; $('pause-screen').hidden=!value;
       $('pause').setAttribute('aria-pressed',String(value));
@@ -1042,14 +1300,31 @@
     $('start').addEventListener('click',start);
     $('resume').addEventListener('click',()=>pause(false));
     $('pause').addEventListener('click',()=>pause());
+    $('album').addEventListener('click',openAlbum);
+    $('pause-album').addEventListener('click',openAlbum);
+    $('end-album').addEventListener('click',openAlbum);
+    $('album-close').addEventListener('click',closeAlbum);
+    $('pet-grid').addEventListener('click',e=>{
+      const card=e.target.closest('[data-pet]');
+      if(card && album.select(card.dataset.pet)) {
+        renderAlbum();$('pet-grid').querySelector('[data-pet="'+card.dataset.pet+'"]').focus({preventScroll:true});draw();
+      }
+    });
+    $('companion-none').addEventListener('click',()=>{album.select(null);renderAlbum();draw();});
+    $('hatch-play').addEventListener('click',()=>closeHatch(true));
+    $('hatch-continue').addEventListener('click',()=>closeHatch());
+    renderAlbum();
     function returnToStart() {
       if(!state.paused && !state.ended)return;
       // Guarda a aventura atual antes de limpar a pista. Mantém as imagens,
       // o herói escolhido, o recorde, a preferência de som e a tela cheia.
-      updateHUD();saveRecord();adventureToken++;muteAudio();
+      consumeEvents(false);updateHUD();saveRecord();adventureToken++;muteAudio();
       engine.restart(state);state.running=false;
       particles=[];bubbles=[];animals=[];animalIn=4;dustIn=0;
       missionSignature='';lastFootstep=-1;last=0;lastRecordWrite=-Infinity;
+      $('album-screen').hidden=$('hatch-screen').hidden=true;
+      setDiscoveryDialog(null);
+      albumResume=hatchResume=false;currentHatch=null;pendingHatches=[];
       for(const id of ['pause-screen','end-screen','jump','roar','pause','play-hint','mission'])$(id).hidden=true;
       $('intro').hidden=false;$('hero-name').hidden=false;
       $('pause').setAttribute('aria-pressed','false');$('pause').setAttribute('aria-label','Pausar aventura');
@@ -1071,7 +1346,7 @@
       $('restart').focus({preventScroll:true});
     }
     $('restart').addEventListener('click',()=>{
-      if(!state.ended || portraitPhone.matches || !characterImagesReady())return;
+      if(!state.ended || discoveryDialog() || portraitPhone.matches || !characterImagesReady())return;
       adventureToken++;
       if(touchDevice.matches)enterFullscreen();
       engine.restart(state);particles=[];bubbles=[];animals=[];animalIn=4;dustIn=0;
@@ -1094,6 +1369,17 @@
     $('roar').addEventListener('click',e=>{if(e.detail===0)roar();});
     document.addEventListener('keydown',e=>{
       if (e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input,textarea,select,[contenteditable="true"]')) return;
+      const dialog=discoveryDialog();
+      if(dialog) {
+        if(e.code==='Escape'){e.preventDefault();if(!$('album-screen').hidden)closeAlbum();else closeHatch();}
+        if(e.code==='Tab') {
+          const buttons=[...dialog.querySelectorAll('button:not(:disabled)')];
+          const first=buttons[0],last=buttons[buttons.length-1];
+          if(e.shiftKey && (document.activeElement===first || !dialog.contains(document.activeElement))) {e.preventDefault();last.focus();}
+          else if(!e.shiftKey && (document.activeElement===last || !dialog.contains(document.activeElement))) {e.preventDefault();first.focus();}
+        }
+        return;
+      }
       if (e.code==='KeyZ' || e.code==='Space' || e.code==='ArrowUp') {
         // Espaço sobre um botão mantém a ação acessível do próprio botão.
         if (e.code==='Space' && e.target.closest('button')) return;
@@ -1104,8 +1390,8 @@
       if ((e.code==='KeyX' || e.code==='KeyR') && !e.repeat) {e.preventDefault();roar();}
     });
     // Sair da aba pausa a aventura; os segundos dos poderes não são gastos.
-    document.addEventListener('visibilitychange',()=>{last=0;if(document.hidden){saveRecord();if(state.running)pause(true);}});
-    window.addEventListener('pagehide',saveRecord);
+    document.addEventListener('visibilitychange',()=>{last=0;if(document.hidden){saveDiscoveries();saveRecord();if(state.running)pause(true);}});
+    window.addEventListener('pagehide',()=>{saveDiscoveries();saveRecord();});
     window.addEventListener('blur',()=>{if(state.running && !state.paused)pause(true);});
 
     // Primitivas de desenho: todos os itens, animais e cenários são Canvas.
@@ -1138,7 +1424,8 @@
     }
     function scenery() {
       const offset=state.running?state.distance*50:ambient*7;
-      const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#b7dfd8');sky.addColorStop(.62,'#dcebd1');sky.addColorStop(1,'#ebefd0');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+      const party=state.festival>0;
+      const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,party?(state.festivalKind==='volcano'?'#f7d7b2':'#bde7f1'):'#b7dfd8');sky.addColorStop(.62,party?'#f8efd4':'#dcebd1');sky.addColorStop(1,'#ebefd0');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
       ellipse(W-82,100,36,36,'#fff0b0');ellipse(W-82,100,49,49,'#fff4c43d');
       for(let i=0;i<6;i++) { const period=W+220;const x=((i*253-offset*.10)%period+period)%period-100;cloud(x,110+(i%3)*28,.65+(i%2)*.35,.88); }
       const hill=ctx.createLinearGradient(0,250,0,400);hill.addColorStop(0,'#b4d4a3');hill.addColorStop(1,'#a4cc8b');
@@ -1338,7 +1625,8 @@
       for(let i=0;i<count;i++) {const angle=Math.random()*Math.PI*2,v=dust?30+Math.random()*50:90+Math.random()*160;particles.push({x,y,vx:Math.cos(angle)*v-(dust?80:0),vy:dust?-Math.random()*35:Math.sin(angle)*v-100,life:dust?.6:1.3,full:dust?.6:1.3,size:dust?5+Math.random()*6:4+Math.random()*4,color:dust?'#ead8b2':palette[i%palette.length],rotation:Math.random()*6,spin:Math.random()*8-4,dust});}
       if(particles.length>180)particles.splice(0,particles.length-180);
     }
-    function consumeEvents() {
+    function consumeEvents(reveal=true) {
+      saveDiscoveries();
       while(state.events.length) {
         const event=state.events.shift();playSound(event.type);
         if(event.text) {
@@ -1356,7 +1644,9 @@
         if(event.type==='shield' || event.type==='charge')burst(state.player.x,ground-60,15);
         if(event.type==='flee')burst(event.x,ground-40,8,true);
         if(event.type==='friend' || event.type==='celebrate' || event.type==='clear')burst(event.x,ground-110,event.type==='celebrate'?32:13);
+        if(event.type==='festival')burst(W*.65,180,45);
       }
+      if(reveal && pendingHatches.length && $('hatch-screen').hidden)showHatch();
     }
     function fallbackEric(x,y,height) {
       // Se eric.png não for encontrado, este desenho permite continuar brincando.
@@ -1488,10 +1778,45 @@
       round(-width/2,-28,width,46,13,'#fffef1','#536d47');path([[-6,17],[5,33],[13,17]],'#fffef1');
       ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=colors[b.kind] || '#6f9458';ctx.fillText(b.text,0,-3);ctx.restore();
     }
+    function festivalDecorations() {
+      if(state.festival<=0)return;
+      ctx.save();
+      if(state.festivalKind==='volcano') {
+        volcano(W*.76,ground-83,1.05);
+        for(let i=0;i<18;i++) {
+          const phase=((reducedMotion?0:state.time*.55)+i*.14)%1;
+          const x=W*.76+Math.sin(i*2.7)*phase*135,y=ground-164-Math.sin(phase*Math.PI)*180;
+          star(x,y,4+i%3,palette[i%palette.length],phase*5);
+        }
+      } else {
+        ctx.strokeStyle='#faf4d1';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,195);ctx.quadraticCurveTo(W*.5,235,W,185);ctx.stroke();
+        for(let i=0;i<15;i++) {
+          const x=(i+.5)*W/15,y=195+Math.sin((i+.5)/15*Math.PI)*18;
+          path([[x-12,y],[x+12,y],[x,y+23]],palette[i%palette.length]);
+        }
+        goal(W*.72,ground-107);
+      }
+      for(let i=0;i<32;i++) {
+        const x=((i*83+(reducedMotion?0:state.time*16))%(W+50))-25;
+        const y=(i*43+(reducedMotion?0:state.time*43))%H;
+        ctx.save();ctx.translate(x,y);ctx.rotate(i+(reducedMotion?0:state.time));ctx.fillStyle=palette[i%palette.length];ctx.fillRect(-3,-2,7,4);ctx.restore();
+      }
+      ctx.restore();
+    }
+    function companion() {
+      if(!album.selected || !characterImagesReady())return;
+      const image=babyImages[album.selected];if(!image?.complete || !image.naturalWidth)return;
+      const mobile=touchDevice.matches,x=state.running?state.player.x-90:(mobile?W*.5-120:W*.27-135);
+      const fly=album.selected==='tico'?25:0;
+      const bounce=reducedMotion || state.paused || state.ended?0:Math.sin(ambient*9)*3;
+      const y=ground-63-fly-state.player.lift*.2+bounce;
+      ctx.drawImage(image,x-40,y,82,72);
+      ctx.fillStyle='#6c9b69';ctx.font='bold 15px Trebuchet MS';ctx.textAlign='center';ctx.fillText('♥',x,y-3);
+    }
     function draw() {
       ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);
       ctx.save();if(state.shake>0 && !reducedMotion && !state.paused)ctx.translate(Math.sin(ambient*61)*2.5,Math.cos(ambient*53)*1.8);
-      scenery();
+      scenery();festivalDecorations();
       if(!state.running && W>600) {
         star(W*.17,ground-270,8,'#fff3bf',.3);star(W*.37,ground-235,6,'#fff5d5',-.2);
         ball(W*.40,ground-23,20,.2);fries(W*.14,ground-113,.72);fossil(W*.38,ground-182,true);
@@ -1508,7 +1833,7 @@
         ctx.save();ctx.globalAlpha=Math.max(0,p.life/p.full);ctx.translate(p.x,p.y);ctx.rotate(p.rotation);
         if(p.dust)ellipse(0,0,p.size,p.size*.65,p.color);else {ctx.fillStyle=p.color;ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*.55);}ctx.restore();
       }
-      roarWave();player();for(const b of bubbles)drawBubble(b);ctx.restore();
+      roarWave();companion();player();for(const b of bubbles)drawBubble(b);ctx.restore();
     }
     function updateHUD() {
       $('goals').textContent=state.goals; $('treasures').textContent=state.treasures; $('stars').textContent=state.stars;
@@ -1525,7 +1850,16 @@
         $('mission-text').textContent=mission.title;
         $('mission-progress').innerHTML=Array.from({length:mission.target},(_,i)=>'<i class="'+(i<state.taskProgress?'done':'')+'"></i>').join('');
         $('mission').setAttribute('aria-label',mission.title+': '+state.taskProgress+' de '+mission.target);
+        $('mission-symbol').querySelector('use').setAttribute('href',({ball:'#i-ball',jump:'#i-jump',friend:'#i-dino',treasure:'#i-fossil',scare:'#i-dino'})[mission.key]);
       }
+      if(eggSignature!==state.eggProgress) {
+        eggSignature=state.eggProgress;
+        $('egg-progress').dataset.progress=String(state.eggProgress);
+        $('egg-progress').setAttribute('aria-label','Ovo: '+state.eggProgress+' de 3 missões');
+        $('egg-dots').innerHTML=Array.from({length:3},(_,i)=>'<i class="'+(i<state.eggProgress?'done':'')+'"></i>').join('');
+      }
+      $('festival-banner').hidden=state.festival<=0;
+      $('festival-banner').textContent=state.festivalKind==='volcano'?'🎉 FESTA DO VULCÃO!':'⚽ CHUVA DE BOLAS!';
       $('boost-status').hidden=state.boost<=0; $('shield-status').hidden=state.shield<=0;
       $('boost-time').textContent=Math.ceil(state.boost)+'s'; $('shield-time').textContent=Math.ceil(state.shield)+'s';
       $('boost-bar').style.width=(state.boost/3*100)+'%'; $('shield-bar').style.width=(state.shield/(state.characterId==='samuel'?3:engine.SHIELD_SECONDS)*100)+'%';
