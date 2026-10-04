@@ -155,3 +155,86 @@ test('acessar o próprio localStorage pode falhar sem impedir a aventura', () =>
   model.setEggProgress(2);
   assert.equal(model.hatch().id, 'pipo');
 });
+
+test('cada dino explica o poder automático que oferece como companheiro', () => {
+  const catalog = plain(load(memoryStorage()).CATALOG);
+  assert.deepEqual(catalog.map(dino => [dino.id, dino.power]), [
+    ['pipo', 'Rugidinho'], ['lili', 'Escudo amigo'], ['tico', 'Busca tesouros'],
+    ['bubi', 'Abre caminho'], ['nino', 'Dá coração'], ['zazu', 'Superpasse']
+  ]);
+  const effects = [/travesso/, /2 segundos/, /moeda.*fóssil/, /obstáculo/, /coração.*moeda/, /bola/];
+  catalog.forEach((dino, index) => {
+    assert.equal(typeof dino.help, 'string');
+    assert.match(dino.help, effects[index], dino.id);
+    assert.match(dino.help, /^[^.!?]+\.$/, 'a ajuda cabe em uma frase simples');
+  });
+});
+
+test('um álbum antigo começa sem resgates e mantém suas descobertas', () => {
+  const storage = memoryStorage(JSON.stringify({ version: 1, eggProgress: 2,
+    unlocked: ['pipo', 'lili'], selected: 'lili' }));
+  const model = load(storage).create();
+  assert.equal(model.rescues, 0);
+  assert.equal(model.eggProgress, 2);
+  assert.deepEqual(plain(model.unlocked), ['pipo', 'lili']);
+  assert.equal(model.selected, 'lili');
+});
+
+test('cada resgate soma um ao total e salva junto com os dados do álbum', () => {
+  const storage = memoryStorage(JSON.stringify({ version: 1, eggProgress: 2,
+    unlocked: ['pipo', 'lili'], selected: 'lili', rescues: 7 }));
+  const model = load(storage).create();
+  assert.equal(model.rescues, 7);
+  model.recordRescue();
+  assert.equal(model.rescues, 8);
+  model.recordRescue();
+  assert.equal(model.rescues, 9);
+  assert.deepEqual(JSON.parse(storage.getItem(KEY)), { version: 1, eggProgress: 2,
+    unlocked: ['pipo', 'lili'], selected: 'lili', rescues: 9 });
+  const reloaded = load(storage).create();
+  assert.equal(reloaded.rescues, 9);
+  reloaded.setEggProgress(1);
+  reloaded.select('pipo');
+  reloaded.hatch();
+  assert.equal(load(storage).create().rescues, 9, 'outras gravações também preservam o total');
+});
+
+test('totais de resgates inválidos voltam a zero sem apagar os dinos', () => {
+  for (const rescues of [-1, 1000001, 1.5, NaN, Infinity, '2', null, {}, []]) {
+    const storage = memoryStorage(JSON.stringify({ version: 1, eggProgress: 1,
+      unlocked: ['pipo'], selected: 'pipo', rescues }));
+    const model = load(storage).create();
+    assert.equal(model.rescues, 0, String(rescues));
+    assert.equal(model.eggProgress, 1);
+    assert.deepEqual(plain(model.unlocked), ['pipo']);
+    assert.equal(model.selected, 'pipo');
+    model.recordRescue();
+    assert.equal(load(storage).create().rescues, 1);
+  }
+});
+
+test('resgates continuam em memória com armazenamento bloqueado ou registro corrompido', () => {
+  const blocked = { getItem() { throw new Error('bloqueado'); }, setItem() { throw new Error('bloqueado'); } };
+  for (const storage of [blocked, memoryStorage('{'), memoryStorage(
+    '{"version":1,"rescues":8,"__proto__":{"selected":"pipo"}}')]) {
+    const model = load(storage).create();
+    assert.equal(model.rescues, 0);
+    model.recordRescue();
+    model.recordRescue();
+    assert.equal(model.rescues, 2);
+    model.hatch();
+    assert.equal(model.rescues, 2);
+  }
+});
+
+test('aceita os limites do total e nunca ultrapassa um milhão de resgates', () => {
+  for (const initial of [0, 999999, 1000000]) {
+    const storage = memoryStorage(JSON.stringify({ version: 1, rescues: initial }));
+    const model = load(storage).create();
+    assert.equal(model.rescues, initial);
+    model.recordRescue();
+    assert.equal(model.rescues, initial === 0 ? 1 : 1000000);
+    model.recordRescue();
+    assert.equal(load(storage).create().rescues, initial === 0 ? 2 : 1000000);
+  }
+});

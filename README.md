@@ -64,11 +64,32 @@ O recorde é salvo no `localStorage`, na chave `eric-runner-highscore-v1`, no na
 
 Cada missão concluída racha o ovo no alto da tela. Na terceira, nasce um filhote e a aventura pausa para mostrar o novo amigo. “Brincar com ele!” escolhe esse companheiro e continua a corrida; “Continuar” mantém a escolha anterior. Não há prazo para abrir o ovo, e as rachaduras permanecem ao reiniciar ou trocar de herói.
 
-O álbum reúne seis amigos, descobertos em sequência sem repetir: **Pipo** (T-rex), **Lili** (Tricerátops), **Tico** (Pterossauro), **Bubi** (Estegossauro), **Nino** (Braquiossauro) e **Zazu** (Anquilossauro). O escolhido acompanha qualquer um dos três heróis, com pequenos movimentos e saltos; não recebe dano nem altera as colisões. Com a família completa, novos ovos continuam rendendo uma comemoração.
+O álbum reúne seis amigos, descobertos em sequência sem repetir: **Pipo** (T-rex), **Lili** (Tricerátops), **Tico** (Pterossauro), **Bubi** (Estegossauro), **Nino** (Braquiossauro) e **Zazu** (Anquilossauro). O escolhido acompanha qualquer um dos três heróis, com pequenos movimentos e saltos, e ajuda automaticamente com seu próprio poder. Ele não recebe dano. Com a família completa, novos ovos continuam rendendo uma comemoração.
 
 A primeira festa chega após vinte segundos de corrida. A **Chuva de bolas** oferece dez segundos de gols fáceis. Depois de trinta segundos de pista normal, a **Festa do vulcão** lança confetes e oferece moedas e batatas em alturas acessíveis. As festas se alternam; retiram os perigos presentes e não geram obstáculos nem causam dano durante seus dez segundos. Pausar, abrir o álbum ou revelar um filhote congela esses tempos. Uma nova partida começa novamente com a Chuva de bolas.
 
-O álbum, o companheiro escolhido e as rachaduras ficam na chave `eric-runner-album-v1` do `localStorage`, compartilhados entre Eric, Daniel e Samuel neste navegador. Sobrevivem a recarregar a página; limpar os dados do site apaga essa coleção. Se o armazenamento estiver bloqueado, continuam funcionando durante a sessão. Os filhotes são desenhos SVG internos ao HTML e as festas usam Canvas, sem novos arquivos para baixar.
+O álbum, o companheiro escolhido, as rachaduras e o total de resgates ficam na chave `eric-runner-album-v1` do `localStorage`, compartilhados entre Eric, Daniel e Samuel neste navegador. Sobrevivem a recarregar a página; limpar os dados do site apaga essa coleção. Álbuns da versão anterior conservam os dinos e começam com zero resgates. Se o armazenamento estiver bloqueado, continuam funcionando durante a sessão. Os filhotes são desenhos SVG internos ao HTML e as festas usam Canvas, sem novos arquivos para baixar.
+
+## Uma viagem com resgates e ajudantes
+
+A cada quarenta segundos de corrida, o cenário passa suavemente ao próximo mundo: **Jardim Dino**, com árvores de blocos e vulcões de brinquedo; **Praia dos Brinquedos**, com palmeiras, conchas e castelos de areia; **Vale das Estrelas**, com cristais e estrelas em tons claros. Depois, volta ao jardim. Pista, salto e controles usam a mesma geometria em todos. Pausa, álbum, nascimento e fim da partida congelam o relógio e a transição; reiniciar volta ao jardim. A preferência de movimento reduzido troca os cenários diretamente.
+
+O primeiro filhote pede ajuda após doze segundos de pista normal. No jardim ele está numa bolha: use o especial. Na praia ele está num castelo, e no vale tem um balão: pule perto ou use o especial. O aviso mostra o filhote e a ação, com destaque no botão correspondente. A área fica segura durante o resgate. Se a criança esperar seis segundos, chega uma ajuda gentil e o amigo também é salvo, sem falha ou perda de vida.
+
+Cada resgate dá uma estrela, conta como encontro com amigo e recupera até dois corações, respeitando o máximo de vinte. O total fica visível e salvo no álbum. Depois, outro pedido aguarda trinta e dois segundos de pista normal; as festas suspendem essa espera. Um pedido que já começou pode terminar durante a festa. Os dinos resgatados visitam a aventura; a coleção continua sendo descoberta pelos ovos a cada três missões.
+
+Escolha um companheiro no álbum para receber uma ajuda a cada doze segundos ativos. Quando o poder precisa de um alvo, ele espera um alvo próximo e visível para agir. Cada ajuda afeta apenas um alvo e tem uma animação própria:
+
+| Amigo | Poder automático |
+| --- | --- |
+| Pipo | **Rugidinho:** afugenta um travesso próximo. |
+| Lili | **Escudo amigo:** oferece dois segundos de proteção, sem encurtar outro escudo. |
+| Tico | **Busca tesouros:** recolhe uma moeda ou fóssil próximo. |
+| Bubi | **Abre caminho:** libera um obstáculo à frente. |
+| Nino | **Dá coração:** recupera um coração; com a vida cheia, deixa uma moeda perto. |
+| Zazu | **Superpasse:** chuta uma bola próxima ou oferece uma bola alcançável. |
+
+Os poderes pausam junto com a corrida. Reabrir o álbum ou selecionar novamente o mesmo amigo não renova a ajuda. Reiniciar conserva o companheiro, mas começa uma recarga nova. “Sem companheiro” desativa a ajuda automática. Nenhum botão de jogo adicional é necessário; os poderes de Eric, Daniel e Samuel continuam disponíveis.
 
 ## Animação com os pés no chão
 
@@ -91,7 +112,7 @@ Fontes das gravações:
 - **Kenney — [Impact Sounds](https://kenney.nl/assets/impact-sounds), licença [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/):** `impactSoft_medium_000.ogg` (chute), `impactSoft_heavy_001.ogg` (esbarrão), `footstep_grass_002.ogg` (aterrissagem), `footstep_grass_000.ogg` e `footstep_grass_001.ogg` (passos), `impactBell_heavy_000.ogg` (poder dino).
 - **Eric — rugido original:** gravação fornecida pelo pai para este jogo; não está sob a licença CC0 dos demais efeitos.
 
-Os efeitos musicais, o vento do Daniel e as bolhas do Samuel são sintetizados pelo próprio JavaScript. Os três especiais usam a gravação real do Eric como rugido; para Daniel e Samuel, essa voz é provisória até termos gravações próprias. A reprodução mantém o trecho completo e sua velocidade natural. Um áudio que termina de preparar após reiniciar ou trocar de herói não toca na nova aventura. Os créditos também estão em `LICENSE_AUDIO.md`. O pacote distribuído não depende de arquivos de áudio externos.
+Os efeitos musicais, o vento do Daniel e as bolhas do Samuel são sintetizados pelo próprio JavaScript. Os três especiais usam a gravação real do Eric como rugido; para Daniel e Samuel, essa voz é provisória até termos gravações próprias. Pipo também usa a gravação no seu Rugidinho, em volume menor. A reprodução mantém o trecho completo e sua velocidade natural. Um áudio que termina de preparar após reiniciar ou trocar de herói não toca na nova aventura. Os créditos também estão em `LICENSE_AUDIO.md`. O pacote distribuído não depende de arquivos de áudio externos.
 
 Para recriar a inclusão dos mesmos arquivos durante o desenvolvimento, rode `python scripts/embed-audio.py`. Os arquivos de origem ficam em `output/audio`; esse script e essa pasta não são necessários para jogar. `scripts/prepare-roar.py` documenta o tratamento da gravação atual a partir de um WAV PCM de 16 bits, usando NumPy e SciPy, e salva `output/audio/eric-roar.wav`. O original é preservado. Os cortes de início e fim devem ser ajustados nesse script para uma nova gravação.
 
@@ -110,12 +131,12 @@ As imagens foram geradas com a ferramenta integrada a partir dos personagens e d
 ## Verificação
 
 ```powershell
-node --test tests/game.test.cjs tests/adventure.test.cjs tests/album.test.cjs
+node --test tests/game.test.cjs tests/adventure.test.cjs tests/album.test.cjs tests/journey.test.cjs
 ```
 
 Os 46 testes exercitam a física extraída do próprio HTML: salto e aterrissagem, chute único, duração e expiração dos poderes, proteção, dano unitário, 20 corações, proteção de 2 segundos, escudo breve sem imunidade permanente, dano em colisões sucessivas, fim de partida, reinício, pontuação, margem de coleta, pausa, animação, amigos sem penalidade, fuga dos seis inimigos, onda limitada à tela, recarga do especial, tarefas, espaçamento durante o turbo e dez minutos de corrida protegida simulada com memória limitada. Também verificam seleção e reinício com cada herói, fases dos especiais, atração de itens, bolhas e duração da proteção, pontuação única e amigos preservados.
 
-Mais nove testes verificam ovos a cada três missões, progresso após reinício, sequência e duração das festas, congelamento na pausa, retirada de perigos preservando amigos, coleta acessível e retorno do dano depois da festa. Dez testes do álbum verificam os seis filhotes, seleção, persistência, coleção sem duplicatas, validação de dados e armazenamento bloqueado: **65 testes no total**.
+Mais nove testes verificam ovos a cada três missões, progresso após reinício, sequência e duração das festas, congelamento na pausa, retirada de perigos preservando amigos, coleta acessível e retorno do dano depois da festa. Dezesseis testes do álbum verificam os seis filhotes, seleção, persistência, coleção sem duplicatas, validação de dados, armazenamento bloqueado, descrição dos poderes e total de resgates. Vinte testes da viagem verificam os três mundos, pausas e reinício, os seis poderes, limites dos alvos, recargas, resgates por salto/especial/ajuda, proteção e recompensas sem duplicação: **91 testes no total**.
 
 `tests/browser.test.cjs` verifica tela cheia nativa, pausa ao sair, fallback quando a API é recusada, vida, novos mobs, fim e reinício, recorde após reload e tratamento de storage bloqueado, além do HTML local no Chromium com Playwright disponível no ambiente de desenvolvimento. Confere a imagem frontal aprovada no início e na pausa, inclusive no celular, as oito fases da corrida com solas no chão e sem linha preta, as seis poses do rugido com escala do rosto consistente, tarefas, teclas Z/X e alternativa Espaço, toque nos dois botões de 76 px com intervalo de 12 px, perda de vida após coletar moeda e deixar o escudo expirar, pausa, gols, poderes, sete gravações decodificadas e reprodução completa do rugido real do Eric em velocidade natural, fuga dos travessos sem assustar amigos, landscape em 844 × 390 e 667 × 320, convite na vertical, pausa por rotação preservando poderes e geometria preservada quando o painel é ocultado. As capturas ficam em `output/verification`. Playwright não é uma dependência do jogo.
 
@@ -127,6 +148,8 @@ Mais nove testes verificam ovos a cada três missões, progresso após reinício
 
 `tests/adventure.browser.test.cjs` confere o álbum vazio, a descoberta dos seis filhotes por missões, escolha e retirada do companheiro, rachaduras entre partidas e após reload, troca de herói, festas seguras e seus tempos, retomada correta ao fechar o álbum e armazenamento bloqueado. Também verifica missões concluídas imediatamente antes de pausar ou sair da aba, salvamento sem duplicar filhotes e foco de teclado dentro das escolhas. Usa cliques e toques reais no computador e em celulares de 844 × 390 e 667 × 320, conferindo que os botões do álbum e do nascimento cabem na tela.
 
-Para executar a verificação do navegador, instale Playwright no ambiente de desenvolvimento e rode `node tests/browser.test.cjs`, `node tests/characters.browser.test.cjs`, `node tests/loading.browser.test.cjs`, `node tests/navigation.browser.test.cjs` e `node tests/adventure.browser.test.cjs`. `PLAYWRIGHT_MODULE` pode apontar para uma instalação já existente. Defina `GAME_URL` com o endereço publicado para conferir as suítes online. A suíte de loading sempre usa seu servidor temporário para reproduzir a rede lenta e as falhas.
+`tests/journey.browser.test.cjs` verifica mundos aos quarenta segundos, pausas e avisos, os três tipos de resgate com teclado/toque/ajuda, recompensa única e salvamento imediatamente antes de interromper a página. Exercita os seis poderes por seleção real no álbum, persistência, recargas, retirada do companheiro e alternativas de Nino e Zazu quando não há alvo. Confere os controles e avisos nos dois tamanhos de celular e gera capturas dos três mundos.
+
+Para executar a verificação do navegador, instale Playwright no ambiente de desenvolvimento e rode `node tests/browser.test.cjs`, `node tests/characters.browser.test.cjs`, `node tests/loading.browser.test.cjs`, `node tests/navigation.browser.test.cjs`, `node tests/adventure.browser.test.cjs` e `node tests/journey.browser.test.cjs`. `PLAYWRIGHT_MODULE` pode apontar para uma instalação já existente. Defina `GAME_URL` com o endereço publicado para conferir as suítes online. A suíte de loading sempre usa seu servidor temporário para reproduzir a rede lenta e as falhas.
 
 Os arquivos de criação e pacotes em `output/` ficam no ambiente local e não são enviados ao repositório. O site utiliza o HTML e as 13 imagens dos personagens; os sons estão embutidos.
