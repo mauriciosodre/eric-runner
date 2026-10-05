@@ -13,7 +13,7 @@ const Engine = sandbox.RunnerEngine;
 function game() {
   const state = Engine.create();
   state.running = true;
-  state.spawnIn = state.obstacleIn = state.mobIn = Infinity;
+  state.spawnIn = state.obstacleIn = state.mobIn = state.rainbowIn = Infinity;
   return state;
 }
 function advance(state, seconds) {

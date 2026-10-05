@@ -119,7 +119,7 @@
     .rescue-banner small { display:block; font-size:10px; font-weight:normal; margin-top:2px; }
     .jump-button.rescue-cue { box-shadow:0 0 0 4px #edd58e,0 3px 0 #93ac6d; }
     .jump-button.jump-cue { border-color:#b35b28; background:#fff2c0; color:#87411e; box-shadow:0 0 0 4px #ffd47a,0 4px 0 #ae763e; }
-    #jump-cue { position:absolute; z-index:3; right:39px; bottom:85px; padding:7px 12px; border:2px solid #a45c2b; border-radius:13px; background:#fff8df; color:#87411e; font-weight:bold; font-size:17px; pointer-events:none; }
+    #jump-cue { position:absolute; z-index:3; left:50%; top:-58px; transform:translateX(-50%); padding:7px 12px; border:2px solid #a45c2b; border-radius:13px; background:#fff8df; color:#87411e; font-weight:bold; font-size:17px; white-space:nowrap; pointer-events:none; }
     #jump-cue svg { width:23px; height:23px; vertical-align:middle; margin-right:3px; }
     .word-panel { position:absolute; z-index:2; left:50%; top:80px; transform:translateX(-50%); display:flex; align-items:center; gap:8px; padding:7px 11px; border:2px solid #fffef8; border-radius:17px; background:#fffdf4e8; box-shadow:0 3px 0 #65876d14; pointer-events:none; }
     .word-panel > svg { width:29px; height:29px; color:#719a67; flex:none; }
@@ -180,7 +180,7 @@
       .word-panel { top:max(83px,calc(env(safe-area-inset-top) + 69px)); padding:5px 9px; gap:7px; }
       .word-panel > svg { width:23px; height:23px; }
       .word-letter { width:24px; height:25px; font-size:17px; }
-      #jump-cue { right:auto; left:calc(55% + 14px); bottom:max(62px,calc(env(safe-area-inset-bottom) + 62px)); padding:2px 7px; font-size:11px; border-width:1px; border-radius:8px; }
+      #jump-cue { left:50%; top:5px; bottom:auto; padding:2px 7px; font-size:11px; border-width:1px; border-radius:8px; }
       #jump-cue svg { width:15px; height:15px; margin-right:1px; }
       .album-pages { margin-top:5px; gap:12px; }
       .album-pages button { height:30px; }
@@ -338,6 +338,7 @@
       .action-dock .jump-button svg { width:26px; height:26px; }
       .action-dock .roar-button { padding:10px 12px; gap:8px; }
       .action-dock .roar-button small { font-size:9px; margin-top:-3px; letter-spacing:.4px; }
+      .action-dock #jump.jump-cue { padding-top:17px; }
       .play-hint { bottom:max(98px,calc(env(safe-area-inset-bottom) + 94px)); font-size:10px; }
     }
     @media(pointer:coarse) and (orientation:landscape) and (max-width:500px) { .action-dock { left:50%; } }
@@ -415,6 +416,35 @@
     @media(pointer:coarse) and (orientation:landscape) and (max-height:290px) and (max-width:620px) {
       .mission { left:198px; right:214px; min-width:0; max-width:none; transform:none; padding:4px 6px; }
     }
+    /* Em celulares baixos, o tamanho acompanha o espaço útil. Os dois alvos
+       continuam grandes para o toque e deixam a metade esquerda livre. */
+    @media(pointer:coarse) and (orientation:landscape) and (max-height:350px) {
+      .action-dock { left:auto; right:max(16px,env(safe-area-inset-right)); transform:none; gap:10px; }
+      .action-dock .jump-button { width:clamp(128px,20vw,144px); min-width:128px; height:64px; min-height:64px; border-radius:18px; font-size:18px; }
+      .action-dock .jump-button svg { width:22px; height:22px; }
+      .action-dock .roar-button { padding:7px 8px; gap:6px; }
+      .action-dock .roar-button small { font-size:8px; }
+    }
+    @media(pointer:coarse) and (orientation:landscape) and (max-height:290px) {
+      .action-dock .jump-button { width:120px; min-width:120px; height:56px; min-height:56px; border-radius:16px; font-size:17px; }
+      .action-dock .jump-button svg { width:20px; height:20px; }
+      .action-dock .roar-button { padding:5px 8px; }
+      .hud { top:max(7px,env(safe-area-inset-top)); }
+      .score { padding:4px 7px; }
+      .score strong { font-size:14px; }
+    }
+    .rainbow-panel { background:#fffdf3f0; }
+    .rainbow-dots { display:flex; gap:4px; }
+    .rainbow-dot { display:grid; place-items:center; position:relative; width:28px; height:28px; border:2px dashed #90738f; border-radius:9px; background:var(--color); color:#fffef0; font-size:17px; font-weight:bold; }
+    .rainbow-dot.done { border-style:solid; border-color:#5e885a; box-shadow:0 0 0 2px #ddedbc; }
+    .rainbow-dot.done::after { content:'✓'; position:absolute; right:-5px; bottom:-4px; font-size:12px; line-height:15px; width:15px; height:15px; border-radius:50%; background:#fffef0; color:#4b754a; }
+    @media(pointer:fine) and (max-width:800px) {
+      .rainbow-panel { top:auto; bottom:25px; }
+      .rainbow-panel small { display:none; }
+    }
+    @media(pointer:coarse) and (orientation:landscape) {
+      .rainbow-panel { left:max(14px,env(safe-area-inset-left)); top:auto; bottom:max(22px,env(safe-area-inset-bottom)); transform:none; }
+    }
   </style>
 </head>
 <body>
@@ -474,26 +504,26 @@
         <div class="rescue-banner" id="rescue-banner" hidden><svg aria-hidden="true"><use id="rescue-symbol" href="#i-dino"/></svg><div><strong id="rescue-name">Vamos ajudar um filhote!</strong><small id="rescue-action">Use seu especial!</small></div></div>
         <div class="word-panel" id="word-panel" hidden aria-label="Letras da palavra"><svg aria-hidden="true"><use id="word-symbol" href="#i-dino"/></svg><div><small>ENCONTRE A LETRA</small><div id="word-letters"></div></div></div>
         <div class="journey-banner" id="word-celebration" hidden></div>
-        <div id="jump-cue" hidden><svg aria-hidden="true"><use href="#i-jump"/></svg> PULE!</div>
+        <div class="word-panel rainbow-panel" id="rainbow-panel" hidden aria-label="Brincadeira das cores"><div><small id="rainbow-title">ACHE AS 3 CORES</small><div class="rainbow-dots"><span class="rainbow-dot" data-color="red" role="img" aria-label="Vermelho" style="--color:#f47d7a">●</span><span class="rainbow-dot" data-color="blue" role="img" aria-label="Azul" style="--color:#72bfd0">◆</span><span class="rainbow-dot" data-color="yellow" role="img" aria-label="Amarelo" style="--color:#f9c85a">★</span></div></div></div>
         <div class="intro" id="intro"><span class="intro-tag">✦ Hoje o herói é você!</span><h2>O mundo é seu,<br> <span id="intro-character-name">Eric.</span></h2><p>Calce suas superchuteiras.<br>Tem uma aventura esperando por você!</p>
           <div class="character-picker" id="character-picker" role="group" aria-label="Escolha seu herói">
-            <button class="character-card" data-character="eric" aria-label="Escolher Eric" aria-pressed="true"><img src="eric.png?v=10" alt="" draggable="false"><strong>Eric</strong><small>Rugido do dino</small></button>
-            <button class="character-card" data-character="daniel" aria-label="Escolher Daniel" aria-pressed="false"><img src="daniel.png?v=1" alt="" draggable="false" loading="lazy"><strong>Daniel</strong><small>Sopro do Ptero</small></button>
-            <button class="character-card" data-character="samuel" aria-label="Escolher Samuel" aria-pressed="false"><img src="samuel.png?v=1" alt="" draggable="false" loading="lazy"><strong>Samuel</strong><small>Bolha de Abraço</small></button>
+            <button class="character-card" data-character="eric" aria-label="Escolher Eric" aria-pressed="true"><img src="eric-thumb.webp?v=1" alt="" draggable="false"><strong>Eric</strong><small>Rugido do dino</small></button>
+            <button class="character-card" data-character="daniel" aria-label="Escolher Daniel" aria-pressed="false"><img src="daniel-thumb.webp?v=1" alt="" draggable="false" loading="lazy"><strong>Daniel</strong><small>Sopro do Ptero</small></button>
+            <button class="character-card" data-character="samuel" aria-label="Escolher Samuel" aria-pressed="false"><img src="samuel-thumb.webp?v=1" alt="" draggable="false" loading="lazy"><strong>Samuel</strong><small>Bolha de Abraço</small></button>
           </div>
           <button class="primary" id="start" disabled><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos correr!</button><span class="tiny"><svg width="13" height="13" aria-hidden="true"><use href="#i-touch"/></svg><span class="keyboard-hint" id="intro-keyboard-hint">Z para pular · X para rugir</span><span class="touch-hint" id="intro-touch-hint">Toque em PULAR ou RUGIR</span></span></div>
         <span class="hero-name" id="hero-name">NOSSO PEQUENO HERÓI</span>
         <span class="play-hint" id="play-hint" hidden><span class="keyboard-hint" id="play-keyboard-hint">Z pula · X ruge</span><span class="touch-hint" id="play-touch-hint">PULAR e RUGIR, um ao lado do outro</span></span>
         <div class="action-dock">
           <button class="jump-button roar-button" id="roar" aria-label="Rugir e afugentar os travessos" title="Rugir (X ou R)" hidden><svg aria-hidden="true"><use href="#i-dino"/></svg><span id="roar-label">RUGIR!</span><kbd class="desktop-key">X</kbd><small id="roar-hint">ESPANTA OS TRAVESSOS</small></button>
-          <button class="jump-button" id="jump" aria-label="PULAR" title="Pular (Z ou Espaço)" hidden><svg aria-hidden="true"><use href="#i-jump"/></svg> PULAR <kbd class="desktop-key">Z</kbd></button>
+          <button class="jump-button" id="jump" aria-label="PULAR" title="Pular (Z ou Espaço)" hidden><span id="jump-cue" hidden><svg aria-hidden="true"><use href="#i-jump"/></svg> PULE!</span><svg aria-hidden="true"><use href="#i-jump"/></svg> PULAR <kbd class="desktop-key">Z</kbd></button>
         </div>
         <div class="pause-screen" id="pause-screen" hidden><div class="pause-card"><svg width="34" height="34" style="color:#82a862" aria-hidden="true"><use href="#i-dino"/></svg><h2>Uma pausinha.</h2><p>A aventura espera por você.</p><div class="menu-actions"><button class="primary" id="resume"><svg aria-hidden="true"><use href="#i-play"/></svg> Continuar</button><button class="primary secondary" id="home"><svg aria-hidden="true"><use href="#i-home"/></svg> Voltar ao início</button></div><button class="album-link" id="pause-album" aria-label="Ver álbum de dinos"><svg aria-hidden="true"><use href="#i-album"/></svg> Ver álbum</button></div></div>
         <div class="pause-screen" id="end-screen" role="dialog" aria-modal="true" aria-labelledby="end-title" hidden><div class="pause-card end-card"><div class="end-heading-tools"><svg style="color:#dda449" aria-hidden="true"><use href="#i-star"/></svg><button class="album-link" id="end-album" aria-label="Ver álbum de dinos"><svg aria-hidden="true"><use href="#i-album"/></svg> Ver álbum</button></div><h2 id="end-title">Que aventura, Eric!</h2><p>Você brilhou. Escolha quem vem brincar agora!</p><div class="end-results"><div><small>SEUS PONTOS</small><strong id="end-score">0</strong></div><div><small>SEU RECORDE</small><strong id="end-record">0</strong></div></div>
           <div class="character-picker end-character-picker" id="end-character-picker" role="group" aria-label="Escolha o herói da próxima aventura">
-            <button class="character-card" data-character="eric" aria-label="Escolher Eric" aria-pressed="true"><img src="eric.png?v=10" alt="" draggable="false" loading="lazy"><strong>Eric</strong></button>
-            <button class="character-card" data-character="daniel" aria-label="Escolher Daniel" aria-pressed="false"><img src="daniel.png?v=1" alt="" draggable="false" loading="lazy"><strong>Daniel</strong></button>
-            <button class="character-card" data-character="samuel" aria-label="Escolher Samuel" aria-pressed="false"><img src="samuel.png?v=1" alt="" draggable="false" loading="lazy"><strong>Samuel</strong></button>
+            <button class="character-card" data-character="eric" aria-label="Escolher Eric" aria-pressed="true"><img src="eric-thumb.webp?v=1" alt="" draggable="false" loading="lazy"><strong>Eric</strong></button>
+            <button class="character-card" data-character="daniel" aria-label="Escolher Daniel" aria-pressed="false"><img src="daniel-thumb.webp?v=1" alt="" draggable="false" loading="lazy"><strong>Daniel</strong></button>
+            <button class="character-card" data-character="samuel" aria-label="Escolher Samuel" aria-pressed="false"><img src="samuel-thumb.webp?v=1" alt="" draggable="false" loading="lazy"><strong>Samuel</strong></button>
           </div>
           <div class="menu-actions"><button class="primary" id="restart"><svg aria-hidden="true"><use href="#i-play"/></svg> Vamos de novo!</button><button class="primary secondary" id="change-character"><svg aria-hidden="true"><use href="#i-dino"/></svg> Trocar personagem</button></div></div></div>
         <div class="pause-screen discovery-screen" id="album-screen" role="dialog" aria-modal="true" aria-labelledby="album-title" hidden><div class="album-card"><div class="album-heading"><h2 id="album-title">Seus amigos dinos</h2><span id="album-count">0/12</span></div><p class="album-note"><span id="album-note">Ovos surpresa: descubra e reencontre amigos!</span> · <span id="rescue-total">0 resgates</span></p><div class="pet-grid" id="pet-grid"></div><div class="album-pages" aria-label="Páginas do álbum"><button id="album-prev" aria-label="Página anterior do álbum">‹</button><span id="album-page">1 / 2</span><button id="album-next" aria-label="Próxima página do álbum">›</button></div><p id="companion-help">Escolha seu ajudante.</p><div class="album-actions"><button class="primary secondary" id="companion-none">Sem companheiro</button><button class="primary" id="album-close">Voltar ao jogo</button></div></div></div>
@@ -619,6 +649,13 @@
       {text:'DINO',icon:'dino'}, {text:'BOLA',icon:'ball'}, {text:'OVO',icon:'egg'},
       {text:'GOL',icon:'goal'}, {text:'AMIGO',icon:'heart'}
     ].map(word=>Object.freeze(word)));
+    const RAINBOW_COLORS=Object.freeze([
+      {id:'red',bit:1,color:'#f47d7a'}, {id:'blue',bit:2,color:'#72bfd0'}, {id:'yellow',bit:4,color:'#f9c85a'}
+    ].map(color=>Object.freeze(color)));
+    function rainbow(s) {
+      return {active:s.rainbow>0,remaining:s.rainbow,collected:RAINBOW_COLORS.filter(c=>s.rainbowMask & c.bit).length,
+        target:3,complete:s.rainbowMask===7,mask:s.rainbowMask,lastColor:s.rainbowLastColor};
+    }
     function word(s) { return WORDS[s.wordIndex%WORDS.length]; }
     function world(s) { return Math.floor(s.time/40)%3; }
     function create() {
@@ -629,6 +666,8 @@
         health:20, maxHealth:20, ended:false,
         goals:0, treasures:0, friends:0, stars:0, taskIndex:0, taskProgress:0,
         wordIndex:0, wordProgress:0, wordsCompleted:0, letterIn:5, wordCelebrate:0,
+        rainbow:0, rainbowIn:35, rainbowMask:0, rainbowCompleted:0, rainbowSpawnIn:0,
+        rainbowSequence:0, rainbowCelebrate:0, rainbowLastColor:null,
         eggProgress:0, festival:0, festivalKind:'balls', festivalIn:20, festivalCount:0, festivalSpawnIn:0,
         boost:0, shield:0, hurt:0, slow:0, shake:0, kick:0, roar:0,
         roarCooldown:0, roarWave:0, scared:0,
@@ -662,7 +701,7 @@
       return true;
     }
     function damage(s,slow) {
-      if(s.ended || s.festival>0 || s.rescue || s.shield>0 || s.hurt>0)return;
+      if(s.ended || s.festival>0 || s.rainbow>0 || s.rescue || s.shield>0 || s.hurt>0)return;
       s.health=Math.max(0,s.health-1);s.hurt=2;s.slow=slow;
       emit(s,'bump','OPA!',s.player.x,185);
       if(s.health===0){s.ended=true;emit(s,'finish','QUE AVENTURA!',s.player.x,230);}
@@ -773,12 +812,58 @@
     function updateWords(s,dt) {
       s.wordCelebrate=Math.max(0,s.wordCelebrate-dt);
       // Resgates e festas mantêm a letra existente, sem acrescentar outra cena.
-      if(s.festival>0 || s.rescue || s.items.some(i=>i.type==='letter' && !i.collected))return;
+      if(s.festival>0 || s.rainbow>0 || s.rescue || s.items.some(i=>i.type==='letter' && !i.collected))return;
       s.letterIn=Math.max(0,s.letterIn-dt);
       if(s.letterIn>0 || s.items.length>=28)return;
       const x=Math.max(s.width+45,s.player.x+150);
       s.items.push({type:'letter',letter:word(s).text[s.wordProgress],x,lift:94,radius:30,phase:0});
       s.letterIn=6;
+    }
+    // As cores podem chegar em qualquer ordem. Reencontrar uma cor só faz festa.
+    function collectColor(s,id) {
+      if(!s.running || s.paused || s.ended || s.rainbow<=0)return false;
+      const color=RAINBOW_COLORS.find(c=>c.id===id);
+      if(!color)return false;
+      const unique=!(s.rainbowMask & color.bit);
+      s.rainbowMask|=color.bit;s.rainbowLastColor=id;
+      emit(s,'rainbow-color','',s.player.x+30,210,{color:id,unique,collected:rainbow(s).collected,mask:s.rainbowMask});
+      if(unique && s.rainbowMask===7) {
+        s.rainbowCompleted++;s.stars++;s.health=Math.min(s.maxHealth,s.health+1);s.rainbowCelebrate=3;
+        emit(s,'rainbow-success','TODAS AS CORES!',s.player.x+60,290,{count:s.rainbowCompleted});
+      }
+      return true;
+    }
+    function updateRainbow(s,dt) {
+      s.rainbowCelebrate=Math.max(0,s.rainbowCelebrate-dt);
+      if(s.rainbow>0) {
+        s.rainbow=Math.max(0,s.rainbow-dt);
+        if(s.rainbow===0) {
+          const result=rainbow(s);s.rainbowIn=50;s.rainbowSpawnIn=0;
+          s.items=s.items.filter(i=>i.type!=='colorStar');
+          s.obstacleIn=Math.max(.9,s.obstacleIn);s.mobIn=Math.max(1.5,s.mobIn);
+          emit(s,'rainbow-end',result.complete?'PARABÉNS!':'SIGA BRINCANDO!',s.player.x+60,285,
+            {complete:result.complete,collected:result.collected});
+          return;
+        }
+      } else {
+        if(s.festival>0 || s.rescue)return;
+        s.rainbowIn=Math.max(0,s.rainbowIn-dt);
+        if(s.rainbowIn>0)return;
+        s.rainbow=12;s.rainbowMask=0;s.rainbowLastColor=null;s.rainbowSequence=0;s.rainbowSpawnIn=0;
+        // Brinquedos já ultrapassados e animações de fuga ficam; amigos continuam.
+        s.obstacles=s.obstacles.filter(o=>o.hit);s.mobs=s.mobs.filter(m=>!isEnemy(m) || m.resolved);s.slow=0;
+        emit(s,'rainbow-start','ARCO-ÍRIS DAS CORES!',s.player.x+60,300);
+      }
+      s.rainbowSpawnIn=Math.max(0,s.rainbowSpawnIn-dt);
+      if(s.rainbowSpawnIn===0) {
+        const stars=s.items.filter(i=>i.type==='colorStar' && !i.collected).length;
+        if(stars<10 && s.items.length<28) {
+          const n=s.rainbowSequence++,color=RAINBOW_COLORS[n%RAINBOW_COLORS.length];
+          s.items.push({type:'colorStar',color:color.id,x:Math.max(s.width+45,s.player.x+150),
+            lift:n%2===0?94:220,radius:30,phase:0});
+        }
+        s.rainbowSpawnIn=.8;
+      }
     }
     function rescueVisible(s) { return !!s.rescue && s.rescue.x>=0 && s.rescue.x<=s.width; }
     function completeRescue(s,reason) {
@@ -794,7 +879,7 @@
         s.rescue.x=Math.max(s.player.x+120,s.rescue.x-travel);
         s.rescue.ttl=Math.max(0,s.rescue.ttl-dt);
         if(s.rescue.ttl<=2)completeRescue(s,'helper');
-      } else if(s.festival===0) {
+      } else if(s.festival===0 && s.rainbow===0) {
         s.rescueIn=Math.max(0,s.rescueIn-dt);
         if(s.rescueIn===0) {
           const index=world(s),variant=['bubble','castle','balloon'][index];
@@ -838,6 +923,7 @@
     }
     // Uma surpresa curta, sem perigo, seguida por um tempo de corrida normal.
     function updateFestival(s,dt) {
+      if(s.rainbow>0)return;
       if(s.festival>0) {
         s.festival=Math.max(0,s.festival-dt);
         if(s.festival===0) {
@@ -877,6 +963,7 @@
       const travel=s.speed*dt;
       s.distance += travel/50;
       updateRescue(s,dt,travel);
+      updateRainbow(s,dt);
       updateWords(s,dt);
       const p=s.player;
       p.stride+=travel/27;
@@ -885,7 +972,7 @@
         p.lift -= p.vy*dt;
         if (p.lift <= 0) { p.lift=0; p.vy=0; emit(s,'land',''); }
       }
-      if(s.festival===0) {
+      if(s.festival===0 && s.rainbow===0) {
         s.spawnIn-=dt;
         if (s.spawnIn <= 0) {
           const types=['ball','fries','ball','coin','ball','fossil','fries','ball'];
@@ -954,6 +1041,7 @@
         const nearY=Math.abs(item.lift-(p.lift+88)) < 90+item.radius;
         if (!item.collected && nearX && nearY) {
           if(item.type==='letter')collectLetter(s,item.letter);
+          else if(item.type==='colorStar')collectColor(s,item.color);
           else collect(s,item.type);
           if (item.type==='ball') { item.kicked=true; item.vx=700; item.vy=-290; }
           else item.collected=true;
@@ -990,15 +1078,16 @@
       s.obstacles=s.obstacles.filter(o=>o.x > -90);
       s.mobs=s.mobs.filter(m=>m.x>-110 && (!m.fleeing || m.x<s.width+110));
     }
-    return { SHIELD_SECONDS, WORDS, word, collectLetter, create, setCharacter, setCompanion, world, restart, score, jump, collect, step, spriteFrame, pose, roarPhase, task, roar, isEnemy };
+    return { SHIELD_SECONDS, WORDS, word, collectLetter, RAINBOW_COLORS, rainbow, collectColor, create, setCharacter, setCompanion, world, restart, score, jump, collect, step, spriteFrame, pose, roarPhase, task, roar, isEnemy };
   })();
   </script>
   <script>
   (() => {
     'use strict';
     /* ================================================================
-       IMAGEM DO ERIC: coloque eric.png na MESMA pasta deste index.html.
-       Para usar outra imagem, mude SOMENTE a variável abaixo.
+       IMAGEM DO ERIC: o jogo usa eric.webp, cópia sem perdas do eric.png.
+       Para outra pose frontal, coloque eric.png na MESMA pasta e aponte
+       ERIC_IMAGE_URL para ela. As folhas de movimento são independentes.
        Exemplo: const ERIC_IMAGE_URL = 'meu-eric.png';
        Prefira PNG com fundo transparente, corpo inteiro e olhando à direita.
        Todo HTML, CSS e JavaScript está neste arquivo; as imagens são externas.
@@ -1007,9 +1096,11 @@
     let loadingUIReady=false;
     function queueCharacterImage(id,image,url,width,height,prepare) {
       const asset={image,url,width,height,prepare,status:'idle',attempt:0,timer:null};
-      characterImageLoads[id].push(asset);requestCharacterImage(asset);return asset;
+      characterImageLoads[id].push(asset);return asset;
     }
     function requestCharacterImage(asset) {
+      if(asset.status==='ready' || asset.status==='loading')return;
+      asset.image.decoding='async';asset.image.fetchPriority='high';
       clearTimeout(asset.timer);
       const attempt=++asset.attempt;asset.status='loading';
       const failed=()=>{
@@ -1034,15 +1125,23 @@
       asset.image.src=asset.url+(attempt>1?(asset.url.includes('?')?'&':'?')+'retry='+Date.now()+'-'+attempt:'');
       syncAssetLoading();
     }
+    // Apenas o herói escolhido baixa e prepara suas folhas. As imagens dos
+    // outros personagens ficam sem src, sem competir pela rede ou memória.
+    function loadCharacterImages(id) {
+      loadExtraCharacter(id);
+      for(const asset of characterImageLoads[id])if(asset.status==='idle')requestCharacterImage(asset);
+    }
     function characterImagesReady() {
       const assets=characterImageLoads[state.characterId];
       return assets.length>0 && assets.every(asset=>asset.status==='ready');
     }
     function syncCharacterPortraits(id,image) {
-      // Se a URL original falhou, a miniatura deve usar a mesma imagem
-      // recuperada e validada que o Canvas, inclusive no fim da partida.
+      // Os cartões usam cópias pequenas da mesma arte. Mantemos a miniatura
+      // saudável e usamos a pose validada apenas para recuperar um cartão quebrado.
       for(const portrait of document.querySelectorAll('[data-character="'+id+'"] img')) {
-        if(portrait.src!==image.src)portrait.src=image.src;
+        const recover=()=>{if(portrait.src!==image.src)portrait.src=image.src;};
+        portrait.onerror=recover;
+        if(portrait.complete && !portrait.naturalWidth)recover();
       }
     }
     function syncAssetLoading() {
@@ -1063,11 +1162,11 @@
         (state.ended?$('restart'):$('start')).focus({preventScroll:true});
       }
     }
-    const ERIC_IMAGE_URL = 'eric.png?v=10';
+    const ERIC_IMAGE_URL = 'eric.webp?v=10';
     // ANIMAÇÃO: oito imagens na folha eric-actions.png (4 colunas × 2 linhas).
     // 0–3 = passos; 4 = salto; 5 = chute; 6 = rugido; 7 = descanso.
     // Para usar só sua imagem estática, deixe ERIC_ACTIONS_URL = ''.
-    const ERIC_ACTIONS_URL = 'eric-actions.png?v=6';
+    const ERIC_ACTIONS_URL = 'eric-actions.webp?v=6';
     const ericActions = new Image();
     let actionsReady=false;
     // Retângulos medidos pelo alfa do PNG. Cortam as margens transparentes,
@@ -1079,7 +1178,7 @@
     if(ERIC_ACTIONS_URL)queueCharacterImage('eric',ericActions,ERIC_ACTIONS_URL,1774,887,()=>{actionsReady=true;});
     // Corrida: oito fases menores do MESMO passo. A última coluna é a
     // âncora horizontal medida pelo rosto, evitando que a cabeça salte.
-    const ERIC_RUN_URL='eric-run.png?v=7';
+    const ERIC_RUN_URL='eric-run.webp?v=7';
     const runFrames=[
       [68,1,326,443,247],[498,1,303,443,660.5],
       [934,1,311,443,1104],[1386,1,303,443,1548.5],
@@ -1099,13 +1198,13 @@
     queueCharacterImage('eric',ericRun,ERIC_RUN_URL,1774,887,()=>{runSprites=runFrames.map(f=>isolateSprite(ericRun,f));runReady=true;});
     // Rugido separado: expressão e garras inspiradas na referência original.
     // Mantém também a pose estática de reserva preparada antes da partida.
-    const ERIC_ROAR_URL='eric-roar.png?v=7';
+    const ERIC_ROAR_URL='eric-roar.webp?v=7';
     const roarFrame=[110,11,1031,1273];
     const ericRoar=new Image();let roarReady=false;
     queueCharacterImage('eric',ericRoar,ERIC_ROAR_URL,1199,1312,()=>{roarReady=true;});
     // Preparação → força → rugido → relaxar. Os dois últimos valores
     // medem o centro e a largura do rosto para manter a mesma câmera.
-    const ERIC_ROAR_ACTIONS_URL='eric-roar-actions.png?v=9';
+    const ERIC_ROAR_ACTIONS_URL='eric-roar-actions.webp?v=9';
     const roarFrames=[
       [112,9,367,503,309.5,106],[581,10,381,501,785.5,106],
       [1056,13,405,497,1271.5,110],[83,514,429,503,313,115],
@@ -1133,8 +1232,8 @@
     const EXTRA_CHARACTER_FRAMES = {"daniel":{"run":{"file":"daniel-run.png","width":1774,"height":887,"columns":4,"rows":2,"frames":[{"x":107,"y":11,"width":267,"height":430,"sole":441,"headX":276.0,"headWidth":144,"index":0},{"x":529,"y":11,"width":255,"height":429,"sole":440,"headX":683.0,"headWidth":144,"index":1},{"x":962,"y":10,"width":260,"height":428,"sole":438,"headX":1117.0,"headWidth":144,"index":2},{"x":1384,"y":10,"width":277,"height":427,"sole":437,"headX":1551.5,"headWidth":145,"index":3},{"x":107,"y":451,"width":275,"height":426,"sole":877,"headX":269.5,"headWidth":145,"index":4},{"x":529,"y":451,"width":253,"height":427,"sole":878,"headX":696.0,"headWidth":146,"index":5},{"x":969,"y":451,"width":260,"height":427,"sole":878,"headX":1132.5,"headWidth":145,"index":6},{"x":1408,"y":452,"width":292,"height":420,"sole":872,"headX":1576.5,"headWidth":143,"index":7}]},"actions":{"file":"daniel-actions.png","width":1536,"height":1024,"columns":3,"rows":2,"frames":[{"x":140,"y":15,"width":335,"height":494,"sole":509,"headX":361.0,"headWidth":166,"index":0},{"x":590,"y":9,"width":354,"height":466,"sole":475,"headX":758.5,"headWidth":169,"index":1},{"x":1024,"y":9,"width":369,"height":499,"sole":508,"headX":1212.0,"headWidth":168,"index":2},{"x":129,"y":512,"width":352,"height":495,"sole":1007,"headX":344.5,"headWidth":167,"index":3},{"x":581,"y":512,"width":397,"height":495,"sole":1007,"headX":745.5,"headWidth":163,"index":4},{"x":1065,"y":518,"width":306,"height":489,"sole":1007,"headX":1224.5,"headWidth":161,"index":5}]},"special":{"file":"daniel-special.png","width":1536,"height":1024,"columns":3,"rows":2,"frames":[{"x":88,"y":6,"width":320,"height":499,"sole":505,"headX":255.5,"headWidth":161,"index":0},{"x":595,"y":5,"width":348,"height":504,"sole":509,"headX":756.0,"headWidth":164,"index":1},{"x":1072,"y":6,"width":355,"height":504,"sole":510,"headX":1247.0,"headWidth":162,"index":2},{"x":51,"y":509,"width":398,"height":507,"sole":1016,"headX":260.5,"headWidth":169,"index":3},{"x":588,"y":512,"width":350,"height":500,"sole":1012,"headX":769.0,"headWidth":168,"index":4},{"x":1095,"y":512,"width":325,"height":501,"sole":1013,"headX":1261.5,"headWidth":163,"index":5}]},"standing":{"file":"daniel.png","x":18,"y":25,"width":939,"height":1428,"sole":1453,"headX":544,"headWidth":434,"sourceWidth":1024,"sourceHeight":1536}},"samuel":{"run":{"file":"samuel-run.png","width":1774,"height":887,"columns":4,"rows":2,"frames":[{"x":107,"y":7,"width":273,"height":435,"sole":442,"headX":263.5,"headWidth":231,"index":0},{"x":527,"y":7,"width":254,"height":434,"sole":441,"headX":666.5,"headWidth":227,"index":1},{"x":932,"y":5,"width":265,"height":437,"sole":442,"headX":1080.5,"headWidth":229,"index":2},{"x":1331,"y":7,"width":268,"height":430,"sole":437,"headX":1480.5,"headWidth":233,"index":3},{"x":116,"y":449,"width":266,"height":430,"sole":879,"headX":264.0,"headWidth":230,"index":4},{"x":521,"y":449,"width":260,"height":430,"sole":879,"headX":664.5,"headWidth":229,"index":5},{"x":928,"y":447,"width":270,"height":432,"sole":879,"headX":1081.5,"headWidth":231,"index":6},{"x":1352,"y":445,"width":274,"height":434,"sole":879,"headX":1507.0,"headWidth":234,"index":7}]},"actions":{"file":"samuel-actions.png","width":1536,"height":1024,"columns":3,"rows":2,"frames":[{"x":155,"y":12,"width":368,"height":491,"sole":503,"headX":390.5,"headWidth":265,"index":0},{"x":590,"y":5,"width":354,"height":483,"sole":488,"headX":762.0,"headWidth":254,"index":1},{"x":1065,"y":22,"width":346,"height":482,"sole":504,"headX":1271.5,"headWidth":263,"index":2},{"x":130,"y":511,"width":341,"height":496,"sole":1007,"headX":327.0,"headWidth":252,"index":3},{"x":583,"y":511,"width":397,"height":494,"sole":1005,"headX":759.0,"headWidth":254,"index":4},{"x":1101,"y":511,"width":326,"height":500,"sole":1011,"headX":1284.0,"headWidth":260,"index":5}]},"special":{"file":"samuel-special.png","width":1536,"height":1024,"columns":3,"rows":2,"frames":[{"x":114,"y":4,"width":301,"height":503,"sole":507,"headX":274.5,"headWidth":247,"index":0},{"x":622,"y":1,"width":283,"height":505,"sole":506,"headX":763.5,"headWidth":249,"index":1},{"x":1104,"y":2,"width":318,"height":505,"sole":507,"headX":1252.5,"headWidth":253,"index":2},{"x":104,"y":513,"width":374,"height":504,"sole":1017,"headX":276.5,"headWidth":263,"index":3},{"x":603,"y":514,"width":303,"height":503,"sole":1017,"headX":761.0,"headWidth":260,"index":4},{"x":1095,"y":514,"width":304,"height":504,"sole":1018,"headX":1253.0,"headWidth":256,"index":5}]},"standing":{"file":"samuel.png","x":50,"y":27,"width":911,"height":1419,"sole":1446,"headX":500,"headWidth":606,"sourceWidth":1024,"sourceHeight":1536}}}; // CHARACTER_FRAMES_EMBED
     const characters={
       eric:{name:'Eric',playSize:190,color:'#6fa468',button:'RUGIR!',verb:'rugir',short:'ruge',icon:'#i-dino',hint:'ESPANTA OS TRAVESSOS',special:'Rugido do dino'},
-      daniel:{name:'Daniel',playSize:194,color:'#378eae',button:'SOPRAR!',verb:'soprar',short:'sopra',icon:'#i-wind',hint:'SOPRA E ATRAI TESOUROS',special:'Sopro do Ptero',file:'daniel.png?v=1'},
-      samuel:{name:'Samuel',playSize:156,color:'#9c78bd',button:'BOLHAS!',verb:'criar bolhas',short:'faz bolhas',icon:'#i-bubbles',hint:'UM ABRAÇO PROTETOR',special:'Bolha de Abraço',file:'samuel.png?v=1'}
+      daniel:{name:'Daniel',playSize:194,color:'#378eae',button:'SOPRAR!',verb:'soprar',short:'sopra',icon:'#i-wind',hint:'SOPRA E ATRAI TESOUROS',special:'Sopro do Ptero',file:'daniel.webp?v=1'},
+      samuel:{name:'Samuel',playSize:156,color:'#9c78bd',button:'BOLHAS!',verb:'criar bolhas',short:'faz bolhas',icon:'#i-bubbles',hint:'UM ABRAÇO PROTETOR',special:'Bolha de Abraço',file:'samuel.webp?v=1'}
     };
     const CHARACTER_KEY='eric-runner-character-v1';
     const extras={};
@@ -1160,7 +1259,7 @@
       for(const name of ['run','actions','special']) {
         const manifest=manifests[name];if(!manifest?.frames?.length)continue;
         const atlas=entry.atlases[name]={manifest,image:new Image(),ready:false,sprites:[]};
-        queueCharacterImage(id,atlas.image,manifest.file+'?v=1',manifest.width,manifest.height,()=>{
+        queueCharacterImage(id,atlas.image,manifest.file.replace(/\.png$/,'.webp')+'?v=1',manifest.width,manifest.height,()=>{
           atlas.sprites=manifest.frames.map(f=>isolateSprite(atlas.image,[f.x,f.y,f.width,f.height]));atlas.ready=true;
         });
       }
@@ -1341,14 +1440,14 @@
     }
     function selectCharacter(id,persist=true) {
       if(!characters[id] || !engine.setCharacter(state,id))return false;
-      loadExtraCharacter(id);syncCharacterUI();syncAssetLoading();
+      loadCharacterImages(id);syncCharacterUI();syncAssetLoading();
       if(persist)try{localStorage.setItem(CHARACTER_KEY,id);}catch(_){}
       draw();return true;
     }
     let savedCharacter='eric';
     try {const saved=localStorage.getItem(CHARACTER_KEY);if(Object.hasOwn(characters,saved))savedCharacter=saved;}catch(_){}
     // Não desenha antes da primeira medição do Canvas; apenas inicia os assets escolhidos.
-    engine.setCharacter(state,savedCharacter);loadExtraCharacter(savedCharacter);syncCharacterUI();
+    engine.setCharacter(state,savedCharacter);loadCharacterImages(savedCharacter);syncCharacterUI();
     loadingUIReady=true;syncAssetLoading();
     $('loading-retry').addEventListener('click',()=>{
       for(const asset of characterImageLoads[state.characterId])if(asset.status==='error')requestCharacterImage(asset);
@@ -1471,6 +1570,7 @@
       if (kind==='rescue-success') [659,784,1047].forEach((f,i)=>tone(f,.25,i*.1,'sine',f,.03));
       if (kind==='letter') tone(784,.18,0,'sine',1047,.025);
       if (kind==='word') [523,659,784,1047].forEach((f,i)=>tone(f,.28,i*.09,'triangle',f,.028));
+      if (kind==='rainbow-start' || kind==='rainbow-success') [523,659,784].forEach((f,i)=>tone(f,.22,i*.12,'sine',f,.028));
       if (kind==='companion') {
         if(globalThis.DinoAlbum.CATALOG.find(p=>p.id===state.companionId)?.ability==='pipo')sample('roar',.18);
         else {tone(880,.18,0,'sine',1047,.025);tone(1319,.2,.1,'sine',1319,.018);}
@@ -1497,7 +1597,9 @@
       // No celular a pista termina acima dos controles, sem esconder os brinquedos.
       // Toda arte usa este chão; a física continua medindo a altura do salto.
       const mobileControls=touchDevice.matches && !portraitPhone.matches;
-      const reserve=mobileControls?Math.max(104,(parseFloat(getComputedStyle(document.querySelector('.action-dock')).bottom)||12)+90):104;
+      const dock=document.querySelector('.action-dock');
+      const controlsHeight=dock.getBoundingClientRect().height || parseFloat(getComputedStyle($('jump')).height) || 76;
+      const reserve=mobileControls?(parseFloat(getComputedStyle(dock).bottom)||12)+controlsHeight+16:104;
       ground=mobileControls?Math.min(436,H*(rect.height-reserve)/rect.height):436;
       const pixelWidth=Math.round(rect.width*dpr),pixelHeight=Math.round(rect.height*dpr);
       if(canvas.width!==pixelWidth)canvas.width=pixelWidth;
@@ -1853,6 +1955,18 @@
       ctx.fillStyle='#76508e';ctx.font='bold 31px "Trebuchet MS",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(item.letter,0,1);
       star(28,-24,5,'#fff7d5',.3);ctx.restore();
     }
+    function colorStar(item,y) {
+      const color=engine.RAINBOW_COLORS.find(c=>c.id===item.color);
+      if(!color)return;
+      ctx.save();ctx.translate(item.x,y);ctx.rotate(reducedMotion?0:Math.sin(ambient*3+item.phase)*.07);
+      ellipse(0,2,36,36,'#fffef033');
+      star(0,0,33,color.color);ctx.strokeStyle='#876576';ctx.lineWidth=2.4;ctx.stroke();
+      ellipse(-10,-7,2.8,3.3,'#70546a');ellipse(10,-7,2.8,3.3,'#70546a');
+      ellipse(-11,-8,1,1,'#fffef0');ellipse(9,-8,1,1,'#fffef0');
+      ctx.strokeStyle='#70546a';ctx.lineWidth=1.8;ctx.beginPath();ctx.arc(0,-2,6.5,.25,Math.PI-.25);ctx.stroke();
+      ctx.fillStyle='#fffef0';ctx.font='bold 12px "Trebuchet MS",sans-serif';ctx.textAlign='center';ctx.fillText({red:'●',blue:'◆',yellow:'★'}[item.color],0,20);
+      ellipse(-8,-19,5,2,'#fffef07a');ctx.restore();
+    }
     function rabbit(a) {
       const bounce=reducedMotion?0:Math.abs(Math.sin(a.phase))*6,wave=a.celebrate>0?Math.sin(a.phase*2)*.55:0;
       ctx.save();ctx.translate(a.x,(a.y??ground)-3-bounce);ctx.scale(a.scale??1,a.scale??1);
@@ -2033,7 +2147,7 @@
       saveDiscoveries();
       while(state.events.length) {
         const event=state.events.shift();playSound(event.type);
-        if(event.text && !['world','rescue-start','companion','letter','word'].includes(event.type)) {
+        if(event.text && !event.type.startsWith('rainbow-') && !['world','rescue-start','companion','letter','word'].includes(event.type)) {
           const special=['roar','wind','bubble'].includes(event.type);
           if(special)bubbles=bubbles.filter(b=>b.kind!=='jump' && b.kind!=='charge');
           bubbles.push({text:event.text,x:event.x,y:ground-event.lift,life:special?1.7:1.15,full:special?1.7:1.15,kind:event.type});
@@ -2052,6 +2166,14 @@
         if(event.type==='world' || event.type==='rescue-start' || event.type==='companion')$('announcement').textContent=event.text;
         if(event.type==='letter'){$('announcement').textContent='Letra '+event.text;burst(event.x,ground-94,10);}
         if(event.type==='word'){lastWord={text:event.word,icon:event.icon};$('announcement').textContent='Você formou '+event.word+'!';burst(state.player.x+100,ground-165,38);}
+        if(event.type==='rainbow-start'){$('announcement').textContent='Ache uma estrela vermelha, uma azul e uma amarela!';burst(W*.65,ground-165,20);}
+        if(event.type==='rainbow-color') {
+          const name={red:'Vermelho',blue:'Azul',yellow:'Amarelo'}[event.color];
+          tone({red:523,blue:659,yellow:784}[event.color],.16,0,'sine',undefined,event.unique?.027:.012);
+          if(event.unique){$('announcement').textContent=name+' encontrado!';burst(event.x,ground-94,9);}
+        }
+        if(event.type==='rainbow-success'){$('announcement').textContent='Todas as cores! Uma estrela e um coração para você.';burst(state.player.x+100,ground-155,38);}
+        if(event.type==='rainbow-end')$('announcement').textContent=event.complete?'Você brilhou! Vamos continuar.':'Vamos continuar brincando!';
         if(event.type==='companion')burst(state.player.x-85,ground-65,9);
         if(event.type==='rescue-success') {
           rescueCelebration={id:event.petId,x:event.x,start:state.time};
@@ -2149,7 +2271,7 @@
       if(state.characterId!=='eric'){drawExtraCharacter(size);ctx.restore();return;}
       const index=engine.spriteFrame(state);
       if(index===7 && imageReady) {
-        // Usar diretamente o PNG aprovado evita reinterpretar o rosto
+        // Usar a cópia sem perdas da pose aprovada evita reinterpretar o rosto
         // pela pose de descanso da folha de animação.
         const f=standingFrame,scale=size/f[3];
         ctx.drawImage(ericImage,f[0],f[1],f[2],f[3],(f[0]-f[4])*scale,-size,f[2]*scale,size);
@@ -2292,7 +2414,7 @@
       for(const item of state.items) {
         const y=ground-item.lift+(item.type!=='ball'?Math.sin(ambient*3+item.phase)*5:0);
         if(item.type==='ball')ball(item.x,y,item.radius,item.kicked?item.angle:state.time*1.8);
-        else {ellipse(item.x,y+42,18,4,'#68804413');if(item.type==='fries')fries(item.x,y,.85);else if(item.type==='letter')letterToken(item,y);else fossil(item.x,y,item.type==='coin');}
+        else {ellipse(item.x,y+42,18,4,'#68804413');if(item.type==='fries')fries(item.x,y,.85);else if(item.type==='letter')letterToken(item,y);else if(item.type==='colorStar')colorStar(item,y);else fossil(item.x,y,item.type==='coin');}
       }
       for(const p of particles) {
         ctx.save();ctx.globalAlpha=Math.max(0,p.life/p.full);ctx.translate(p.x,p.y);ctx.rotate(p.rotation);
@@ -2325,8 +2447,19 @@
       }
       const modal=!!discoveryDialog(),playing=state.running && !state.ended && !state.paused && !modal;
       const theme=worlds[engine.world(state)];stage.dataset.world=theme.id;
+      const colors=engine.rainbow(state);
+      // Um objetivo de cada vez: a missão volta sem perder progresso, e as
+      // estrelas de salto ficam visíveis também nas telas mais baixas.
+      $('mission').hidden=!state.running || colors.active;
+      $('rainbow-panel').hidden=!(playing && colors.active);
+      $('rainbow-title').textContent=colors.complete?'Todas as cores!':'ACHE AS 3 CORES';
+      for(const color of engine.RAINBOW_COLORS) {
+        const dot=$('rainbow-panel').querySelector('[data-color="'+color.id+'"]'),found=!!(colors.mask & color.bit);
+        dot.classList.toggle('done',found);
+        dot.setAttribute('aria-label',({red:'Vermelho',blue:'Azul',yellow:'Amarelo'})[color.id]+(found?': encontrado':': encontre esta cor'));
+      }
       $('journey-name').textContent=theme.name;$('journey-symbol').textContent=theme.symbol;
-      $('journey-banner').hidden=!(playing && state.time>=40 && state.time%40<3 && !state.rescue && state.festival<=0);
+      $('journey-banner').hidden=!(playing && state.time>=40 && state.time%40<3 && !state.rescue && state.festival<=0 && !colors.active);
       $('rescue-banner').hidden=!(playing && state.rescue);
       const rescue=state.rescue,jumpRescue=rescue?.variant!=='bubble';
       if(rescue) {
@@ -2342,7 +2475,7 @@
       $('jump').classList.toggle('jump-cue',!!nextHazard);
       $('jump-cue').hidden=!nextHazard;
       const word=engine.word(state),wordMark=state.wordIndex+':'+state.wordProgress;
-      $('word-panel').hidden=!playing || !!rescue;
+      $('word-panel').hidden=!playing || !!rescue || colors.active;
       $('word-panel').dataset.nextLetter=word.text[state.wordProgress];
       $('word-panel').setAttribute('aria-label','Forme '+word.text+'. Próxima letra: '+word.text[state.wordProgress]);
       if(wordMark!==wordSignature) {
@@ -2351,7 +2484,7 @@
         $('word-symbol').setAttribute('href',symbol);
         $('word-letters').innerHTML=Array.from(word.text,(letter,i)=>'<span class="word-letter '+(i<state.wordProgress?'done':i===state.wordProgress?'next':'')+'">'+letter+'</span>').join('');
       }
-      $('word-celebration').hidden=!(playing && state.wordCelebrate>0 && lastWord && !rescue);
+      $('word-celebration').hidden=!(playing && state.wordCelebrate>0 && lastWord && !rescue && !colors.active);
       if(lastWord)$('word-celebration').textContent='★ '+lastWord.text+'!  +1 ♥';
       if(!$('word-celebration').hidden)$('journey-banner').hidden=true;
       $('festival-banner').hidden=state.festival<=0 || !!rescue || !playing;

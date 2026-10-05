@@ -29,7 +29,7 @@ async function open(page, saved) {
 async function quiet(page) {
   await page.evaluate(()=>{
     const s=__state;s.items=[];s.mobs=[];s.obstacles=[];
-    s.spawnIn=s.mobIn=s.obstacleIn=s.festivalIn=s.rescueIn=s.letterIn=Infinity;
+    s.spawnIn=s.mobIn=s.obstacleIn=s.festivalIn=s.rescueIn=s.letterIn=s.rainbowIn=Infinity;
     s.festival=0;s.rescue=null;s.shield=s.hurt=0;s.companionCooldown=Infinity;
   });
 }

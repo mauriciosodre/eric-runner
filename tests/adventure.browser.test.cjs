@@ -55,7 +55,7 @@ async function quiet(page, disableFestivals = true) {
   await page.evaluate(disableFestivals => {
     const s = __adventureState;
     s.items = []; s.mobs = []; s.obstacles = [];
-    s.spawnIn = s.mobIn = s.obstacleIn = s.letterIn = Infinity;
+    s.spawnIn = s.mobIn = s.obstacleIn = s.letterIn = s.rainbowIn = Infinity;
     if (disableFestivals) s.festivalIn = Infinity;
     s.shield = s.hurt = 0;
   }, disableFestivals);

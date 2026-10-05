@@ -17,7 +17,7 @@ async function server() {
     if (!filename.startsWith(root + path.sep) || !fs.existsSync(filename) || !fs.statSync(filename).isFile()) {
       res.writeHead(404); res.end(); return;
     }
-    res.writeHead(200, { 'Content-Type': filename.endsWith('.png') ? 'image/png' : 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+    res.writeHead(200, { 'Content-Type': filename.endsWith('.webp') ? 'image/webp' : filename.endsWith('.png') ? 'image/png' : 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
     res.end(fs.readFileSync(filename));
   });
   await new Promise(resolve => app.listen(0, '127.0.0.1', resolve));
@@ -30,7 +30,7 @@ async function observe(page, character = 'eric') {
     const originals = new WeakMap();
     const draw = CanvasRenderingContext2D.prototype.drawImage;
     CanvasRenderingContext2D.prototype.drawImage = function(image, ...args) {
-      const asset = image.src?.split('?')[0].split('/').pop() || originals.get(image);
+      const asset = image.src?.split('?')[0].split('/').pop().replace(/\.webp$/,'.png') || originals.get(image);
       if (asset && /^(eric|daniel|samuel)(-|\.)/.test(asset)) {
         if (this.canvas.id === 'game') {
           __loadingDraws.push({ asset, running: !!globalThis.__loadingState?.running });
@@ -47,13 +47,13 @@ async function observe(page, character = 'eric') {
     } });
   }, character);
 }
-function basename(route) { return new URL(route.request().url()).pathname.split('/').pop(); }
+function basename(route) { return new URL(route.request().url()).pathname.split('/').pop().replace(/\.webp$/,'.png'); }
 async function holdAssets(page, names) {
   const gates = new Map(names.map(name => {
     let release;
     return [name, { requested: 0, released: false, wait: new Promise(resolve => { release = resolve; }), release: () => release() }];
   }));
-  await page.route('**/*.png*', async route => {
+  await page.route(/\.(?:png|webp)(?:\?|$)/, async route => {
     const gate = gates.get(basename(route));
     if (gate && !gate.released) { gate.requested++; await gate.wait; }
     try { await route.continue(); } catch (_) {}
@@ -121,7 +121,7 @@ async function delayedDecode(browser, url) {
     globalThis.__loadingDecodeReleases = [];
     HTMLImageElement.prototype.decode = function(...args) {
       const pending = decode.apply(this, args);
-      if (!this.src.split('?')[0].endsWith('/eric-run.png')) return pending;
+      if (!/\/eric-run\.(?:png|webp)$/.test(this.src.split('?')[0])) return pending;
       return pending.then(() => new Promise(resolve => { __loadingDecodeReleases.push(resolve); }));
     };
   });
@@ -148,7 +148,7 @@ async function retryFailure(browser, url, kind) {
     globalThis.__loadingDimensionChecks = [];
     HTMLImageElement.prototype.decode = function(...args) {
       return decode.apply(this, args).then(result => {
-        if (this.src.split('?')[0].endsWith('/eric-run.png')) __loadingDimensionChecks.push([this.naturalWidth, this.naturalHeight]);
+        if (/\/eric-run\.(?:png|webp)$/.test(this.src.split('?')[0])) __loadingDimensionChecks.push([this.naturalWidth, this.naturalHeight]);
         return result;
       });
     };
@@ -158,14 +158,14 @@ async function retryFailure(browser, url, kind) {
     globalThis.__failedLoadingDecode = false;
     HTMLImageElement.prototype.decode = function(...args) {
       return decode.apply(this, args).then(result => {
-        if (!__failedLoadingDecode && this.src.split('?')[0].endsWith('/eric-run.png')) {
+        if (!__failedLoadingDecode && /\/eric-run\.(?:png|webp)$/.test(this.src.split('?')[0])) {
           __failedLoadingDecode = true; throw new Error('Falha de decodificação simulada');
         }
         return result;
       });
     };
   });
-  await page.route('**/*.png*', async route => {
+  await page.route(/\.(?:png|webp)(?:\?|$)/, async route => {
     const name = basename(route), count = (attempts.get(name) || 0) + 1;
     attempts.set(name, count);
     if (name === 'eric-run.png' && count === 1) {
@@ -223,7 +223,7 @@ async function delayedCharacter(browser, url, id) {
     await assertWaiting(page, `${id}: especial ainda pendente mantém a espera`);
     gates.release(`${id}-special.png`); await startReady(page);
     await page.waitForFunction(character => __loadingDraws.some(d => d.asset === character + '-run.png' && d.running), id);
-    assert.ok(gates.requested('eric-run.png') > 0, 'Eric permanece com uma folha atrasada durante o teste');
+    assert.equal(gates.requested('eric-run.png'), 0, 'folha do Eric não disputa a rede com o personagem escolhido');
     assert.equal(await running(page), true, 'um herói não escolhido com folha atrasada não bloqueia o escolhido');
     await page.evaluate(() => RunnerEngine.roar(__loadingState));
     await page.waitForFunction(character => __loadingDraws.some(d => d.asset === character + '-special.png' && d.running), id);
@@ -280,9 +280,9 @@ async function mobileLoading(browser, url) {
 async function recoveredCharacterCards(browser, url) {
   const page = await browser.newPage(); await observe(page);
   let originalFailures = 0, successfulRetries = 0;
-  await page.route('**/*.png*', async route => {
+  await page.route(/\.(?:png|webp)(?:\?|$)/, async route => {
     const resource = new URL(route.request().url());
-    if (basename(route) === 'eric.png') {
+    if (['eric.png','eric-thumb.png'].includes(basename(route))) {
       if (!resource.searchParams.has('retry')) { originalFailures++; await route.abort('failed'); return; }
       successfulRetries++;
     }

@@ -22,7 +22,7 @@ async function instrument(page, saved) {
     const draw = CanvasRenderingContext2D.prototype.drawImage;
     CanvasRenderingContext2D.prototype.drawImage = function(image, ...a) {
       const prior = originals.get(image);
-      const asset = image.src?.split('?')[0].split('/').pop() || prior?.asset;
+      const asset = (image.src?.split('?')[0].split('/').pop() || prior?.asset)?.replace(/\.webp$/,'.png');
       if (asset && /^(eric|daniel|samuel)(-|\.)/.test(asset) && a.length === 8) {
         if (!frames && /^(daniel|samuel)-/.test(asset)) {
           const script = [...document.scripts].find(s => s.textContent.includes('CHARACTER_FRAMES_EMBED'));
@@ -251,7 +251,8 @@ async function verifyAllPoses(page, id) {
     await mobile.close();
 
     const fallback = await browser.newPage(); await instrument(fallback, 'daniel');
-    await fallback.route('**/daniel*.png*', route => route.abort());
+    const danielAssets=/\/daniel[^/]*\.(?:png|webp)(?:\?|$)/;
+    await fallback.route(danielAssets, route => route.abort());
     await fallback.goto(url); await fallback.waitForFunction(() => !!globalThis.__characterState);
     await fallback.waitForTimeout(250);
     assert.equal(await fallback.evaluate(() => __characterState.characterId), 'daniel');
@@ -260,7 +261,7 @@ async function verifyAllPoses(page, id) {
     assert.ok(await fallback.locator('#start').isDisabled(), 'imagens ausentes mantêm a partida bloqueada');
     await fallback.keyboard.press('z');
     assert.equal(await fallback.evaluate(() => __characterState.running), false, 'teclado também aguarda o personagem completo');
-    await fallback.unroute('**/daniel*.png*');
+    await fallback.unroute(danielAssets);
     await fallback.locator('#loading-retry').click();
     await fallback.getByRole('button', { name: 'Vamos correr!', exact: true }).click(); await fallback.waitForTimeout(160);
     assert.ok(await fallback.evaluate(() => __characterState.time > 0), 'nova tentativa carrega Daniel e libera a aventura');

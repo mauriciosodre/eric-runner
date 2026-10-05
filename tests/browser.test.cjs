@@ -42,7 +42,7 @@ async function observe(page) {
     const atlasBuffers=new WeakMap(),edges=new Map();
     CanvasRenderingContext2D.prototype.drawImage=function(image,...args) {
       let info=atlasBuffers.get(image);
-      const asset=image.src?.split('?')[0].split('/').pop() || info?.asset;
+      const asset=(image.src?.split('?')[0].split('/').pop() || info?.asset)?.replace(/\.webp$/,'.png');
       if(['eric.png','eric-actions.png','eric-run.png','eric-roar.png','eric-roar-actions.png'].includes(asset) && args.length===8) {
         const transform=this.getTransform();
         if(!info) {
@@ -357,7 +357,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     assert.ok(roarBounds.x+roarBounds.width<jumpBounds.x,'botões separados no celular pequeno em landscape');
     const controlGap=jumpBounds.x-(roarBounds.x+roarBounds.width);
     assert.ok(controlGap>=8 && controlGap<=18,'botões vizinhos, com espaço para não tocar no outro sem querer');
-    assert.ok(roarBounds.height>=74 && jumpBounds.height>=74,'botões maiores para os dedinhos');
+    assert.ok(roarBounds.height>=62 && jumpBounds.height>=62 && roarBounds.height<=66 && jumpBounds.height<=66,'botões adaptados à altura do celular pequeno, com alvos grandes');
     const compactStage=await mobile.locator('#stage').boundingBox();
     assert.ok(compactStage.width===667 && compactStage.height===320);
     await mobile.screenshot({path:path.join(output,'mobile-landscape-small.png')});
@@ -398,7 +398,7 @@ const url = process.env.GAME_URL || pathToFileURL(path.join(__dirname, '..', 'in
     await pointerStart.waitForTimeout(200);
     assert.equal(await pointerStart.evaluate(()=>document.fullscreenElement?.id),'stage','toque inicial no cenário também entra em tela cheia');
     await pointerStart.close();
-    console.log('PASS:',url,'; dano após escudo breve; Z pula e X ruge; controles vizinhos de 76px; tela cheia real; 20 corações; fim e reinício; recorde no reload; storage bloqueado; corrida e rugido; landscape 844×390 e 667×320; nenhum erro de JavaScript.');
+    console.log('PASS:',url,'; dano após escudo breve; Z pula e X ruge; controles vizinhos adaptados ao celular; tela cheia real; 20 corações; fim e reinício; recorde no reload; storage bloqueado; corrida e rugido; landscape 844×390 e 667×320; nenhum erro de JavaScript.');
     console.log('Capturas:', output);
   } finally { await browser.close(); }
 })().catch(e => { console.error(e); process.exitCode = 1; });

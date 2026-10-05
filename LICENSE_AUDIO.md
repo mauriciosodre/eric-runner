@@ -40,4 +40,6 @@ mantendo o trecho completo e a velocidade natural.
 As notas musicais, a mola do pulo, o vento do turbo, o vento do Sopro do Ptero
 do Daniel e os sons leves das bolhas do Samuel são gerados pelo JavaScript
 do jogo e não utilizam gravações de terceiros. Coletar letras e completar
-palavras usa notas suaves geradas pela mesma síntese.
+palavras usa notas suaves geradas pela mesma síntese. A brincadeira do
+Arco-íris das cores também usa notas e uma pequena sequência original,
+sem novas gravações externas.
