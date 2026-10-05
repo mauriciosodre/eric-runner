@@ -32,11 +32,12 @@ O rugido acompanha os especiais dos três personagens. Daniel e Samuel usam
 provisoriamente a mesma gravação do Eric, inteira e na velocidade natural,
 até a inclusão de vozes próprias.
 
-Pipo também usa essa gravação no seu Rugidinho, com volume menor,
+Pipo e Fifi também usam essa gravação no Rugidinho, com volume menor,
 mantendo o trecho completo e a velocidade natural.
 
 ## Síntese original do jogo
 
 As notas musicais, a mola do pulo, o vento do turbo, o vento do Sopro do Ptero
 do Daniel e os sons leves das bolhas do Samuel são gerados pelo JavaScript
-do jogo e não utilizam gravações de terceiros.
+do jogo e não utilizam gravações de terceiros. Coletar letras e completar
+palavras usa notas suaves geradas pela mesma síntese.

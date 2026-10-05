@@ -18,6 +18,16 @@ async function observe(page, saved = {}, blocked = false) {
     } else {
       try { for (const [key, value] of Object.entries(saved)) localStorage.setItem(key, value); } catch (_) {}
     }
+    // A fixture escolhe os seis amigos da primeira página pelo RNG público.
+    // A quantidade carregada do álbum mantém a sequência após recarregar.
+    let albumModel;
+    Object.defineProperty(globalThis, 'DinoAlbum', { configurable: true, get: () => albumModel, set(value) {
+      albumModel = Object.freeze({ ...value, create(storage) {
+        let album;
+        album = value.create(storage, () => (album.unlocked.length + .25) / value.CATALOG.length);
+        return album;
+      }});
+    }});
     globalThis.__freezeAdventure = true;
     globalThis.__holdAdventureFrame = false;
     const requestFrame = requestAnimationFrame, heldFrames = [];
@@ -45,7 +55,7 @@ async function quiet(page, disableFestivals = true) {
   await page.evaluate(disableFestivals => {
     const s = __adventureState;
     s.items = []; s.mobs = []; s.obstacles = [];
-    s.spawnIn = s.mobIn = s.obstacleIn = Infinity;
+    s.spawnIn = s.mobIn = s.obstacleIn = s.letterIn = Infinity;
     if (disableFestivals) s.festivalIn = Infinity;
     s.shield = s.hurt = 0;
   }, disableFestivals);
@@ -61,8 +71,8 @@ async function verifyInitialAlbum(page) {
   assert.equal(await page.locator('#album').count(), 1, 'há uma porta para o álbum desde o início');
   await page.getByRole('button', { name: 'Abrir álbum de dinos', exact: true }).click();
   assert.equal(await page.locator('#album-screen').isVisible(), true, 'o álbum abre sobre a seleção de herói');
-  assert.match(await page.locator('#album-count').textContent(), /0\s*\/\s*6/, 'a família começa com seis descobertas disponíveis');
-  assert.equal(await page.locator('#album-screen button[data-pet]:disabled').count(), 6, 'dinos ainda não encontrados ficam bloqueados');
+  assert.match(await page.locator('#album-count').textContent(), /0\s*\/\s*12/, 'a família começa com doze descobertas disponíveis');
+  assert.equal(await page.locator('#album-screen button[data-pet]:disabled').count(), 6, 'os seis dinos visíveis da primeira página ficam bloqueados');
   await page.keyboard.press('z');
   assert.equal(await page.evaluate(() => __adventureState.running), false, 'o atalho de pulo não começa a corrida atrás do álbum');
   assert.match(await page.locator('#album-close').textContent(), /Voltar ao início/);
@@ -152,7 +162,7 @@ async function verifyCollection(page) {
   assert.equal((await readAlbum(page)).selected, 'pipo', 'Continuar preserva o companheiro que já brincava');
   for (const name of ['Tico', 'Bubi', 'Nino', 'Zazu']) await hatch(page, name);
   await page.getByRole('button', { name: 'Abrir álbum de dinos', exact: true }).click();
-  assert.match(await page.locator('#album-count').textContent(), /6\s*\/\s*6/);
+  assert.match(await page.locator('#album-count').textContent(), /6\s*\/\s*12/, 'os seis primeiros amigos ocupam metade da coleção');
   assert.equal(await page.locator('#album-screen button[data-pet]:disabled').count(), 0);
   assert.equal(await page.locator('#album-screen [data-pet="pipo"]').getAttribute('aria-pressed'), 'true');
   await page.getByRole('button', { name: 'Brincar com Zazu', exact: true }).click();
@@ -209,7 +219,7 @@ async function verifyFestivals(page) {
 async function verifyMobile(page, width, saved) {
   await open(page, saved);
   await page.getByRole('button', { name: 'Abrir álbum de dinos', exact: true }).tap();
-  assert.match(await page.locator('#album-count').textContent(), /6\s*\/\s*6/);
+  assert.match(await page.locator('#album-count').textContent(), /6\s*\/\s*12/);
   for (const button of await page.locator('#album-screen button').all()) {
     const rect = await button.boundingBox(), viewport = page.viewportSize();
     assert.ok(rect && rect.x >= -1 && rect.y >= -1 && rect.x + rect.width <= viewport.width + 1 && rect.y + rect.height <= viewport.height + 1, `a escolha ${await button.textContent()} cabe no álbum de ${width}px`);
@@ -237,7 +247,7 @@ async function verifyBlockedStorage(page) {
   await page.getByRole('button', { name: 'Pausar aventura', exact: true }).click();
   await page.getByRole('button', { name: 'Voltar ao início', exact: true }).click();
   await page.getByRole('button', { name: 'Abrir álbum de dinos', exact: true }).click();
-  assert.match(await page.locator('#album-count').textContent(), /1\s*\/\s*6/, 'sem armazenamento a família ainda funciona na sessão');
+  assert.match(await page.locator('#album-count').textContent(), /1\s*\/\s*12/, 'sem armazenamento a família ainda funciona na sessão');
   assert.equal(await page.locator('#album-screen [data-pet="pipo"]').getAttribute('aria-pressed'), 'true');
   assert.deepEqual(errors, [], 'armazenamento bloqueado não interrompe a brincadeira');
 }
@@ -353,6 +363,6 @@ async function verifyModalKeyboard(browser) {
     await hatch(mobileHatch, 'Pipo', true); await hatchContext.close();
     const blockedContext = await browser.newContext(); const blocked = await blockedContext.newPage();
     await verifyBlockedStorage(blocked); await blockedContext.close();
-    console.log('PASS aventuras: ovos por missões, seis dinos, companheiros, persistência, festas seguras, pausas e dois celulares.');
+    console.log('PASS aventuras: ovos por missões, seis amigos da primeira página de doze, companheiros, persistência, festas seguras, pausas e dois celulares.');
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

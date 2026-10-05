@@ -174,7 +174,7 @@ test('primeiro pedido de ajuda chega aos doze segundos e usa o mundo atual e ami
   advance(s,.1); assert.equal(s.rescue.variant,'bubble'); assert.equal(s.rescue.petId,'pipo');
   const start = s.events.find(e => e.type === 'rescue-start'); assert.equal(start.variant,'bubble'); assert.equal(start.petId,'pipo');
   Engine.roar(s); assert.equal(s.rescue,null); assert.equal(s.rescueCount,1);
-  for (const [time,variant,petId,count] of [[41,'castle','lili',2],[81,'balloon','tico',3],[121,'bubble','bubi',4],[161,'castle','nino',5],[201,'balloon','zazu',6],[241,'bubble','pipo',7]]) {
+  for (const [time,variant,petId,count] of [[41,'castle','lili',2],[81,'balloon','tico',3],[121,'bubble','bubi',4],[161,'castle','nino',5],[201,'balloon','zazu',6],[241,'bubble','fifi',7]]) {
     const r = startRescue(s,time); assert.equal(r.variant,variant); assert.equal(r.petId,petId); assert.equal(s.rescueCount,count);
     s.roarCooldown=0; Engine.roar(s);
   }

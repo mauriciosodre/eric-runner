@@ -55,7 +55,7 @@ async function quiet(page, { rescue = false, companion = false } = {}) {
   await page.evaluate(({ rescue, companion }) => {
     const s = __journeyState;
     s.items = []; s.mobs = []; s.obstacles = [];
-    s.spawnIn = s.mobIn = s.obstacleIn = s.festivalIn = Infinity;
+    s.spawnIn = s.mobIn = s.obstacleIn = s.festivalIn = s.letterIn = Infinity;
     s.festival = 0; s.shield = s.hurt = 0;
     if (!rescue) { s.rescue = null; s.rescueIn = Infinity; }
     if (!companion) s.companionCooldown = Infinity;
