@@ -45,6 +45,18 @@ async function separateWordHUD(page) {
     assert.equal(overlap,false,`a palavra não cobre ${selector}`);
   }
 }
+async function paintedCone(page) {
+  return page.evaluate(()=>{
+    const c=document.getElementById('game'),r=c.getBoundingClientRect(),s=__state,pixels=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+    const x=Math.round(s.obstacles[0].x*c.width/s.width),range=Math.ceil(c.width/c.clientWidth*8);
+    let top=c.height,bottom=-1;
+    for(let y=0;y<c.height;y++)for(let col=Math.max(0,x-range);col<Math.min(c.width,x+range);col++) {
+      const i=(y*c.width+col)*4;
+      if(Math.abs(pixels[i]-244)<7 && Math.abs(pixels[i+1]-138)<7 && Math.abs(pixels[i+2]-59)<7){top=Math.min(top,y);bottom=y;}
+    }
+    return bottom<0?null:{x:r.x+(x-range)*r.width/c.width,y:r.y+top*r.height/c.height,width:2*range*r.width/c.width,height:(bottom-top+1)*r.height/c.height};
+  });
+}
 async function hazards(page, mobile) {
   await page.locator('#start').click();await quiet(page);
   await page.evaluate(()=>{
@@ -58,16 +70,7 @@ async function hazards(page, mobile) {
   if(mobile) {
     const letters=await page.locator('#word-panel').boundingBox(),mission=await page.locator('#mission').boundingBox();
     assert.ok(letters.y>=mission.y+mission.height+4,'a palavra tem espaço próprio abaixo da missão');
-    const paintedBottom=await page.evaluate(()=>{
-      const c=document.getElementById('game'),s=__state,pixels=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
-      const x=Math.round(s.obstacles[0].x*c.width/s.width),range=Math.ceil(c.width/c.clientWidth*8);
-      let bottom=-1;
-      for(let y=0;y<c.height;y++)for(let col=Math.max(0,x-range);col<Math.min(c.width,x+range);col++) {
-        const i=(y*c.width+col)*4;
-        if(Math.abs(pixels[i]-244)<7 && Math.abs(pixels[i+1]-138)<7 && Math.abs(pixels[i+2]-59)<7)bottom=y;
-      }
-      return bottom<0?null:c.getBoundingClientRect().top+bottom*c.clientHeight/c.height;
-    });
+    const body=await paintedCone(page),paintedBottom=body && body.y+body.height;
     const buttonTop=Math.min((await page.locator('#jump').boundingBox()).y,(await page.locator('#roar').boundingBox()).y);
     assert.ok(paintedBottom!==null && paintedBottom<buttonTop-8,'o corpo do obstáculo fica inteiro acima dos botões de toque');
     assert.ok((await page.locator('#jump-cue').boundingBox()).y>paintedBottom+8,'o aviso do botão também fica abaixo da pista');
@@ -117,9 +120,18 @@ async function words(page) {
   assert.equal(await page.evaluate(()=>__state.stars),1,'a palavra completa dá exatamente uma estrela');
   await page.locator('#word-celebration').waitFor({state:'visible'});
   assert.match(await page.locator('#word-celebration').textContent(),/DINO/);
-  await fits(page,'#word-panel');await fits(page,'#word-celebration');
+  await page.evaluate(()=>{__state.obstacles=[{kind:'cone',width:60,height:60,x:__state.width/2,hit:false}];__advance(.01);});
+  await page.screenshot({path:path.join(output,`word-obstacle-${page.viewportSize().width}.png`),fullPage:true});
+  const body=await paintedCone(page),banner=await page.locator('#word-celebration').boundingBox();
+  assert.ok(body,'o cone foi desenhado durante a comemoração');
+  const overlap=banner.x<body.x+body.width && banner.x+banner.width>body.x && banner.y<body.y+body.height && banner.y+banner.height>body.y;
+  assert.equal(overlap,false,'a comemoração da palavra deixa o cone inteiro visível');
+  await fits(page,'#word-celebration');
+  if(await page.evaluate(()=>matchMedia('(pointer:fine) and (max-width:800px)').matches)) assert.equal(await page.locator('#word-panel').isVisible(),false,'na janela estreita, a comemoração usa a faixa da palavra');
+  else await fits(page,'#word-panel');
   await page.screenshot({path:path.join(output,`word-complete-${page.viewportSize().width}.png`),fullPage:true});
-  await page.evaluate(()=>{__state.wordIndex=4;__state.wordProgress=0;__advance(.01);});
+  await quiet(page);await page.evaluate(()=>{__state.wordIndex=4;__state.wordProgress=0;__advance(3.1);});
+  await page.locator('#word-panel').waitFor({state:'visible'});
   await page.waitForFunction(()=>document.getElementById('word-panel').dataset.nextLetter==='A');
   await separateWordHUD(page);await fits(page,'#word-panel');
   if(page.viewportSize().height<290) assert.ok((await page.locator('#word-panel').boundingBox()).x+(await page.locator('#word-panel').boundingBox()).width<(await page.locator('#roar').boundingBox()).x,'AMIGO cabe ao lado dos controles na tela baixa');

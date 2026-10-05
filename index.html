@@ -400,7 +400,7 @@
     /* Em janelas estreitas, as letras ganham uma linha abaixo dos demais avisos. */
     @media(pointer:fine) and (max-width:800px) {
       .word-panel { top:160px; }
-      .festival-banner,.journey-banner,.rescue-banner { top:226px; }
+      .festival-banner,.journey-banner,.rescue-banner { top:160px; }
     }
     /* Quando as barras do navegador deixam pouca altura, usamos o canto livre
        ao lado dos controles. A pista e os brinquedos continuam inteiros à vista. */
@@ -1369,6 +1369,7 @@
     $('highscore').textContent=bestScore;
     const portraitPhone=window.matchMedia('(pointer:coarse) and (orientation:portrait)');
     const touchDevice=window.matchMedia('(pointer:coarse)');
+    const compactWordHUD=window.matchMedia('(pointer:fine) and (max-width:800px)');
     const H=540;
     let ground=436;
     let W=1120,dpr=1,last=0,ambient=0,particles=[],bubbles=[],animals=[],animalIn=4,dustIn=0,missionSignature='',bubbleSafeY=190;
@@ -2355,6 +2356,8 @@
       if(!$('word-celebration').hidden)$('journey-banner').hidden=true;
       $('festival-banner').hidden=state.festival<=0 || !!rescue || !playing;
       if(!$('word-celebration').hidden)$('festival-banner').hidden=true;
+      // Na janela estreita, um aviso por vez ocupa a faixa segura acima da pista.
+      if(compactWordHUD.matches && (!$('word-celebration').hidden || !$('journey-banner').hidden || !$('festival-banner').hidden))$('word-panel').hidden=true;
       $('festival-banner').textContent=state.festivalKind==='volcano'?'🎉 FESTA DO VULCÃO!':'⚽ CHUVA DE BOLAS!';
       $('boost-status').hidden=state.boost<=0; $('shield-status').hidden=state.shield<=0;
       $('boost-time').textContent=Math.ceil(state.boost)+'s'; $('shield-time').textContent=Math.ceil(state.shield)+'s';
